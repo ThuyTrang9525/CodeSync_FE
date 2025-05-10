@@ -4,15 +4,14 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminUser from './pages/Admin/AdminUser';
 import AdminClass from './pages/Admin/AdminClass';
 import AdminNotification from './pages/Admin/AdminNotification';
-import StudentGoal from './pages/student/StudentGoal';
-import StudentManagementStudy from './pages/student/StudentManagementStudy';
-import ClassesGrid from './pages/teacher/homepage';
-import NotificationsTable from './pages/teacher/notification';
-import StudentTable from './pages/teacher/StudentList';
-import Homepage from "./pages/student/Homepage";
-import Profile from "./pages/student/profile";
+import StudentGoal from './pages/Student/StudentGoal';
+import StudentManagementStudy from './pages/Student/StudentManagementStudy';
+import ClassesGrid from './pages/Teacher/TeacherHomepage';
+import NotificationsTable from './pages/Teacher/TeacherNotification';
+import StudentTable from './pages/Teacher/TeacherListStudent';
+import Homepage from "./pages/Student/StudentHomepage";
+import Profile from "./pages/Student/StudentProfile";
 import Login from './pages/Login/Login';
-
 
 
 const routes = [

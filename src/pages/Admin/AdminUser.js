@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import Header from '../../components/Admin/HeaderAdmin';
-import Nav from '../../components/Admin/NavAdmin';
-import Button from '../../components/Admin/ButtonAddProps';
-import RoleFilter from '../../components/Admin/RoleFilter';
-import SearchForm from '../../components/Admin/SearchAdmin';
-import TitleTable from '../../components/Admin/TitleTable';
-import TableData from '../../components/Admin/TableDataUser';
-import Pagination from '../../components/Admin/Pagination';
+import Header from '../../components/Admin/AdminHeader';
+import Nav from '../../components/Admin/AdminNav';
+import Button from '../../components/Admin/AdminButtonAddProps';
+import RoleFilter from '../../components/Admin/AdminRoleFilter';
+import SearchForm from '../../components/Admin/AdminSearch';
+import TitleTable from '../../components/Admin/AdminTitleTable';
+import TableData from '../../components/Admin/AdminTableDataUser';
+import Pagination from '../../components/Admin/AdminPagination';
 export default class AdminUser extends Component {
   render() {
     return (

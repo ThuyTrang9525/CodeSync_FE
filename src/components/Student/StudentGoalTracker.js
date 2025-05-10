@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 
-import GoalList from "./goal-list"
-import CreateGoalForm from "./create-goal-form"
-import GoalStats from "./goal-stats"
+import GoalList from "./StudentGoalList"
+import CreateGoalForm from "./StudentCreateFormGoal"
+import GoalStats from "./StudentGoalStats"
 import { GoalStatus } from "../../types/goal"
 
 export default function GoalTracker() {

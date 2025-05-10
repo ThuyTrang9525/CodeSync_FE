@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { GoalStatus } from "../../types/goal"
-import GoalItem from "./goal-item"
+import GoalItem from "./StudentGoalItem"
 
 export default function GoalList({ goals, updateGoalStatus, deleteGoal, editGoal }) {
   const [activeTab, setActiveTab] = useState("all")

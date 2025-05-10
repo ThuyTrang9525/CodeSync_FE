@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
-import Header from '../../components/Admin/HeaderAdmin';
-import Nav from '../../components/Admin/NavAdmin';
-import Notification from '../../components/Admin/Notification'; 
-import Pagination from '../../components/Admin/Pagination';
+import Header from '../../components/Admin/AdminHeader';
+import Nav from '../../components/Admin/AdminNav';
+import Notification from '../../components/Admin/AdminNotification'; 
+import Pagination from '../../components/Admin/AdminPagination';
 export default class AdminNotification extends Component {
   render() {
     return (

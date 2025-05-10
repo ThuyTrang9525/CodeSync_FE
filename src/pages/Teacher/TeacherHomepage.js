@@ -1,6 +1,6 @@
 "use client"
 
-import Navigation from '../../components/Teacher/Navigation';
+import Navigation from '../../components/Teacher/TeacherNavigation';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { useEffect } from "react"
 import Header from "../../components/header"

@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 import { Menu } from "lucide-react"
-import SkillsTable from "./skills-table"
-import StudyPlanTable from "./study-plan-table"
-import SelfStudyTable from "./self-study-table"
+import SkillsTable from "./StudentSkillsTable"
+import StudyPlanTable from "./StudentStudyPlanTable"
+import SelfStudyTable from "./StudentSeftStudyTable"
 
 export default function StudyPlanManagement() {
   const [menuOpen, setMenuOpen] = useState(false)
