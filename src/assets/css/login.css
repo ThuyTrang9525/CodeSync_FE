@@ -241,7 +241,7 @@
   }
 
   .form-input {
-    width: 100%;
+    width: 188%;
     height: 3.5rem;
     padding: 0 3rem 0 1.25rem;
     border-radius: var(--border-radius-xl);
@@ -250,6 +250,7 @@
     transition: all 0.2s ease;
     font-size: 1rem;
   }
+
 
   .input-wrapper:hover .form-input {
     background-color: var(--white);
