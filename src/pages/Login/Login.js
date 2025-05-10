@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import '../../assets/css/login.css';
+import '../../assets/css/Login.css';
 import axios from "axios";
 
 function LoginPage() {
