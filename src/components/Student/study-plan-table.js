@@ -138,8 +138,8 @@ export default function StudyPlanTable() {
     }
   
     return (
-      <div className="container">
-        <table className="table-box">
+
+      <table className="full-width-table">
           <thead>
             <tr>
               <th>Date</th>
@@ -350,7 +350,7 @@ export default function StudyPlanTable() {
             </tr>
           </tbody>
         </table>
-      </div>
+      
     )
   }
   

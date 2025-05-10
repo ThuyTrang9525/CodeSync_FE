@@ -118,7 +118,7 @@ export default function SelfStudyTable() {
   
     return (
       <div className="">
-        <table className="table-box">
+       <table className="full-width-table">
           <thead>
             <tr>
               <th>Date</th>

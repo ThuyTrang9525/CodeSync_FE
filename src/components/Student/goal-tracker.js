@@ -96,8 +96,6 @@ export default function GoalTracker() {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      
-      <div className="container py-4 flex-grow-1">
         <div className="row mb-4">
           <div className="col-12">
             <GoalStats
@@ -117,7 +115,7 @@ export default function GoalTracker() {
             <CreateGoalForm addGoal={addGoal} />
           </div>
         </div>
-      </div>
+      
       
     </div>
   )

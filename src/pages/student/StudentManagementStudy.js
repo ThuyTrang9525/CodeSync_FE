@@ -2,10 +2,16 @@ import StudyPlanManagement from "../../components/Student/study-plan-management"
 import "../../assets/css/student-management-study.css";
 import Header from "../../components/header"
 import Footer from "../../components/footer"
+import Navbar from "../../components/Student/nav-bar";
 export default function StudentManagementStudy() {
   return (
-    <main className="container mx-auto p-4">
+    <div>
+       <Header />
+      <Navbar />
        <StudyPlanManagement />
-    </main>
+        <Footer />
+    </div>
+       
+
   )
 }
