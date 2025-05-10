@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import EditProfileModal from '../../components/Student/editProfileModal';
-import UploadProfileModal from '../../components/Student/uploadAchivementModal';
-import '../../assets/css/profileStudent.css';
-import "../../assets/css/editProfile.css";
-import "../../assets/css/uploadAchivement.css";
+import EditProfileModal from '../../components/Student/StudentEditProfileModal';
+import UploadProfileModal from '../../components/Student/StudentUploadAchievementsModal';
+import '../../assets/css/StudentProfile.css';
+import "../../assets/css/StudentEditProfile.css";
+import "../../assets/css/StudentUploadAchivement.css";
 export default function Profile() {
     const [editModalOpen, setEditModalOpen] = useState(false)
     const [uploadModalOpen, setUploadModalOpen] = useState(false)

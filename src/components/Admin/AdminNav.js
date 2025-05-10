@@ -17,11 +17,11 @@ export default function NavAdmin() {
         <li className={`nav-item ${isActive('/admin-user') ? 'active' : ''}`}>
           <Link to="/admin-user" className="nav-link">User</Link>
         </li>
-        <li className={`nav-item ${isActive('/admin/class') ? 'active' : ''}`}>
-          <Link to="/admin/class" className="nav-link">Class</Link>
+        <li className={`nav-item ${isActive('/admin-class') ? 'active' : ''}`}>
+          <Link to="/admin-class" className="nav-link">Class</Link>
         </li>
-        <li className={`nav-item ${isActive('/admin/notification') ? 'active' : ''}`}>
-          <Link to="/admin/notification" className="nav-link">Notification</Link>
+        <li className={`nav-item ${isActive('/admin-notification') ? 'active' : ''}`}>
+          <Link to="/admin-notification" className="nav-link">Notification</Link>
         </li>
         <li className={`nav-item ${isActive('/admin/report') ? 'active' : ''}`}>
           <Link to="/admin/report" className="nav-link">Report</Link>

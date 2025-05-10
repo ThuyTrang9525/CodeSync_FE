@@ -3,83 +3,62 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 
-// Thay thế button bằng thẻ <button> nếu không có component button
-export default function StudyPlanTable() {
-    const [studyPlanData, setStudyPlanData] = useState([
+export default function SelfStudyTable() {
+    const [selfStudyData, setSelfStudyData] = useState([
       {
         id: 1,
         date: "3 Mar",
         skill: "TOEIC",
         lesson: "Listening: When, Where, Why, How\nGrammar: Tenses",
-        selfAssessment: "2",
-        difficulty: "Confused in recognizing verb tenses quickly.",
-        plan: "Do more tense exercises and review grammar rules.",
-        problemSolved: "Yes",
+        timeAllocation: "9:00-10:00pm",
+        learningResources: "Website link",
+        learningActivity: "Read & write key attributes, memorize",
+        evaluation: "Practice more with linking words",
       },
       {
         id: 2,
         date: "3 Mar",
         skill: "TOEIC",
         lesson: "Listening: When, Where, Why, How\nGrammar: Tenses",
-        selfAssessment: "2",
-        difficulty: "Confused in recognizing verb tenses quickly.",
-        plan: "Do more tense exercises and review grammar rules.",
-        problemSolved: "Yes",
+        timeAllocation: "9:00-10:00pm",
+        learningResources: "Website link",
+        learningActivity: "Read & write key attributes, memorize",
+        evaluation: "Practice more with linking words",
       },
       {
         id: 3,
         date: "3 Mar",
         skill: "TOEIC",
         lesson: "Listening: When, Where, Why, How\nGrammar: Tenses",
-        selfAssessment: "2",
-        difficulty: "Confused in recognizing verb tenses quickly.",
-        plan: "Do more tense exercises and review grammar rules.",
-        problemSolved: "Yes",
+        timeAllocation: "9:00-10:00pm",
+        learningResources: "Website link",
+        learningActivity: "Read & write key attributes, memorize",
+        evaluation: "Practice more with linking words",
       },
       {
         id: 4,
         date: "3 Mar",
         skill: "TOEIC",
         lesson: "Listening: When, Where, Why, How\nGrammar: Tenses",
-        selfAssessment: "2",
-        difficulty: "Confused in recognizing verb tenses quickly.",
-        plan: "Do more tense exercises and review grammar rules.",
-        problemSolved: "Yes",
-      },
-      {
-        id: 5,
-        date: "3 Mar",
-        skill: "TOEIC",
-        lesson: "Listening: When, Where, Why, How\nGrammar: Tenses",
-        selfAssessment: "2",
-        difficulty: "Confused in recognizing verb tenses quickly.",
-        plan: "Do more tense exercises and review grammar rules.",
-        problemSolved: "Yes",
-      },
-      {
-        id: 6,
-        date: "3 Mar",
-        skill: "TOEIC",
-        lesson: "Listening: When, Where, Why, How\nGrammar: Tenses",
-        selfAssessment: "2",
-        difficulty: "Confused in recognizing verb tenses quickly.",
-        plan: "Do more tense exercises and review grammar rules.",
-        problemSolved: "Yes",
+        timeAllocation: "9:00-10:00pm",
+        learningResources: "Website link",
+        learningActivity: "Read & write key attributes, memorize",
+        evaluation: "Practice more with linking words",
       },
     ])
   
     const [editingCell, setEditingCell] = useState({ id: null, field: null })
     const [editValue, setEditValue] = useState("")
   
-    // New state for adding a new study plan entry
+    // New state for adding a new self-study entry
     const [newEntry, setNewEntry] = useState({
       date: "",
       skill: "",
       lesson: "",
-      selfAssessment: "",
-      difficulty: "",
-      plan: "",
-      problemSolved: "No",
+      timeAllocation: "",
+      learningResources: "",
+      learningActivity: "",
+      evaluation: "",
     })
   
     const handleEdit = (id, field, value) => {
@@ -88,8 +67,8 @@ export default function StudyPlanTable() {
     }
   
     const handleSave = (id, field) => {
-      setStudyPlanData(
-        studyPlanData.map((item) => {
+      setSelfStudyData(
+        selfStudyData.map((item) => {
           if (item.id === id) {
             return {
               ...item,
@@ -115,10 +94,10 @@ export default function StudyPlanTable() {
       // Validate required fields
       if (!newEntry.date || !newEntry.skill) return
   
-      const newId = studyPlanData.length > 0 ? Math.max(...studyPlanData.map((item) => item.id)) + 1 : 1
+      const newId = selfStudyData.length > 0 ? Math.max(...selfStudyData.map((item) => item.id)) + 1 : 1
   
-      setStudyPlanData([
-        ...studyPlanData,
+      setSelfStudyData([
+        ...selfStudyData,
         {
           id: newId,
           ...newEntry,
@@ -130,29 +109,29 @@ export default function StudyPlanTable() {
         date: "",
         skill: "",
         lesson: "",
-        selfAssessment: "",
-        difficulty: "",
-        plan: "",
-        problemSolved: "No",
+        timeAllocation: "",
+        learningResources: "",
+        learningActivity: "",
+        evaluation: "",
       })
     }
   
     return (
-      <div className="container">
-        <table className="table-box">
+      <div className="">
+       <table className="full-width-table">
           <thead>
             <tr>
               <th>Date</th>
               <th>Skill/ Module</th>
               <th>My Lesson</th>
-              <th>Self - assessment (1-3)</th>
-              <th>My difficult</th>
-              <th>My plan</th>
-              <th>Problem solved</th>
+              <th>Time allocation</th>
+              <th>Learning resources</th>
+              <th>Learning activity</th>
+              <th>Evaluation of work</th>
             </tr>
           </thead>
           <tbody>
-            {studyPlanData.map((item) => (
+            {selfStudyData.map((item) => (
               <tr key={item.id}>
                 <td
                   className={editingCell.id === item.id && editingCell.field === "date" ? "" : "editable-cell"}
@@ -206,74 +185,75 @@ export default function StudyPlanTable() {
                   )}
                 </td>
                 <td
-                  className={editingCell.id === item.id && editingCell.field === "selfAssessment" ? "" : "editable-cell"}
-                  onClick={() => handleEdit(item.id, "selfAssessment", item.selfAssessment)}
+                  className={editingCell.id === item.id && editingCell.field === "timeAllocation" ? "" : "editable-cell"}
+                  onClick={() => handleEdit(item.id, "timeAllocation", item.timeAllocation)}
                 >
-                  {editingCell.id === item.id && editingCell.field === "selfAssessment" ? (
+                  {editingCell.id === item.id && editingCell.field === "timeAllocation" ? (
                     <input
                       className="editable-input"
                       value={editValue}
                       onChange={(e) => setEditValue(e.target.value)}
-                      onBlur={() => handleSave(item.id, "selfAssessment")}
-                      onKeyDown={(e) => e.key === "Enter" && handleSave(item.id, "selfAssessment")}
+                      onBlur={() => handleSave(item.id, "timeAllocation")}
+                      onKeyDown={(e) => e.key === "Enter" && handleSave(item.id, "timeAllocation")}
                       autoFocus
                     />
                   ) : (
-                    item.selfAssessment
+                    item.timeAllocation
                   )}
                 </td>
                 <td
-                  className={editingCell.id === item.id && editingCell.field === "difficulty" ? "" : "editable-cell"}
-                  onClick={() => handleEdit(item.id, "difficulty", item.difficulty)}
+                  className={
+                    editingCell.id === item.id && editingCell.field === "learningResources" ? "" : "editable-cell"
+                  }
+                  onClick={() => handleEdit(item.id, "learningResources", item.learningResources)}
                 >
-                  {editingCell.id === item.id && editingCell.field === "difficulty" ? (
+                  {editingCell.id === item.id && editingCell.field === "learningResources" ? (
+                    <input
+                      className="editable-input"
+                      value={editValue}
+                      onChange={(e) => setEditValue(e.target.value)}
+                      onBlur={() => handleSave(item.id, "learningResources")}
+                      onKeyDown={(e) => e.key === "Enter" && handleSave(item.id, "learningResources")}
+                      autoFocus
+                    />
+                  ) : (
+                    item.learningResources
+                  )}
+                </td>
+                <td
+                  className={
+                    editingCell.id === item.id && editingCell.field === "learningActivity" ? "" : "editable-cell"
+                  }
+                  onClick={() => handleEdit(item.id, "learningActivity", item.learningActivity)}
+                >
+                  {editingCell.id === item.id && editingCell.field === "learningActivity" ? (
                     <textarea
                       className="editable-input"
                       value={editValue}
                       onChange={(e) => setEditValue(e.target.value)}
-                      onBlur={() => handleSave(item.id, "difficulty")}
+                      onBlur={() => handleSave(item.id, "learningActivity")}
                       rows={3}
                       autoFocus
                     />
                   ) : (
-                    item.difficulty
+                    item.learningActivity
                   )}
                 </td>
                 <td
-                  className={editingCell.id === item.id && editingCell.field === "plan" ? "" : "editable-cell"}
-                  onClick={() => handleEdit(item.id, "plan", item.plan)}
+                  className={editingCell.id === item.id && editingCell.field === "evaluation" ? "" : "editable-cell"}
+                  onClick={() => handleEdit(item.id, "evaluation", item.evaluation)}
                 >
-                  {editingCell.id === item.id && editingCell.field === "plan" ? (
+                  {editingCell.id === item.id && editingCell.field === "evaluation" ? (
                     <textarea
                       className="editable-input"
                       value={editValue}
                       onChange={(e) => setEditValue(e.target.value)}
-                      onBlur={() => handleSave(item.id, "plan")}
+                      onBlur={() => handleSave(item.id, "evaluation")}
                       rows={3}
                       autoFocus
                     />
                   ) : (
-                    item.plan
-                  )}
-                </td>
-                <td
-                  className={editingCell.id === item.id && editingCell.field === "problemSolved" ? "" : "editable-cell"}
-                  onClick={() => handleEdit(item.id, "problemSolved", item.problemSolved)}
-                >
-                  {editingCell.id === item.id && editingCell.field === "problemSolved" ? (
-                    <select
-                      className="editable-input"
-                      value={editValue}
-                      onChange={(e) => setEditValue(e.target.value)}
-                      onBlur={() => handleSave(item.id, "problemSolved")}
-                      autoFocus
-                    >
-                      <option value="Yes">Yes</option>
-                      <option value="No">No</option>
-                      <option value="Partially">Partially</option>
-                    </select>
-                  ) : (
-                    item.problemSolved
+                    item.evaluation
                   )}
                 </td>
               </tr>
@@ -308,40 +288,37 @@ export default function StudyPlanTable() {
               <td>
                 <input
                   className="w-full p-2 border border-[#009688] rounded"
-                  placeholder="1-3"
-                  value={newEntry.selfAssessment}
-                  onChange={(e) => handleNewEntryChange("selfAssessment", e.target.value)}
+                  placeholder="Time allocation"
+                  value={newEntry.timeAllocation}
+                  onChange={(e) => handleNewEntryChange("timeAllocation", e.target.value)}
+                />
+              </td>
+              <td>
+                <input
+                  className="w-full p-2 border border-[#009688] rounded"
+                  placeholder="Learning resources"
+                  value={newEntry.learningResources}
+                  onChange={(e) => handleNewEntryChange("learningResources", e.target.value)}
                 />
               </td>
               <td>
                 <textarea
                   className="w-full p-2 border border-[#009688] rounded"
-                  placeholder="Difficulty"
+                  placeholder="Learning activity"
                   rows={2}
-                  value={newEntry.difficulty}
-                  onChange={(e) => handleNewEntryChange("difficulty", e.target.value)}
+                  value={newEntry.learningActivity}
+                  onChange={(e) => handleNewEntryChange("learningActivity", e.target.value)}
                 />
               </td>
               <td>
-                <textarea
-                  className="w-full p-2 border border-[#009688] rounded"
-                  placeholder="Plan"
-                  rows={2}
-                  value={newEntry.plan}
-                  onChange={(e) => handleNewEntryChange("plan", e.target.value)}
-                />
-              </td>
-              <td>
-                <div className=" flex-col space-y-2">
-                  <select
+                <div className="flex flex-col space-y-2">
+                  <textarea
                     className="w-full p-2 border border-[#009688] rounded"
-                    value={newEntry.problemSolved}
-                    onChange={(e) => handleNewEntryChange("problemSolved", e.target.value)}
-                  >
-                    <option value="Yes">Yes</option>
-                    <option value="No">No</option>
-                    <option value="Partially">Partially</option>
-                  </select>
+                    placeholder="Evaluation"
+                    rows={2}
+                    value={newEntry.evaluation}
+                    onChange={(e) => handleNewEntryChange("evaluation", e.target.value)}
+                  />
                   <button className="w-full bg-[#009688] hover:bg-[#00796b]" size="sm" onClick={handleAddEntry}>
                     <Plus className="h-4 w-4 mr-1" /> Add
                   </button>

@@ -38,13 +38,7 @@
   main {
     flex: 1;
   }
-  
-  .container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-  }
+
   
   /* Typography */
   h1,
@@ -305,11 +299,7 @@
     overflow: hidden;
   }
   
-  .card-header {
-    padding: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    background-color: var(--card-color);
-  }
+ 
   
   .card-body {
     padding: 1rem;
@@ -680,12 +670,7 @@
     z-index: 1020;
   }
   
-  /* Custom components */
-  .header {
-    background-color: white;
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: var(--shadow);
-  }
+
   
   .avatar {
     width: 36px;
@@ -829,18 +814,15 @@
   /* Add these new styles to the end of your CSS file */
   
   /* Form improvements */
-  .create-goal-card {
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 150, 136, 0.1);
-    transition: all 0.3s ease;
-  }
-  
+
   .create-goal-card:hover {
     box-shadow: 0 8px 24px rgba(0, 150, 136, 0.15);
   }
   
-  .create-goal-card .card-header {
-    background-color: var(--primary-color);
+  .create-goal-card  {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 150, 136, 0.1);
+    transition: all 0.3s ease;
     color: white;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;

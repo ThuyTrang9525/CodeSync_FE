@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import Header from '../../components/Admin/HeaderAdmin';
-import Nav from '../../components/Admin/NavAdmin';
-import TopProgressChart from '../../components/Admin/TopProgressChart';
-import '../../assets/css/admin.css';
+import Header from '../../components/Admin/AdminHeader';
+import Nav from '../../components/Admin/AdminNav';
+import TopProgressChart from '../../components/Admin/AdminTopProgressChart';
+import '../../assets/css/Admin.css';
 import axios from 'axios';
 
 export default class AdminDashboard extends Component {
@@ -31,7 +31,6 @@ export default class AdminDashboard extends Component {
       <div className="container">
         <Header />
         <Nav />
-
         <div className="stats-grid">
           <div className="stat-card">
             <h3 className="stat-title">Total Teachers</h3>

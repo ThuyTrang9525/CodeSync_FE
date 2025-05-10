@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Navigation from '../../components/Teacher/Navigation';
+import Navigation from '../../components/Teacher/TeacherNavigation';
 import Header from "../../components/header"
 import Footer from "../../components/footer"
 

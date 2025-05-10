@@ -2,9 +2,9 @@
 
 import { useState } from "react"
 
-import GoalList from "./goal-list"
-import CreateGoalForm from "./create-goal-form"
-import GoalStats from "./goal-stats"
+import GoalList from "./StudentGoalList"
+import CreateGoalForm from "./StudentCreateFormGoal"
+import GoalStats from "./StudentGoalStats"
 import { GoalStatus } from "../../types/goal"
 
 export default function GoalTracker() {
@@ -96,8 +96,6 @@ export default function GoalTracker() {
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      
-      <div className="container py-4 flex-grow-1">
         <div className="row mb-4">
           <div className="col-12">
             <GoalStats
@@ -117,7 +115,7 @@ export default function GoalTracker() {
             <CreateGoalForm addGoal={addGoal} />
           </div>
         </div>
-      </div>
+      
       
     </div>
   )
