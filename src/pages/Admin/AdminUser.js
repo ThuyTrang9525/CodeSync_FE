@@ -31,7 +31,7 @@ export default class AdminUser extends Component {
             
             <TableData />
 
-<Pagination />
+            <Pagination />
             
         </div>
       )

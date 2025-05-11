@@ -51,6 +51,8 @@ export default class AdminDashboard extends Component {
         </div>
 
         <TopProgressChart />
+
+        
       </div>
     );
   }
