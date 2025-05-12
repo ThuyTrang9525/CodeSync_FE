@@ -5,7 +5,7 @@ import Footer from "../../components/footer"
 import Navbar from "../../components/Student/StudentNavBar";
 export default function StudentManagementStudy() {
   return (
-    <div>
+    <div >
        <Header />
       <Navbar />
        <StudyPlanManagement />

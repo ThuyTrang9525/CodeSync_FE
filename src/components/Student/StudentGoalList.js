@@ -1,29 +1,47 @@
-"use client"
-
-import { useState } from "react"
-import { GoalStatus } from "../../types/goal"
-import GoalItem from "./StudentGoalItem"
+import { useState, useEffect } from "react";
+import axios from "axios";
+import GoalItem from "./StudentGoalItem";
 
 export default function GoalList({ goals, updateGoalStatus, deleteGoal, editGoal }) {
-  const [activeTab, setActiveTab] = useState("all")
+  const [activeTab, setActiveTab] = useState("all");
 
-  const semesterGoals = goals.filter((goal) => goal.semester === "Sem 2/2025")
-  const completedGoals = semesterGoals.filter((goal) => goal.status === GoalStatus.Completed)
-  const inProgressGoals = semesterGoals.filter((goal) => goal.status === GoalStatus.InProgress)
-  const notStartedGoals = semesterGoals.filter((goal) => goal.status === GoalStatus.NotStarted)
+  // Filter goals by status
+  const completedGoals = goals.filter((goal) => goal.status === "completed");
+  const inProgressGoals = goals.filter((goal) => goal.status === "in-progress");
+  const notStartedGoals = goals.filter((goal) => goal.status === "not-started");
 
   const getFilteredGoals = () => {
     switch (activeTab) {
       case "completed":
-        return completedGoals
+        return completedGoals;
       case "in-progress":
-        return inProgressGoals
+        return inProgressGoals;
       case "not-started":
-        return notStartedGoals
+        return notStartedGoals;
       default:
-        return semesterGoals
+        return goals;
     }
-  }
+  };
+
+  // Hàm cập nhật trạng thái goal
+  const handleChangeStatus = (goalId, newStatus) => {
+    if (!goalId) {
+      console.error('Goal ID is missing');
+      return;
+    }
+
+    // Gửi yêu cầu PUT đến API với goalId
+    axios.put(`http://localhost:8000/api/goals/${goalId}`, {
+      status: newStatus,
+    })
+    .then(response => {
+      console.log('Goal updated successfully:', response.data.data);
+      // Cập nhật UI nếu cần
+    })
+    .catch(error => {
+      console.error('Failed to update goal:', error);
+    });
+  };
 
   return (
     <div className="card">
@@ -68,9 +86,9 @@ export default function GoalList({ goals, updateGoalStatus, deleteGoal, editGoal
           {getFilteredGoals().length > 0 ? (
             getFilteredGoals().map((goal) => (
               <GoalItem
-                key={goal.id}
+                key={goal.goalID}  // Đảm bảo 'id' được sử dụng làm key duy nhất cho mỗi goal
                 goal={goal}
-                updateGoalStatus={updateGoalStatus}
+                updateGoalStatus={handleChangeStatus}  // Truyền đúng hàm handleChangeStatus
                 deleteGoal={deleteGoal}
                 editGoal={editGoal}
               />
@@ -83,5 +101,5 @@ export default function GoalList({ goals, updateGoalStatus, deleteGoal, editGoal
         </div>
       </div>
     </div>
-  )
+  );
 }
