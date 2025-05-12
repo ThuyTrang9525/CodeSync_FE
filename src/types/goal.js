@@ -1,10 +1,9 @@
 export const GoalStatus = {
-  NotStarted: "not_started",
-  InProgress: "in_progress",
   Completed: "completed",
+  InProgress: "in-progress",
+  NotStarted: "not-started",
 };
-
-export class Goal {
+export class Goal  {
   constructor(id, title, subject, semester, deadline, status, priority, details, category) {
     this.id = id;
     this.title = title;
@@ -17,3 +16,9 @@ export class Goal {
     this.category = category;
   }
 }
+export const GoalListProps = {
+  goals: [], // Mảng các mục tiêu
+  updateGoalStatus: function (id, status) {}, // Hàm cập nhật trạng thái
+  deleteGoal: function (id) {}, // Hàm xóa mục tiêu
+  editGoal: function (goal) {}, // Hàm chỉnh sửa mục tiêu
+};
