@@ -14,7 +14,7 @@ export default class AdminDashboard extends Component {
   };
 
   componentDidMount() {
-    axios.get('http://localhost:8000/api/dashboard')
+    axios.get('http://localhost:8000/api/stats')
       .then(response => {
         const { teachers, students, classes, visits } = response.data;
         this.setState({ teachers, students, classes, visits });

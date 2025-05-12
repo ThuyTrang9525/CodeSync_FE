@@ -19,11 +19,11 @@ export default class AdminClass extends Component {
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <TitleTable title="Class List" />
+        {/* <TitleTable title="Class List" />
             <Button
             icon={<i className="fas fa-plus"></i>}
             text="Add Class"
-            />  
+            />   */}
         </div> 
         <TableDataClass />
         <Pagination />

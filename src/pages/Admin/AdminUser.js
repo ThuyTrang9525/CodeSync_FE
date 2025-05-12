@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Header from '../../components/Admin/AdminHeader';
 import Nav from '../../components/Admin/AdminNav';
-import Button from '../../components/Admin/AdminButtonAddProps';
+import AdminButtonAddProps from '../../components/Admin/AdminButtonAddProps';
 import RoleFilter from '../../components/Admin/AdminRoleFilter';
 import SearchForm from '../../components/Admin/AdminSearch';
 import TitleTable from '../../components/Admin/AdminTitleTable';
@@ -15,22 +15,11 @@ export default class AdminUser extends Component {
 
             <Nav />
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
             <SearchForm onSearch={(query) => console.log(`Search query: ${query}`)} />
-            <RoleFilter onFilterChange={(role) => console.log(`Selected role: ${role}`)} />
-          </div>
 
-        
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <TitleTable title="User List" />
-              <Button
-                icon={<i className="fas fa-plus"></i>}
-                text="Add User"
-              />  
-            </div>       
+            <AdminButtonAddProps /> 
             
             <TableData />
-
             <Pagination />
             
         </div>

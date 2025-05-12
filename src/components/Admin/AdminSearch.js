@@ -98,6 +98,7 @@ const SearchForm = ({
 
 const styles = {
   form: {
+    marginTop: "20px",
     display: "flex",
     justifyContent: "center",
   },
