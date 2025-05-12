@@ -8,8 +8,10 @@ import Header from "../../components/header"
 import Footer from "../../components/footer"
 import Navbar from "../../components/Student/StudentNavBar"; 
 export default function StudentGoal() {
+  
   return (
-    <div>
+    <div className="container">
+      
       <Header />
       <Navbar />
       <GoalTracker />
