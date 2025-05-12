@@ -2,33 +2,55 @@
 import React, { useState } from "react";
 import '../../assets/css/Login.css';
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("STUDENT"); // Hoặc "teacher"
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      const response = await axios.post("http://localhost:8000/api/login", {
-        email,
-        password,
-        role
-      });
+    const response = await axios.post("http://localhost:8000/api/login", {
+      email,
+      password,
+      role,
+    });
 
-      console.log("Login success:", response.data);
+    const token = response.data.access_token;
+    const profile = response.data.profile;
+    const userRole = response.data.user.role;
 
-      // Lưu token vào localStorage (hoặc context, tùy dự án)
-      localStorage.setItem("token", response.data.access_token);
-    } catch (err) {
-      console.error(err);
-      setError("Login failed. Please check your credentials.");
+    localStorage.setItem("token", token);
+
+    // Điều hướng theo role
+    if (userRole === "TEACHER") {
+      navigate(`/teacher-home`);
+    } else if (userRole === "STUDENT") {
+      navigate(`/student-home`);
     }
-  };
+
+  } catch (err) {
+    console.error("Error during login:", err);
+
+    if (err.response) {
+      // Lỗi từ server (status code 4xx hoặc 5xx)
+      setError(err.response.data.message || "Login failed. Please try again.");
+    } else if (err.request) {
+      // Không nhận được phản hồi từ server
+      setError("No response from server. Please try again later.");
+    } else {
+      // Lỗi khác
+      setError("An unexpected error occurred. Please try again.");
+    }
+  }
+}
 
   return (
     <div className="login-container">

@@ -1,6 +1,9 @@
 import { Component } from "react"
 import { Link } from "react-router-dom"
 import { Home, Target, Edit, Menu, Settings, HelpCircle, LogOut } from "lucide-react"
+
+import Header from "../../components/header"
+import Footer from "../../components/footer"
 import Navbar from "../../components/Student/StudentNavBar"; 
 import "../../assets/css/StudentHomepage.css"
 
@@ -11,9 +14,9 @@ class Homepage extends Component {
             { title: "TOECT", teacher: "Doan Minh Hoang" },
             { title: "Communication", teacher: "Doan Minh Hoang" },
         ]
-
         return (
             <div>
+                <Header />
                 <Navbar />
                 <h2 className="welcome-text">Welcome hoang.doan26</h2>
 
@@ -34,6 +37,7 @@ class Homepage extends Component {
                         </div>
                     ))}
                 </div>
+                <Footer />
             </div>
         )
     }

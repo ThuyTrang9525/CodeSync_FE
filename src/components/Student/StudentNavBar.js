@@ -6,10 +6,12 @@ const Navbar = () => {
     return (
         <div className="navbar">
             <div className="nav-item active">
+            <Link to="/student-home" className="nav-link">
                 <div className="nav-icon">
                     <Home size={24} />
                 </div>
                 Class
+            </Link>
             </div>
             <div className="nav-item">
                 <Link to="/student-goal" className="nav-link">
