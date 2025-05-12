@@ -9,6 +9,9 @@ const UserTableWithEdit = () => {
   const [filteredRole, setFilteredRole] = useState("all");
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 5;
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -88,6 +91,24 @@ const UserTableWithEdit = () => {
     return user.role === filteredRole;
   });
 
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
@@ -107,17 +128,17 @@ const UserTableWithEdit = () => {
             <tr style={styles.tableHeader}>
               <th style={{width:'220px',padding:"12px",textAlign:'left'}}>Name</th>
               <th style={{width:'220px',padding:"12px",textAlign:'left'}}>Email</th>
-              <th style={{width:'50px',padding:"12px",textAlign:'left'}}>Role</th>
-              <th style={{width:'50px',padding:"12px",textAlign:'left'}}>Actions</th>
+              <th style={{width:'65px',padding:"12px",textAlign:'left'}}>Role</th>
+              <th style={{width:'35px',padding:"12px",textAlign:'left'}}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user) => (
+            {currentUsers.map((user) => (
               <tr key={user.userID} style={styles.tableRow}>
                 <td style={styles.tableCell}>{user.name}</td>
                 <td style={styles.tableCell}>{user.email}</td>
                 <td style={styles.tableCell}>{user.role}</td>
-                <td style={styles.tableCell}>
+                <td style={styles.tableCell1}>
                   <button onClick={() => handleEditClick(user)} style={styles.editButton}>
                     <i className="fa-solid fa-pen-to-square"></i>
                   </button>
@@ -129,6 +150,46 @@ const UserTableWithEdit = () => {
             ))}
           </tbody>
         </table>
+
+        <div style={styles.pagination}>
+          <button
+            onClick={handlePrevPage}
+            style={{
+              ...styles.pageButton,
+              backgroundColor: currentPage === 1 ? "#ffffff" : "#04756a",
+              color: currentPage === 1 ? "#aaa" : "#fff",
+            }}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </button>
+
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              onClick={() => handlePageChange(index + 1)}
+              style={{
+                ...styles.pageButton,
+                backgroundColor: currentPage === index + 1 ? "#04756a" : "#fff",
+                color: currentPage === index + 1 ? "#fff" : "#333",
+              }}
+            >
+              {index + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={handleNextPage}
+            style={{
+              ...styles.pageButton,
+              backgroundColor: currentPage === totalPages ? "#fff" : "#04756a",
+              color: currentPage === totalPages ? "#aaa" : "#fff",
+            }}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
 
       {showModal && (
@@ -198,16 +259,14 @@ const UserTableWithEdit = () => {
 
 // Styles
 const styles = {
-filterContainer: {
-  display: "flex",
-  justifyContent: "center",
-  margin: "20px 0"
-},
-header:{
+  container: {
+    padding: "20px",
+  },
+  header: {
     marginTop: "20px",
     display: "flex",
-    justifyContent: "space-between",              
-},
+    justifyContent: "space-between",
+  },
   title: {
     fontSize: "36px",
     fontWeight: "bold",
@@ -221,7 +280,11 @@ header:{
     marginBottom: "20px",
     borderRadius: "1px",
   },
-
+  filterContainer: {
+    display: "flex",
+    justifyContent: "center",
+    margin: "20px 0",
+  },
   tableContainer: {
     overflowX: "auto",
   },
@@ -233,15 +296,15 @@ header:{
     backgroundColor: "#3498db",
     color: "white",
   },
-  tableHeaderCell: {
-    padding: "12px",
-    textAlign: "left",
-  },
   tableRow: {
     borderBottom: "1px solid #ddd",
   },
   tableCell: {
     padding: "12px",
+  },
+  tableCell1: {
+    padding: "12px",
+    textAlign: "center",
   },
   editButton: {
     backgroundColor: "#0F7268",
@@ -260,50 +323,109 @@ header:{
     borderRadius: "4px",
     cursor: "pointer",
   },
-  modalOverlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "white",
-    padding: "20px",
-    borderRadius: "8px",
-    width: "400px",
-  },
+  // Cập nhật phần modalOverlay và modalContent trong styles của "edit"
+modalOverlay: {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100vw",
+  height: "100vh",
+  background: "rgba(0, 0, 0, 0.45)",
+  backdropFilter: "blur(6px)",
+  WebkitBackdropFilter: "blur(6px)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 1000,
+  transition: "opacity 0.3s ease",
+},
+
+modalContent: {
+  background: "rgba(255, 255, 255, 0.95)",
+  borderRadius: "20px",
+  padding: "48px 40px 36px",
+  width: "520px",
+  boxShadow: "0 16px 40px rgba(0, 0, 0, 0.25)",
+  fontFamily: "'Poppins', sans-serif",
+  position: "relative",
+  animation: "fadeInScale 0.35s ease forwards",
+  border: "1px solid rgba(255, 255, 255, 0.25)",
+  textAlign: "center",
+},
+
   inputGroup: {
-    marginBottom: "15px",
+    // marginBottom: "15px",
+    display: "grid",
+    gridTemplateColumns: "70px 850px", // First column is 30px, second takes up the remaining space
+    gap: "10px", // Adds space between grid items
+  },
+ label: {
+    fontWeight: "bold", // Để label đậm
+    fontSize: "16px", // Kích thước phông chữ
+    color: "#333", // Màu sắc của văn bản
+    display: "flex", // Sử dụng flex để căn giữa nội dung
+    justifyContent: "center", // Căn giữa nội dung theo chiều ngang
+    alignItems: "center", // Căn giữa nội dung theo chiều dọc
+    height: "100%", // Đảm bảo chiều cao của label bằng với container
   },
   input: {
-    width: "100%",
-    padding: "8px",
-    borderRadius: "4px",
-    border: "1px solid #ccc",
-  },
-  buttonContainer: {
+  width: "40%",
+  padding: "14px",
+  marginBottom: "18px",
+  fontSize: "16px",
+  borderRadius: "10px",
+  border: "1px solid #ccc",
+  outline: "none",
+  backgroundColor: "#f9f9f9",
+  transition: "all 0.3s ease",
+},
+
+cancelButton: {
+  background: "#e0e0e0",
+  color: "#333",
+  padding: "12px 24px",
+  border: "none",
+  borderRadius: "8px",
+  fontWeight: "500",
+  fontSize: "15px",
+  cursor: "pointer",
+  transition: "background 0.3s ease",
+},
+
+saveButton: {
+  background: "linear-gradient(135deg, #00bfa5, #00796b)",
+  color: "#fff",
+  padding: "12px 24px",
+  border: "none",
+  borderRadius: "8px",
+  fontWeight: "600",
+  fontSize: "15px",
+  cursor: "pointer",
+  transition: "background 0.3s ease",
+},
+buttonContainer:{
+  display: "flex",
+  justifyContent: "space-between",
+  marginTop: "20px",
+  marginBottom: "20px",
+  gap: "10px",
+},
+
+  pagination: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "center",
+    marginTop: "20px",
+    marginBottom: "20px",
   },
-  cancelButton: {
-    backgroundColor: "#ccc",
+  pageButton: {
+    backgroundColor: "#fff",
+    color: "#3498db",
+    border: "1px solid #009688",
     padding: "10px 20px",
+    margin: "0 5px",
     borderRadius: "4px",
-    border: "none",
     cursor: "pointer",
-  },
-  saveButton: {
-    backgroundColor: "#3498db",
-    color: "white",
-    padding: "10px 20px",
-    borderRadius: "4px",
-    border: "none",
-    cursor: "pointer",
+    fontSize: "16px",
   },
 };
 

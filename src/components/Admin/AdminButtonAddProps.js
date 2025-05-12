@@ -133,47 +133,79 @@ const styles = {
     borderRadius: "4px",
     cursor: "pointer",
   },
+
   modalOverlay: {
     position: "fixed",
     top: 0,
     left: 0,
     width: "100vw",
     height: "100vh",
-    background: "rgba(0, 0, 0, 0.4)",
+    background: "rgba(0, 0, 0, 0.45)",
+    backdropFilter: "blur(6px)",
+    WebkitBackdropFilter: "blur(6px)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 1000
+    zIndex: 1000,
+    transition: "opacity 0.3s ease"
   },
   modalContent: {
-    background: "#fff",
-    padding: "30px",
-    borderRadius: "8px",
-    width: "400px",
-    boxShadow: "0 5px 15px rgba(0,0,0,0.3)"
+    background: "rgba(255, 255, 255, 0.95)",
+    borderRadius: "20px",
+    padding: "48px 40px 36px",
+    width: "520px", // To hơn
+    boxShadow: "0 16px 40px rgba(0, 0, 0, 0.25)",
+    fontFamily: "'Poppins', sans-serif",
+    position: "relative",
+    animation: "fadeInScale 0.35s ease forwards",
+    border: "1px solid rgba(255, 255, 255, 0.25)",
+    textAlign: "center"
+  },
+
+  heading: {
+    fontSize: "24px",
+    fontWeight: "600",
+    marginBottom: "24px",
+    color: "#333"
   },
   input: {
     width: "100%",
-    padding: "10px",
-    marginBottom: "12px",
-    fontSize: "16px"
+    padding: "14px",
+    marginBottom: "18px",
+    fontSize: "16px",
+    borderRadius: "10px",
+    border: "1px solid #ccc",
+    outline: "none",
+    backgroundColor: "#f9f9f9",
+    transition: "all 0.3s ease",
   },
   modalButtons: {
     display: "flex",
-    justifyContent: "space-between"
+    justifyContent: "flex-end",
+    gap: "14px",
+    marginTop: "10px"
   },
   submitBtn: {
-    backgroundColor: "#009688",
+    background: "linear-gradient(135deg, #00bfa5, #00796b)",
     color: "#fff",
-    padding: "10px 16px",
+    padding: "12px 24px",
     border: "none",
-    borderRadius: "4px"
+    borderRadius: "8px",
+    fontWeight: "600",
+    fontSize: "15px",
+    cursor: "pointer",
+    transition: "background 0.3s ease",
   },
   cancelBtn: {
-    backgroundColor: "#ccc",
-    padding: "10px 16px",
+    background: "#e0e0e0",
+    color: "#333",
+    padding: "12px 24px",
     border: "none",
-    borderRadius: "4px"
+    borderRadius: "8px",
+    fontWeight: "500",
+    fontSize: "15px",
+    cursor: "pointer",
+    transition: "background 0.3s ease",
   }
 };
 
