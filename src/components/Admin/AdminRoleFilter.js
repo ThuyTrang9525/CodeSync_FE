@@ -20,14 +20,14 @@ const RoleFilter = ({ onFilterChange, defaultRole = 'all', className = '' }) => 
           All
         </button>
         <button
-          onClick={() => handleRoleChange('student')}
-          style={activeRole === 'student' ? styles.activeButton : styles.inactiveButton}
+          onClick={() => handleRoleChange('STUDENT')}
+          style={activeRole === 'STUDENT' ? styles.activeButton : styles.inactiveButton}
         >
           Student
         </button>
         <button
-          onClick={() => handleRoleChange('teacher')}
-          style={activeRole === 'teacher' ? styles.activeButton : styles.inactiveButton}
+          onClick={() => handleRoleChange('TEACHER')}
+          style={activeRole === 'TEACHER' ? styles.activeButton : styles.inactiveButton}
         >
           Teacher
         </button>
@@ -38,7 +38,7 @@ const RoleFilter = ({ onFilterChange, defaultRole = 'all', className = '' }) => 
 
 const styles = {
   wrapper: {
-    maxWidth: '220px',     // Giới hạn chiều rộng
+    maxWidth: '220px',
     width: '100%',
   },
   containers: {

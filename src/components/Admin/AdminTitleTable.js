@@ -1,9 +1,12 @@
 import React from "react";
-// Removed unused import: import { BiBorderTop } from "react-icons/bi";
 
-const TitleTable = ({ title, className }) => {
+const TitleTable = ({ title, className, onClick }) => {
   return (
-    <div style={styles.containerss} className={className}>
+    <div
+      style={styles.containerss}
+      className={className}
+      onClick={onClick}
+    >
       <h2 style={styles.titless}>{title}</h2>
       <div style={styles.border}></div>
     </div>
@@ -14,21 +17,22 @@ const styles = {
   containerss: {
     display: "flex",
     flexDirection: "column",
-    alignItems: "flex-start", // Left-aligned is typically better for titles
+    alignItems: "flex-start",
     width: "80%",
     marginTop: "20px",
+    cursor: "pointer", // 👉 để thấy có thể click được
   },
   titless: {
     fontSize: "24px",
     fontWeight: "bold",
     color: "#333",
-    margin: "0 0 8px 0", // Add some space between title and border
+    margin: "0 0 8px 0",
   },
   border: {
     width: "50%",
     height: "2px",
-    backgroundColor: "#009688", // Teal color
-    borderRadius: "1px", // Slightly rounded border
+    backgroundColor: "#009688",
+    borderRadius: "1px",
   },
 };
 
