@@ -1,5 +1,5 @@
 "use client"
-
+import axios from "axios"
 import React, { useState } from "react"
 import { GoalStatus } from "../../types/goal"
 import { Calendar, BookOpen, Flag, Clock, BarChart2, FileText, Tag, PlusCircle } from "lucide-react"
@@ -11,10 +11,10 @@ export default function CreateGoalForm({ addGoal }) {
     semester: "Sem 2/2025",
     deadline: "",
     priority: "2",
-    details: "",
+    description: "",
     category: "",
   })
-
+ const token = localStorage.getItem("token")
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
@@ -25,25 +25,34 @@ export default function CreateGoalForm({ addGoal }) {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  console.log('Form data being sent:', formData); // Log form data
+  try {
+    const response = await axios.post(
+      "http://localhost:8000/api/goals",
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    
+    console.log('Full Response:', response); // Log the full response
 
-    addGoal({
-      ...formData,
-      status: GoalStatus.NotStarted,
-    })
-
-    // Reset form
-    setFormData({
-      title: "",
-      subject: "",
-      semester: "Sem 2/2025",
-      deadline: "",
-      priority: "2",
-      details: "",
-      category: "",
-    })
+    // Check if status is 201 and handle the data properly
+    if (response.status === 201 && response.data.data) {
+      console.log('Goal created:', response.data.data);
+      // Call addGoal or other success handling logic here
+    } else {
+      throw new Error('Goal creation returned unexpected response');
+    }
+  } catch (error) {
+    console.error('Create goal failed:', error.response ? error.response.data : error.message);
+    alert('There was an issue creating your goal. Please try again later.'); // Optionally show a user-friendly message
   }
+};
 
   return (
     <div className="card create-goal-card">
@@ -54,9 +63,7 @@ export default function CreateGoalForm({ addGoal }) {
       <div className="card-body p-4">
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="title" className="form-label">
-              Goal title
-            </label>
+            <label htmlFor="title" className="form-label">Goal title</label>
             <div className="input-with-icon">
               <Flag size={18} className="input-icon" />
               <input
@@ -73,9 +80,7 @@ export default function CreateGoalForm({ addGoal }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="subject" className="form-label">
-              Subject
-            </label>
+            <label htmlFor="subject" className="form-label">Subject</label>
             <div className="input-with-icon">
               <BookOpen size={18} className="input-icon" />
               <input
@@ -92,9 +97,7 @@ export default function CreateGoalForm({ addGoal }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="category" className="form-label">
-              Category
-            </label>
+            <label htmlFor="category" className="form-label">Category</label>
             <div className="input-with-icon">
               <Tag size={18} className="input-icon" />
               <input
@@ -110,9 +113,7 @@ export default function CreateGoalForm({ addGoal }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="semester" className="form-label">
-              Semester
-            </label>
+            <label htmlFor="semester" className="form-label">Semester</label>
             <div className="input-with-icon">
               <Calendar size={18} className="input-icon" />
               <select
@@ -130,13 +131,11 @@ export default function CreateGoalForm({ addGoal }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="deadline" className="form-label">
-              Deadline
-            </label>
+            <label htmlFor="deadline" className="form-label">Deadline</label>
             <div className="input-with-icon">
               <Clock size={18} className="input-icon" />
               <input
-                type="text"
+                type="date"
                 className="form-control pl-10"
                 id="deadline"
                 name="deadline"
@@ -149,9 +148,7 @@ export default function CreateGoalForm({ addGoal }) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="priority" className="form-label">
-              Priority
-            </label>
+            <label htmlFor="priority" className="form-label">Priority</label>
             <div className="input-with-icon">
               <BarChart2 size={18} className="input-icon" />
               <select
@@ -169,19 +166,18 @@ export default function CreateGoalForm({ addGoal }) {
           </div>
 
           <div className="form-group mb-4">
-            <label htmlFor="details" className="form-label">
-              Details
-            </label>
+            <label htmlFor="description" className="form-label">Description</label>
             <div className="input-with-icon textarea-container">
               <FileText size={18} className="input-icon" style={{ top: "12px" }} />
               <textarea
                 className="form-control pl-10"
-                id="details"
-                name="details"
-                value={formData.details}
+                id="description"
+                name="description"
+                value={formData.description}
                 onChange={handleChange}
-                placeholder="Enter goal details"
+                placeholder="Enter goal description"
                 rows={3}
+                required
               />
             </div>
           </div>

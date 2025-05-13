@@ -22,19 +22,24 @@ function LoginPage() {
       password,
       role,
     });
-
+    const userRole = response.data.user.role; 
     const token = response.data.access_token;
-    const profile = response.data.profile;
-    const userRole = response.data.user.role;
-
-    localStorage.setItem("token", token);
+    console.log("API Response:", response.data);
+    console.log("User Role:", userRole);
+    // Lưu token để dùng các request sau
+    localStorage.setItem('token', token);
+     console.log('Token:', token);
 
     // Điều hướng theo role
     if (userRole === "TEACHER") {
       navigate(`/teacher-home`);
     } else if (userRole === "STUDENT") {
       navigate(`/student-home`);
+    } else if (userRole === "ADMIN") {
+      navigate(`/admin-home`);
     }
+    
+
 
   } catch (err) {
     console.error("Error during login:", err);
@@ -50,6 +55,12 @@ function LoginPage() {
       setError("An unexpected error occurred. Please try again.");
     }
   }
+  await axios.get("http://localhost:8000/api/goals", {
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem('token')}`
+  }
+});
+
 }
 
   return (
