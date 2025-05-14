@@ -19,9 +19,12 @@ export default function StudyPlanManagement() {
           <Menu className="h-6 w-6" />
         </button>
       </div>
-      <SkillsTable />
       <div className="mt-8">
-      <h2 className="text-2xl font-bold text-blue-500 mb-4">Week's Goal</h2>
+      <h2 className="text-2xl font-bold text-blue-500 mb-4">Weak's Goal</h2>
+        <SkillsTable />
+      </div>
+      <div className="mt-8">
+      <h2 className="text-2xl font-bold text-blue-500 mb-4">In class</h2>
         <StudyPlanTable />
       </div>
       <div className="mt-8">
