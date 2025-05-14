@@ -22,7 +22,7 @@
   }
 
   /* Header */
-  .header {
+  .header { 
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -61,7 +61,7 @@
     width: 100%;
     background-color: #ffffff;
     border-bottom: 1px solid #e5e7eb;
-    z-index: 1000;
+    /* z-index: 1000; */
     border-radius: 20px;
     margin-top: 20px;
     position: sticky;

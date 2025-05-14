@@ -12,7 +12,7 @@ import StudentTable from './pages/Teacher/TeacherListStudent';
 import Homepage from "./pages/Student/StudentHomepage";
 import Profile from "./pages/Student/StudentProfile";
 import Login from './pages/Login/Login';
-
+import LandingPage from "./pages/HomePage"
 
 const routes = [
     
@@ -76,6 +76,11 @@ const routes = [
         path: "/student-profile",
         element: <Profile />,
         name: "Student Profile",
+    },
+    {
+        path: "/",
+        element: <LandingPage />,
+        name: "HomePage",
     },
     {
         path: "*",

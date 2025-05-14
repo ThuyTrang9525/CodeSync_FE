@@ -1,174 +1,251 @@
-import { useState } from "react"
+import { useState, useEffect } from "react";
+import axios from "axios";
+import RoleFilter from "./AdminRoleFilter"; // Import component lọc
+
+const API_URL = "http://127.0.0.1:8000/api/users";
 
 const UserTableWithEdit = () => {
-  // Sample user data
-  const [users, setUsers] = useState([
-    { id: 1, username: "HoangDoan", email: "minhhoang1212@gmail.com", role: "Student", class: "PNV26A" },
-    { id: 2, username: "Mr.Trang", email: "trang-nguyen@gmail.com", role: "Teacher", class: "PNV26A" },
-    { id: 3, username: "HoangDoan", email: "minhhoang1212@gmail.com", role: "Student", class: "PNV26A" },
-    { id: 4, username: "HoangDoan", email: "minhhoang1212@gmail.com", role: "Student", class: "PNV26A" },
-    { id: 5, username: "HoangDoan", email: "minhhoang1212@gmail.com", role: "Student", class: "PNV26A" },
-    { id: 6, username: "HoangDoan", email: "minhhoang1212@gmail.com", role: "Student", class: "PNV26A" },
-    { id: 7, username: "HoangDoan", email: "minhhoang1212@gmail.com", role: "Student", class: "PNV26A" },
-  ])
+  const [users, setUsers] = useState([]);
+  const [filteredRole, setFilteredRole] = useState("all");
+  const [showModal, setShowModal] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 5;
 
-  // State for modal
-  const [showModal, setShowModal] = useState(false)
-  const [editingUser, setEditingUser] = useState(null)
   const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
-    role: "Student",
-  })
+    role: "STUDENT",
+  });
 
-  // Handle edit button click
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get(API_URL);
+      setUsers(response.data);
+    } catch (error) {
+      console.error("Lỗi khi lấy user:", error);
+    }
+  };
+
   const handleEditClick = (user) => {
-    setEditingUser(user)
+    setEditingUser(user);
     setFormData({
-      email: user.email,
-      password: "", // Password field starts empty for security
-      role: user.role,
-    })
-    setShowModal(true)
-  }
+      name: user.name || "",
+      email: user.email || "",
+      password: "",
+      role: user.role || "STUDENT",
+    });
+    setShowModal(true);
+  };
 
-  // Handle form input changes
+  const handleDelete = async (userID) => {
+    const confirmDelete = window.confirm("Bạn có chắc chắn muốn xoá user này?");
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`${API_URL}/${userID}`);
+      fetchUsers();
+    } catch (error) {
+      console.error("Lỗi khi xoá user:", error);
+    }
+  };
+
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData({
-      ...formData,
-      [name]: value,
-    })
-  }
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    // Update the user in the users array
-    const updatedUsers = users.map((user) => {
-      if (user.id === editingUser.id) {
-        return {
-          ...user,
-          email: formData.email,
-          role: formData.role,
-          // Note: In a real app, you would handle password updates differently
-        }
-      }
-      return user
-    })
+    if (!editingUser || !editingUser.userID) {
+      console.error("Editing user or userID is missing.");
+      return;
+    }
 
-    setUsers(updatedUsers)
-    setShowModal(false)
-  }
+    try {
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        role: formData.role,
+        ...(formData.password && { password: formData.password }),
+      };
 
-  // Close the modal
-  const closeModal = () => {
-    setShowModal(false)
-  }
+      await axios.put(`${API_URL}/${editingUser.userID}`, payload);
+      setShowModal(false);
+      fetchUsers();
+    } catch (error) {
+      console.error("Lỗi khi cập nhật user:", error.response?.data || error.message);
+    }
+  };
+
+  const closeModal = () => setShowModal(false);
+
+  const filteredUsers = users.filter((user) => {
+    if (filteredRole === "all") return true;
+    return user.role === filteredRole;
+  });
+
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
 
   return (
-    <div style={{ marginTop: '20px' }}>
-      {/* User Table */}
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#3498db', color: 'white' }}>
-              <th style={{ width: '150px', padding: '12px', textAlign: 'left' }}>Username</th>
-                <th style={{ width: '300px', padding: '12px', textAlign: 'left' }}>Email</th>
-                <th style={{ width: '140px', padding: '12px', textAlign: 'left' }}>Role</th>
-                <th style={{ width: '120px', padding: '12px', textAlign: 'left' }}>Class</th>
-                <th style={{ width: '130px', padding: '12px', textAlign: 'left' }}>Actions</th>
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <div>
+          <div style={styles.title}>User Management</div>
+          <div style={styles.border}></div>
+        </div>
 
+        <div style={styles.filterContainer}>
+          <RoleFilter onFilterChange={setFilteredRole} />
+        </div>
+      </div>
+
+      <div style={styles.tableContainer}>
+        <table style={styles.table}>
+          <thead>
+            <tr style={styles.tableHeader}>
+              <th style={{width:'220px',padding:"12px",textAlign:'left'}}>Name</th>
+              <th style={{width:'220px',padding:"12px",textAlign:'left'}}>Email</th>
+              <th style={{width:'65px',padding:"12px",textAlign:'left'}}>Role</th>
+              <th style={{width:'35px',padding:"12px",textAlign:'left'}}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
-              <tr key={user.id} style={{ borderBottom: '1px solid #ddd' }}>
-                <td style={{ padding: '12px' }}>{user.username}</td>
-                <td style={{ padding: '12px' }}>{user.email}</td>
-                <td style={{ padding: '12px' }}>{user.role}</td>
-                <td style={{ padding: '12px' }}>{user.class}</td>
-                <td style={{ padding: '12px' }}>
-                  <button onClick={() => handleEditClick(user)} style={buttonStyles}>
-                    Edit
+            {currentUsers.map((user) => (
+              <tr key={user.userID} style={styles.tableRow}>
+                <td style={styles.tableCell}>{user.name}</td>
+                <td style={styles.tableCell}>{user.email}</td>
+                <td style={styles.tableCell}>{user.role}</td>
+                <td style={styles.tableCell1}>
+                  <button onClick={() => handleEditClick(user)} style={styles.editButton}>
+                    <i className="fa-solid fa-pen-to-square"></i>
                   </button>
-                  <button style={{ ...buttonStyles, color: 'white' }}>
-                    Delete
+                  <button onClick={() => handleDelete(user.userID)} style={styles.deleteButton}>
+                    <i className="fa-solid fa-user-minus"></i>
                   </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+
+        <div style={styles.pagination}>
+          <button
+            onClick={handlePrevPage}
+            style={{
+              ...styles.pageButton,
+              backgroundColor: currentPage === 1 ? "#ffffff" : "#04756a",
+              color: currentPage === 1 ? "#aaa" : "#fff",
+            }}
+            disabled={currentPage === 1}
+          >
+            Prev
+          </button>
+
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              onClick={() => handlePageChange(index + 1)}
+              style={{
+                ...styles.pageButton,
+                backgroundColor: currentPage === index + 1 ? "#04756a" : "#fff",
+                color: currentPage === index + 1 ? "#fff" : "#333",
+              }}
+            >
+              {index + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={handleNextPage}
+            style={{
+              ...styles.pageButton,
+              backgroundColor: currentPage === totalPages ? "#fff" : "#04756a",
+              color: currentPage === totalPages ? "#aaa" : "#fff",
+            }}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
       </div>
 
-      {/* Edit Modal */}
       {showModal && (
-        <div style={modalOverlayStyles}>
-          {/* Modal Content */}
-          <div style={modalContentStyles}>
-            <h2 style={modalHeaderStyles}>Edit User</h2>
-
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalContent}>
+            <h2>Edit User</h2>
             <form onSubmit={handleSubmit}>
-              <div style={inputGroupStyles}>
-                <label htmlFor="email" style={labelStyles}>
-                  Email
-                </label>
+              <div style={styles.inputGroup}>
+                <label>Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                  style={styles.input}
+                />
+              </div>
+              <div style={styles.inputGroup}>
+                <label>Email</label>
                 <input
                   type="email"
-                  id="email"
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  style={inputStyles}
                   required
+                  style={styles.input}
                 />
               </div>
-
-              <div style={inputGroupStyles}>
-                <label htmlFor="password" style={labelStyles}>
-                  Password
-                </label>
+              <div style={styles.inputGroup}>
+                <label>Password (optional)</label>
                 <input
                   type="password"
-                  id="password"
                   name="password"
                   value={formData.password}
                   onChange={handleInputChange}
-                  style={inputStyles}
-                  placeholder="Leave blank to keep current password"
+                  style={styles.input}
                 />
               </div>
-
-              <div style={inputGroupStyles}>
-                <label htmlFor="role" style={labelStyles}>
-                  Role
-                </label>
+              <div style={styles.inputGroup}>
+                <label>Role</label>
                 <select
-                  id="role"
                   name="role"
                   value={formData.role}
                   onChange={handleInputChange}
-                  style={selectStyles}
+                  style={styles.input}
                 >
-                  <option value="Student">Student</option>
-                  <option value="Teacher">Teacher</option>
+                  <option value="STUDENT">STUDENT</option>
+                  <option value="TEACHER">TEACHER</option>
                 </select>
               </div>
-
-              <div style={buttonContainerStyles}>
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  style={cancelButtonStyles}
-                >
+              <div style={styles.buttonContainer}>
+                <button type="button" onClick={closeModal} style={styles.cancelButton}>
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  style={saveButtonStyles}
-                >
+                <button type="submit" style={styles.saveButton}>
                   Save Changes
                 </button>
               </div>
@@ -177,96 +254,179 @@ const UserTableWithEdit = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-const buttonStyles = {
-  backgroundColor: '#0F7268',
-  color: 'white',
-  padding: '8px 16px',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
-  marginRight: '8px',
-}
+// Styles
+const styles = {
+  container: {
+    padding: "20px",
+  },
+  header: {
+    marginTop: "20px",
+    display: "flex",
+    justifyContent: "space-between",
+  },
+  title: {
+    fontSize: "36px",
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: "8px",
+  },
+  border: {
+    width: "150%",
+    height: "2px",
+    backgroundColor: "#009688",
+    marginBottom: "20px",
+    borderRadius: "1px",
+  },
+  filterContainer: {
+    display: "flex",
+    justifyContent: "center",
+    margin: "20px 0",
+  },
+  tableContainer: {
+    overflowX: "auto",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+  },
+  tableHeader: {
+    backgroundColor: "#3498db",
+    color: "white",
+  },
+  tableRow: {
+    borderBottom: "1px solid #ddd",
+  },
+  tableCell: {
+    padding: "12px",
+  },
+  tableCell1: {
+    padding: "12px",
+    textAlign: "center",
+  },
+  editButton: {
+    backgroundColor: "#0F7268",
+    color: "white",
+    padding: "8px 16px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    marginRight: "8px",
+  },
+  deleteButton: {
+    backgroundColor: "#e74c3c",
+    color: "white",
+    padding: "8px 16px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+  },
+  // Cập nhật phần modalOverlay và modalContent trong styles của "edit"
+modalOverlay: {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100vw",
+  height: "100vh",
+  background: "rgba(0, 0, 0, 0.45)",
+  backdropFilter: "blur(6px)",
+  WebkitBackdropFilter: "blur(6px)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 1000,
+  transition: "opacity 0.3s ease",
+},
 
-const modalOverlayStyles = {
-  position: 'fixed',
-  top: '0',
-  left: '0',
-  right: '0',
-  bottom: '0',
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  zIndex: '1000',
-}
+modalContent: {
+  background: "rgba(255, 255, 255, 0.95)",
+  borderRadius: "20px",
+  padding: "48px 40px 36px",
+  width: "520px",
+  boxShadow: "0 16px 40px rgba(0, 0, 0, 0.25)",
+  fontFamily: "'Poppins', sans-serif",
+  position: "relative",
+  animation: "fadeInScale 0.35s ease forwards",
+  border: "1px solid rgba(255, 255, 255, 0.25)",
+  textAlign: "center",
+},
 
-const modalContentStyles = {
-  position: 'fixed',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  backgroundColor: 'white',
-  padding: '20px',
-  borderRadius: '8px',
-  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-  width: '400px',
-  zIndex: '1001',
-}
+  inputGroup: {
+    // marginBottom: "15px",
+    display: "grid",
+    gridTemplateColumns: "70px 850px", // First column is 30px, second takes up the remaining space
+    gap: "10px", // Adds space between grid items
+  },
+ label: {
+    fontWeight: "bold", // Để label đậm
+    fontSize: "16px", // Kích thước phông chữ
+    color: "#333", // Màu sắc của văn bản
+    display: "flex", // Sử dụng flex để căn giữa nội dung
+    justifyContent: "center", // Căn giữa nội dung theo chiều ngang
+    alignItems: "center", // Căn giữa nội dung theo chiều dọc
+    height: "100%", // Đảm bảo chiều cao của label bằng với container
+  },
+  input: {
+  width: "40%",
+  padding: "14px",
+  marginBottom: "18px",
+  fontSize: "16px",
+  borderRadius: "10px",
+  border: "1px solid #ccc",
+  outline: "none",
+  backgroundColor: "#f9f9f9",
+  transition: "all 0.3s ease",
+},
 
-const modalHeaderStyles = {
-  fontSize: '20px',
-  fontWeight: 'bold',
-  marginBottom: '16px',
-}
+cancelButton: {
+  background: "#e0e0e0",
+  color: "#333",
+  padding: "12px 24px",
+  border: "none",
+  borderRadius: "8px",
+  fontWeight: "500",
+  fontSize: "15px",
+  cursor: "pointer",
+  transition: "background 0.3s ease",
+},
 
-const inputGroupStyles = {
-  marginBottom: '16px',
-}
+saveButton: {
+  background: "linear-gradient(135deg, #00bfa5, #00796b)",
+  color: "#fff",
+  padding: "12px 24px",
+  border: "none",
+  borderRadius: "8px",
+  fontWeight: "600",
+  fontSize: "15px",
+  cursor: "pointer",
+  transition: "background 0.3s ease",
+},
+buttonContainer:{
+  display: "flex",
+  justifyContent: "space-between",
+  marginTop: "20px",
+  marginBottom: "20px",
+  gap: "10px",
+},
 
-const labelStyles = {
-  display: 'block',
-  color: '#333',
-  marginBottom: '8px',
-}
+  pagination: {
+    display: "flex",
+    justifyContent: "center",
+    marginTop: "20px",
+    marginBottom: "20px",
+  },
+  pageButton: {
+    backgroundColor: "#fff",
+    color: "#3498db",
+    border: "1px solid #009688",
+    padding: "10px 20px",
+    margin: "0 5px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "16px",
+  },
+};
 
-const inputStyles = {
-  width: '100%',
-  padding: '10px',
-  borderRadius: '4px',
-  border: '1px solid #ddd',
-  fontSize: '14px',
-}
-
-const selectStyles = {
-  width: '100%',
-  padding: '10px',
-  borderRadius: '4px',
-  border: '1px solid #ddd',
-  fontSize: '14px',
-}
-
-const buttonContainerStyles = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-}
-
-const cancelButtonStyles = {
-  backgroundColor: '#0F7268',
-  color: 'white',
-  padding: '8px 16px',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
-}
-
-const saveButtonStyles = {
-  backgroundColor: '#2ecc71',
-  color: 'white',
-  padding: '8px 16px',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
-}
-
-export default UserTableWithEdit
+export default UserTableWithEdit;
