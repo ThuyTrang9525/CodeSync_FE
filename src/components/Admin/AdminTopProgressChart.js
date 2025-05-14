@@ -1,64 +1,116 @@
 // TopProgressChart.jsx
 import React, { useEffect, useRef } from 'react';
 import { Chart } from 'chart.js/auto';
+import axios from 'axios';
 
 const TopProgressChart = () => {
   const chartRef = useRef(null);
-  let chartInstance = null;
+  const chartInstanceRef = useRef(null);
 
   useEffect(() => {
-    const ctx = chartRef.current.getContext('2d');
-    
-    chartInstance = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Thuy Trang', 'Van Vinh', 'Ha Sang'],
-        datasets: [{
-          label: 'Completion %',
-          data: [92, 87, 83],
-          backgroundColor: [
-            'rgba(0, 150, 136, 0.7)',
-            'rgba(0, 150, 136, 0.5)',
-            'rgba(0, 150, 136, 0.3)'
-          ],
-          borderColor: 'rgba(0, 150, 136, 1)',
-          borderWidth: 1
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        scales: {
-          x: {
-            beginAtZero: true,
-            max: 100,
-            title: {
-              display: true,
-              text: 'Completion (%)'
-            }
-          }
-        },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: {
-              label: ctx => ctx.parsed.x + '%'
-            }
-          }
-        },
-        responsive: true,
-        maintainAspectRatio: false
+    const fetchAndRender = async () => {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/api/admin/goals');
+        const goals = response.data;
+
+        // Đếm số lượng theo trạng thái
+        const counts = {
+          not_started: 0,
+          in_progress: 0,
+          completed: 0
+        };
+
+        goals.forEach(goal => {
+          if (goal.status === 'not-started') counts.not_started += 1;
+          else if (goal.status === 'in-progress') counts.in_progress += 1;
+          else if (goal.status === 'completed') counts.completed += 1;
+        });
+
+        const labels = ['Not started', 'In progress', 'Completed'];
+        const dataValues = [
+          counts.not_started,
+          counts.in_progress,
+          counts.completed
+        ];
+
+        renderChart(labels, dataValues);
+      } catch (err) {
+        console.error('Failed to fetch goals:', err);
       }
-    });
+    };
+
+    const renderChart = (labels, dataValues) => {
+      const ctx = chartRef.current?.getContext('2d');
+      if (!ctx) return;
+
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+      }
+
+      chartInstanceRef.current = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Number of Goals',
+            data: dataValues,
+            backgroundColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(219, 248, 0, 0.7)',
+              'rgba(0, 241, 48, 0.92)',
+
+            ],
+            borderColor: [
+              'rgba(255, 99, 132, 0.7)',
+              'rgba(219, 248, 0, 0.7)',
+              'rgba(0, 241, 48, 0.92)',
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          indexAxis: 'x', // Biểu đồ dọc
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Status'
+              }
+            },
+            y: {
+              beginAtZero: true, // Bắt đầu từ 0
+              stepSize: 1, // Chỉ hiển thị các giá trị nguyên (1, 2, 3, ...)
+              ticks: {
+                precision: 0 // Không hiển thị số thập phân
+              }
+            }
+          },
+          plugins: {
+            legend: { display: true },
+            tooltip: {
+              callbacks: {
+                label: (context) => `${context.raw} goals`
+              }
+            }
+          },
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+    };
+
+    fetchAndRender();
 
     return () => {
-      // cleanup chart to avoid memory leaks
-      chartInstance.destroy();
+      if (chartInstanceRef.current) {
+        chartInstanceRef.current.destroy();
+      }
     };
   }, []);
 
   return (
     <div className="chart-card">
-      <h3 className="stat-title">Top 3 Fastest Progress</h3>
+      <h1 style={{fontSize:"36px", fontWeight:"bold"}} className="stat-title">Goals Status Distribution</h1>
       <div className="chart-container" style={{ height: '300px' }}>
         <canvas ref={chartRef}></canvas>
       </div>
