@@ -10,7 +10,7 @@ import Navbar from "../../components/Student/StudentNavBar";
 export default function StudentGoal() {
   
   return (
-    <div className="container">
+    <div >
       
       <Header />
       <Navbar />

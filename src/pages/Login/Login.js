@@ -17,11 +17,17 @@ function LoginPage() {
     setError("");
 
     try {
-    const response = await axios.post("http://localhost:8000/api/login", {
-      email,
-      password,
-      role,
-    });
+  const response = await axios.post(
+  "http://localhost:8000/api/login", 
+  { email, password, role }, // Dữ liệu yêu cầu
+  {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`, // Token
+    }
+  }
+);
+
+;
     const userRole = response.data.user.role; 
     const token = response.data.access_token;
     console.log("API Response:", response.data);
@@ -55,11 +61,6 @@ function LoginPage() {
       setError("An unexpected error occurred. Please try again.");
     }
   }
-  await axios.get("http://localhost:8000/api/goals", {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem('token')}`
-  }
-});
 
 }
 
