@@ -45,9 +45,9 @@ export default function Header() {
               </div>
               <ul className="dropdown-menu" id="userDropdownMenu">
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <Link className="dropdown-item" to="/student-profile">
                     Profile
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <a className="dropdown-item" href="#">
