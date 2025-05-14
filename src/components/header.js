@@ -64,7 +64,7 @@ export default function Header() {
               </ul>
             </div>
 
-            <button className="btn btn-primary">Sign in</button>
+            <button className="btn btn-primary">Log out</button>
           </div>
         </div>
       </div>
