@@ -15,13 +15,13 @@ import Login from './pages/Login/Login';
 import LandingPage from "./pages/HomePage"
 
 const routes = [
-    
+
     {
         path: "/Login",
         element: <Login />,
         name: "Login",
     },
-    
+
     {
         path: "/admin-dashboard",
         element: <AdminDashboard />,
