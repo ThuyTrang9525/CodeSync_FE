@@ -1,176 +1,202 @@
-import { useState } from "react"
+import { useState, useEffect } from "react";
+import axios from "axios";
+import RoleFilter from "./AdminRoleFilter";
 
-const UserTableWithEdit = () => {
-  // Sample user data
-  const [users, setUsers] = useState([
-    { id: 1, classname: "PNV", mainteacher: "Doan Minh Hoang", NumberOfClass: "Student" },
-    { id: 2, classname: "PNV", mainteacher: "trang-nguyen@gmail.com", NumberOfClass: "Teacher" },
-    { id: 3, classname: "PNV", mainteacher: "Doan Minh Hoang", NumberOfClass: "Student" },
-    { id: 4, classname: "PNV", mainteacher: "Doan Minh Hoang", NumberOfClass: "Student" },
-    { id: 5, classname: "PNV", mainteacher: "Doan Minh Hoang", NumberOfClass: "Student" },
-    { id: 6, classname: "PNV", mainteacher: "Doan Minh Hoang", NumberOfClass: "Student" },
-    { id: 7, classname: "PNV", mainteacher: "Doan Minh Hoang", NumberOfClass: "Student" },
-  ])
+const API_URL = "http://127.0.0.1:8000/api/admin/classes";
 
-  // State for modal
-  const [showModal, setShowModal] = useState(false)
-  const [editingUser, setEditingUser] = useState(null)
+const ClassTable = () => {
+  const [classes, setClasses] = useState([]);
+  const [filteredRole, setFilteredRole] = useState("all");
+  const [showModal, setShowModal] = useState(false);
+  const [editingClass, setEditingClass] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const classesPerPage = 5;
+
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    role: "Student",
-  })
+    className: "",
+    name: "",
+    quantity: "", // Số lượng học sinh có thể để trống
+  });
 
-  // Handle edit button click
-  const handleEditClick = (user) => {
-    setEditingUser(user)
+  useEffect(() => {
+    fetchClasses();
+  }, []);
+
+  const fetchClasses = async () => {
+    try {
+      const res = await axios.get(API_URL);
+      setClasses(res.data);
+    } catch (err) {
+      console.error("Error fetching classes:", err);
+    }
+  };
+
+  const handleEditClick = (classItem) => {
+    setEditingClass(classItem);
     setFormData({
-      email: user.email,
-      password: "", // Password field starts empty for security
-      role: user.role,
-    })
-    setShowModal(true)
-  }
+      className: classItem.className || "",
+      name: classItem.name || "",
+      quantity: classItem.numStudents?.toString() || "", // Đảm bảo là chuỗi để hiển thị trong input
+    });
+    setShowModal(true);
+  };
 
-  // Handle form input changes
+  const handleDelete = async (id) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xoá lớp học này?")) return;
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      fetchClasses();
+    } catch (err) {
+      console.error("Error deleting class:", err);
+    }
+  };
+
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData({
-      ...formData,
-      [name]: value,
-    })
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingClass?.classID) return;
 
-    // Update the user in the users array
-    const updatedUsers = users.map((user) => {
-      if (user.id === editingUser.id) {
-        return {
-          ...user,
-          email: formData.email,
-          role: formData.role,
-          // Note: In a real app, you would handle password updates differently
-        }
-      }
-      return user
-    })
+    try {
+      const payload = {
+        ...formData,
+        quantity: formData.quantity === "" ? null : Number(formData.quantity),
+      };
 
-    setUsers(updatedUsers)
-    setShowModal(false)
-  }
+      await axios.put(`${API_URL}/${editingClass.classID}`, payload);
+      setShowModal(false);
+      fetchClasses();
+    } catch (err) {
+      console.error("Error updating class:", err.response?.data || err.message);
+    }
+  };
 
-  // Close the modal
-  const closeModal = () => {
-    setShowModal(false)
-  }
+  const filteredClasses = classes.filter((item) =>
+    filteredRole === "all" ? true : item.role === filteredRole
+  );
+
+  const currentClasses = filteredClasses.slice(
+    (currentPage - 1) * classesPerPage,
+    currentPage * classesPerPage
+  );
+  const totalPages = Math.ceil(filteredClasses.length / classesPerPage);
 
   return (
-    <div style={{ marginTop: '20px' }}>
-      {/* User Table */}
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#3498db', color: 'white' }}>
-              <th style={{ width: '130px', padding: '12px', textAlign: 'left' }}>Class Name</th>
-                <th style={{ width: '300px', padding: '12px', textAlign: 'left' }}>Main Teacher</th>
-                <th style={{ width: '100px', padding: '12px', textAlign: 'left' }}>Number of class</th>
-                <th style={{ width: '160px', padding: '12px', textAlign: 'left' }}>Actions</th>
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <div>
+          <div style={styles.title}>Class Management</div>
+          <div style={styles.border}></div>
+        </div>
+        <RoleFilter onFilterChange={setFilteredRole} />
+      </div>
 
+      <div style={styles.tableContainer}>
+        <table style={styles.table}>
+          <thead style={styles.tableHeader}>
+            <tr>
+              <th>Class Name</th>
+              <th>Main Teacher</th>
+              <th>Number of Students</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
-              <tr key={user.id} style={{ borderBottom: '1px solid #ddd' }}>
-                <td style={{ padding: '12px' }}>{user.classname}</td>
-                <td style={{ padding: '12px' }}>{user.mainteacher}</td>
-                <td style={{ padding: '12px' }}>{user.NumberOfClass}</td>
-                <td style={{ padding: '12px' }}>
-                <button style={{ ...buttonStyles, color: 'white' }}>
-                    Watch
+            {currentClasses.map((item) => (
+              <tr key={item.classID} style={styles.tableRow}>
+                <td>{item.className}</td>
+                <td>{item.user?.name}</td>
+                <td>{item.numStudents ?? 0}</td>
+                <td>
+                  <button onClick={() => handleEditClick(item)} style={styles.editButton}>
+                    <i className="fa-solid fa-pen-to-square"></i>
                   </button>
-                  <button onClick={() => handleEditClick(user)} style={buttonStyles}>
-                    Edit
+                  <button onClick={() => handleDelete(item.classID)} style={styles.deleteButton}>
+                    <i className="fa-solid fa-user-minus"></i>
                   </button>
-                  <button style={{ ...buttonStyles, color: 'white' }}>
-                    Delete
-                  </button>
-                  
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+
+        {/* Pagination */}
+        <div style={styles.pagination}>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            style={currentPage === 1 ? styles.disabledBtn : styles.pageButton}
+          >
+            Prev
+          </button>
+          {Array.from({ length: totalPages }, (_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentPage(idx + 1)}
+              style={currentPage === idx + 1 ? styles.activePage : styles.pageButton}
+            >
+              {idx + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            style={currentPage === totalPages ? styles.disabledBtn : styles.pageButton}
+          >
+            Next
+          </button>
+        </div>
       </div>
 
-      {/* Edit Modal */}
+      {/* Modal Form */}
       {showModal && (
-        <div style={modalOverlayStyles}>
-          {/* Modal Content */}
-          <div style={modalContentStyles}>
-            <h2 style={modalHeaderStyles}>Edit User</h2>
-
+        <div style={styles.modalOverlay}>
+          <div style={styles.modalContent}>
+            <h2>Edit Class</h2>
             <form onSubmit={handleSubmit}>
-              <div style={inputGroupStyles}>
-                <label htmlFor="email" style={labelStyles}>
-                  Email
-                </label>
+              <div style={styles.inputGroup}>
+                <label>Class Name</label>
                 <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
+                  type="text"
+                  name="className"
+                  value={formData.className}
                   onChange={handleInputChange}
-                  style={inputStyles}
                   required
+                  style={styles.input}
                 />
               </div>
-
-              <div style={inputGroupStyles}>
-                <label htmlFor="password" style={labelStyles}>
-                  Password
-                </label>
+              <div style={styles.inputGroup}>
+                <label>Teacher</label>
                 <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  value={formData.password}
+                  type="text"
+                  name="name"
+                  value={formData.name}
                   onChange={handleInputChange}
-                  style={inputStyles}
-                  placeholder="Leave blank to keep current password"
+                  required
+                  style={styles.input}
+                />
+              </div>
+              <div style={styles.inputGroup}>
+                <label>Quantity</label>
+                <input
+                  type="number"
+                  name="quantity"
+                  value={formData.quantity}
+                  onChange={handleInputChange}
+                  placeholder="Optional"
+                  style={styles.input}
+                  min="0"
                 />
               </div>
 
-              <div style={inputGroupStyles}>
-                <label htmlFor="role" style={labelStyles}>
-                  Role
-                </label>
-                <select
-                  id="role"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleInputChange}
-                  style={selectStyles}
-                >
-                  <option value="Student">Student</option>
-                  <option value="Teacher">Teacher</option>
-                </select>
-              </div>
-
-              <div style={buttonContainerStyles}>
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  style={cancelButtonStyles}
-                >
+              <div style={styles.buttonContainer}>
+                <button type="button" onClick={() => setShowModal(false)} style={styles.cancelButton}>
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  style={saveButtonStyles}
-                >
+                <button type="submit" style={styles.saveButton}>
                   Save Changes
                 </button>
               </div>
@@ -179,96 +205,178 @@ const UserTableWithEdit = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-const buttonStyles = {
-  backgroundColor: '#0F7268',
-  color: 'white',
-  padding: '8px 16px',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
-  marginRight: '8px',
-}
+const styles = {
+  container: {
+    padding: "20px",
+  },
+  header: {
+    marginTop: "20px",
+    display: "flex",
+    justifyContent: "space-between",
+  },
+  title: {
+    fontSize: "36px",
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: "8px",
+  },
+  border: {
+    width: "150%",
+    height: "2px",
+    backgroundColor: "#009688",
+    marginBottom: "20px",
+    borderRadius: "1px",
+  },
+  filterContainer: {
+    display: "flex",
+    justifyContent: "center",
+    margin: "20px 0",
+  },
+  tableContainer: {
+    overflowX: "auto",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+  },
+  tableHeader: {
+    backgroundColor: "#3498db",
+    color: "white",
+  },
+  tableRow: {
+    borderBottom: "1px solid #ddd",
+  },
+  tableCell: {
+    padding: "12px",
+  },
+  tableCell1: {
+    padding: "12px",
+    textAlign: "center",
+  },
+  editButton: {
+    backgroundColor: "#0F7268",
+    color: "white",
+    padding: "8px 16px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+    marginRight: "8px",
+  },
+  deleteButton: {
+    backgroundColor: "#e74c3c",
+    color: "white",
+    padding: "8px 16px",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
+  },
+  // Cập nhật phần modalOverlay và modalContent trong styles của "edit"
+modalOverlay: {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100vw",
+  height: "100vh",
+  background: "rgba(0, 0, 0, 0.45)",
+  backdropFilter: "blur(6px)",
+  WebkitBackdropFilter: "blur(6px)",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 1000,
+  transition: "opacity 0.3s ease",
+},
 
-const modalOverlayStyles = {
-  position: 'fixed',
-  top: '0',
-  left: '0',
-  right: '0',
-  bottom: '0',
-  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  zIndex: '1000',
-}
+modalContent: {
+  background: "rgba(255, 255, 255, 0.95)",
+  borderRadius: "20px",
+  padding: "48px 40px 36px",
+  width: "520px",
+  boxShadow: "0 16px 40px rgba(0, 0, 0, 0.25)",
+  fontFamily: "'Poppins', sans-serif",
+  position: "relative",
+  animation: "fadeInScale 0.35s ease forwards",
+  border: "1px solid rgba(255, 255, 255, 0.25)",
+  textAlign: "center",
+},
 
-const modalContentStyles = {
-  position: 'fixed',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  backgroundColor: 'white',
-  padding: '20px',
-  borderRadius: '8px',
-  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-  width: '400px',
-  zIndex: '1001',
-}
+  inputGroup: {
+    // marginBottom: "15px",
+    display: "grid",
+    gridTemplateColumns: "70px 850px", // First column is 30px, second takes up the remaining space
+    gap: "10px", // Adds space between grid items
+  },
+ label: {
+    fontWeight: "bold", // Để label đậm
+    fontSize: "16px", // Kích thước phông chữ
+    color: "#333", // Màu sắc của văn bản
+    display: "flex", // Sử dụng flex để căn giữa nội dung
+    justifyContent: "center", // Căn giữa nội dung theo chiều ngang
+    alignItems: "center", // Căn giữa nội dung theo chiều dọc
+    height: "100%", // Đảm bảo chiều cao của label bằng với container
+  },
+  input: {
+  width: "40%",
+  padding: "14px",
+  marginBottom: "18px",
+  fontSize: "16px",
+  borderRadius: "10px",
+  border: "1px solid #ccc",
+  outline: "none",
+  backgroundColor: "#f9f9f9",
+  transition: "all 0.3s ease",
+},
 
-const modalHeaderStyles = {
-  fontSize: '20px',
-  fontWeight: 'bold',
-  marginBottom: '16px',
-}
+cancelButton: {
+  background: "#e0e0e0",
+  color: "#333",
+  padding: "12px 24px",
+  border: "none",
+  borderRadius: "8px",
+  fontWeight: "500",
+  fontSize: "15px",
+  cursor: "pointer",
+  transition: "background 0.3s ease",
+},
 
-const inputGroupStyles = {
-  marginBottom: '16px',
-}
+saveButton: {
+  background: "linear-gradient(135deg, #00bfa5, #00796b)",
+  color: "#fff",
+  padding: "12px 24px",
+  border: "none",
+  borderRadius: "8px",
+  fontWeight: "600",
+  fontSize: "15px",
+  cursor: "pointer",
+  transition: "background 0.3s ease",
+},
+buttonContainer:{
+  display: "flex",
+  justifyContent: "space-between",
+  marginTop: "20px",
+  marginBottom: "20px",
+  gap: "10px",
+},
 
-const labelStyles = {
-  display: 'block',
-  color: '#333',
-  marginBottom: '8px',
-}
+  pagination: {
+    display: "flex",
+    justifyContent: "center",
+    marginTop: "20px",
+    marginBottom: "20px",
+  },
+  pageButton: {
+    backgroundColor: "#fff",
+    color: "#3498db",
+    border: "1px solid #009688",
+    padding: "10px 20px",
+    margin: "0 5px",
+    borderRadius: "4px",
+    cursor: "pointer",
+    fontSize: "16px",
+  },
+};
 
-const inputStyles = {
-  width: '100%',
-  padding: '10px',
-  borderRadius: '4px',
-  border: '1px solid #ddd',
-  fontSize: '14px',
-}
-
-const selectStyles = {
-  width: '100%',
-  padding: '10px',
-  borderRadius: '4px',
-  border: '1px solid #ddd',
-  fontSize: '14px',
-}
-
-const buttonContainerStyles = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-}
-
-const cancelButtonStyles = {
-  backgroundColor: '#0F7268',
-  color: 'white',
-  padding: '8px 16px',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
-}
-
-const saveButtonStyles = {
-  backgroundColor: '#2ecc71',
-  color: 'white',
-  padding: '8px 16px',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
-}
-
-export default UserTableWithEdit
+export default ClassTable;

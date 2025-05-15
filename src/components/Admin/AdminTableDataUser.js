@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import RoleFilter from "./AdminRoleFilter"; // Import component lọc
 
-const API_URL = "http://127.0.0.1:8000/api/users";
+const API_URL = "http://127.0.0.1:8000/api/admin/users";
 
-const UserTableWithEdit = () => {
+const UserTable = () => {
   const [users, setUsers] = useState([]);
   const [filteredRole, setFilteredRole] = useState("all");
   const [showModal, setShowModal] = useState(false);
@@ -429,4 +429,4 @@ buttonContainer:{
   },
 };
 
-export default UserTableWithEdit;
+export default UserTable;

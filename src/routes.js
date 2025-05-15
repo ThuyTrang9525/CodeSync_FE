@@ -15,13 +15,13 @@ import Login from './pages/Login/Login';
 // import LandingPage from "./pages/HomePage"
 
 const routes = [
-    
+
     {
         path: "/Login",
         element: <Login />,
         name: "Login",
     },
-    
+
     {
         path: "/admin-dashboard",
         element: <AdminDashboard />,
@@ -63,7 +63,7 @@ const routes = [
         name: "Notifiation",
     },
     {
-        path: "/teacher-studentList",
+        path: "/teachers/:classId",
         element: <StudentTable />,
         name: "Student List",
     },
