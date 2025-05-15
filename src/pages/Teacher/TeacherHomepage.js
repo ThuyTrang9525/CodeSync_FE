@@ -10,7 +10,6 @@ function ClassesGrid() {
   const navigate = useNavigate()
   const [classes, setClasses] = useState([])
 
-  // Gọi API để lấy danh sách lớp từ backend
   useEffect(() => {
     const fetchClasses = async () => {
       try {

@@ -1,34 +1,54 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router-dom"
 import Navigation from '../../components/Teacher/TeacherNavigation'
 import Header from "../../components/header"
 import Footer from "../../components/footer"
 
 export default function StudentTable() {
-  const { classId } = useParams();
+  const { classId } = useParams()
   const [students, setStudents] = useState([])
-  const [currentPage, setCurrentPage] = useState(1)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
   const [selectedWeek, setSelectedWeek] = useState("Choose Week")
   const [missingOption, setMissingOption] = useState("Missing Status")
   const [showWeekDropdown, setShowWeekDropdown] = useState(false)
   const [showMissingDropdown, setShowMissingDropdown] = useState(false)
 
-  const weekOptions = ["Week 1", "Week 2", "Week 3", "All", "Selected"]
+  const weekOptions = ["Week 1", "Week 2", "Week 3", "All"]
   const missingOptions = ["Show All", "Show Missing"]
 
   const formattedClassId = classId ? classId.toUpperCase().replace(/-/g, " ") : "PNV26B"
 
   useEffect(() => {
     const fetchStudents = async () => {
+      setLoading(true)
+      setError(null)
       try {
-        const response = await fetch(`/api/classes/${classId}/students`)
+        const response = await fetch(`http://localhost:8000/api/classes/${classId}/students`)
         if (!response.ok) throw new Error("Failed to fetch students")
+
         const data = await response.json()
-        setStudents(data)
+        console.log("Fetched data:", data)
+
+        // Nếu API trả về { students: [...] }
+        if (Array.isArray(data.students)) {
+          setStudents(data.students)
+        }
+        // Nếu API trả về trực tiếp mảng
+        else if (Array.isArray(data)) {
+          setStudents(data)
+        } else {
+          setStudents([])
+          setError("Unexpected data format from API")
+        }
       } catch (error) {
-        console.error("Error fetching students:", error)
+        setError(error.message)
+        setStudents([])
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -51,16 +71,16 @@ export default function StudentTable() {
               {formattedClassId}
             </button>
           </div>
+
           <div className="d-flex align-items-center gap-2">
-            <div className="position-relative">
-              <div className="input-group">
-                <span className="input-group-text bg-white">
-                  <i className="bi bi-search"></i>
-                </span>
-                <input type="text" className="form-control" placeholder="Search..." style={{ width: "180px" }} />
-              </div>
+            <div className="input-group">
+              <span className="input-group-text bg-white">
+                <i className="bi bi-search"></i>
+              </span>
+              <input type="text" className="form-control" placeholder="Search..." />
             </div>
 
+            {/* Week Dropdown */}
             <div className="dropdown">
               <button
                 className="btn btn-outline-secondary dropdown-toggle"
@@ -69,7 +89,7 @@ export default function StudentTable() {
                 {selectedWeek}
               </button>
               {showWeekDropdown && (
-                <ul className="dropdown-menu show" style={{ display: "block" }}>
+                <ul className="dropdown-menu show">
                   {weekOptions.map((week, index) => (
                     <li key={index}>
                       <button
@@ -87,6 +107,7 @@ export default function StudentTable() {
               )}
             </div>
 
+            {/* Missing Dropdown */}
             <div className="dropdown">
               <button
                 className="btn btn-outline-secondary dropdown-toggle"
@@ -95,7 +116,7 @@ export default function StudentTable() {
                 {missingOption}
               </button>
               {showMissingDropdown && (
-                <ul className="dropdown-menu show" style={{ display: "block" }}>
+                <ul className="dropdown-menu show">
                   {missingOptions.map((option, index) => (
                     <li key={index}>
                       <button
@@ -115,53 +136,67 @@ export default function StudentTable() {
           </div>
         </div>
 
-        <div className="table-responsive border rounded">
-          <table className="table table-hover mb-0">
-            <thead className="table-light">
-              <tr>
-                <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>STT</th>
-                <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>Name</th>
-                <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>Email</th>
-                <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>Progress Week 1</th>
-                <th className="text-center" style={{ width: "100px", color: "#6c757d" }}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {students.map((student, index) => (
-                <tr key={student.id}>
-                  <td className="text-center">{index + 1}</td>
-                  <td>{student.name}</td>
-                  <td>{student.email}</td>
-                  <td>
-                    <div className="d-flex align-items-center gap-2">
-                      <div className="progress flex-grow-1">
-                        <div
-                          className="progress-bar"
-                          role="progressbar"
-                          style={{ width: `${student.progress || 0}%`, backgroundColor: "#009688" }}
-                          aria-valuenow={student.progress || 0}
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                        ></div>
-                      </div>
-                      <span className="text-nowrap small">{student.progress || 0}%</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="d-flex justify-content-center gap-2">
-                      <button className="btn btn-sm btn-outline-secondary btn-icon">
-                        <i className="bi bi-eye"></i>
-                      </button>
-                      <button className="btn btn-sm btn-outline-secondary btn-icon">
-                        <i className="bi bi-chat-square-text"></i>
-                      </button>
-                    </div>
-                  </td>
+        {loading ? (
+          <div className="text-center py-5">Loading students...</div>
+        ) : error ? (
+          <div className="text-danger text-center py-5">{error}</div>
+        ) : (
+          <div className="table-responsive border rounded">
+            <table className="table table-hover mb-0">
+              <thead className="table-light">
+                <tr>
+                  <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>STT</th>
+                  <th className="text-center" style={{ color: "#6c757d" }}>Name</th>
+                  <th className="text-center" style={{ color: "#6c757d" }}>Email</th>
+                  <th className="text-center" style={{ color: "#6c757d" }}>Progress Week 1</th>
+                  <th className="text-center" style={{ color: "#6c757d" }}></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {students.length > 0 ? (
+                  students.map((student, index) => (
+                    <tr key={student.userID || index}>
+                      <td className="text-center">{index + 1}</td>
+                      <td className="text-center">{student.name || "No name"}</td>
+                      <td className="text-center">{student.email || "No email"}</td>
+                      <td>
+                        <div className="d-flex align-items-center gap-2">
+                          <div className="progress flex-grow-1">
+                            <div
+                              className="progress-bar"
+                              role="progressbar"
+                              style={{ width: `${student.progress || 0}%`, backgroundColor: "#009688" }}
+                              aria-valuenow={student.progress || 0}
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            ></div>
+                          </div>
+                          <span className="text-nowrap small">{student.progress || 0}%</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="d-flex justify-content-center gap-2">
+                          <button className="btn btn-sm btn-outline-secondary btn-icon">
+                            <i className="bi bi-eye"></i>
+                          </button>
+                          <button className="btn btn-sm btn-outline-secondary btn-icon">
+                            <i className="bi bi-chat-square-text"></i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center">
+                      No students found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         <div className="d-flex align-items-center justify-content-between mt-3">
           <div className="d-flex align-items-center gap-1">

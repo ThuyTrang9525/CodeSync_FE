@@ -1,0 +1,251 @@
+:root {
+  --primary-color: #009688;
+  --primary-light: #e0f2f1;
+  --primary-dark: #00796b;
+  --primary-hover: #00897b;
+  --gray-light: #f5f5f5;
+  --gray-medium: #e0e0e0;
+  --text-dark: #333333;
+  --text-muted: #666666;
+}
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+    "Helvetica Neue", sans-serif;
+  color: var(--text-dark);
+  line-height: 1.6;
+  padding-top: 76px; /* For fixed navbar */
+}
+
+/* Override Bootstrap primary color */
+.btn-primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+}
+
+.btn-outline-primary {
+  color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: var(--primary-light) !important;
+  color: var(--primary-dark) !important;
+}
+
+/* Custom button styles */
+.btn-custom {
+  border-radius: 30px;
+  font-weight: 500;
+  box-shadow: 0 4px 6px rgba(0, 150, 136, 0.1);
+  transition: all 0.3s ease;
+}
+
+.btn-custom:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 150, 136, 0.2);
+}
+
+.btn-custom-sm {
+  border-radius: 30px;
+  font-weight: 500;
+  padding: 0.375rem 1rem;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 4px rgba(0, 150, 136, 0.1);
+  transition: all 0.3s ease;
+}
+
+.btn-custom-sm:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 150, 136, 0.2);
+}
+
+.btn-outline-custom {
+  border-radius: 30px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+/* Section styles */
+.section-title {
+  color: var(--text-dark);
+  margin-bottom: 1rem;
+}
+
+.title-underline {
+  height: 3px;
+  width: 60px;
+  background-color: var(--primary-color);
+  margin: 0 auto 2rem;
+}
+
+/* Hero section */
+.hero-section {
+  background-color: white;
+  padding: 80px 0;
+}
+
+.avatar-circle {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 12px rgba(0, 150, 136, 0.15);
+}
+
+.avatar-inner {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: white;
+}
+
+/* Success section */
+.success-section {
+  background-color: var(--gray-light);
+  padding: 80px 0;
+}
+
+.feature-card {
+  background-color: white;
+  padding: 30px 20px;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+  height: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.icon-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background-color: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+/* Teachers section */
+.teachers-section {
+  background-color: var(--gray-light);
+  padding: 80px 0;
+}
+
+.teacher-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+}
+
+.teacher-benefits li {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.benefit-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  color: var(--primary-color);
+}
+
+/* Learning section */
+.learning-section {
+  background-color: white;
+  padding: 80px 0;
+}
+
+.image-circle {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  box-shadow: 0 8px 16px rgba(0, 150, 136, 0.2);
+}
+
+.image-inner {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background-color: white;
+}
+
+/* Testimonial section */
+.testimonial-section {
+  background-color: var(--gray-light);
+  padding: 80px 0;
+}
+
+.testimonial-card {
+  background-color: white;
+  padding: 40px 30px;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid var(--primary-color);
+}
+
+.quote-mark {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  font-size: 60px;
+  color: var(--primary-light);
+  font-family: Georgia, serif;
+  line-height: 1;
+  opacity: 0.5;
+}
+
+.testimonial-text {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--text-dark);
+  font-style: italic;
+  position: relative;
+  z-index: 1;
+  padding-left: 20px;
+}
+
+.testimonial-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.testimonial-avatar .avatar-inner {
+  width: 44px;
+  height: 44px;
+}
+
+

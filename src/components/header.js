@@ -5,6 +5,17 @@ import { Bell, Search, User } from "lucide-react"
 import Logo from "../assets/image/Logo.jpg";
 
 export default function Header() {
+  const token = localStorage.getItem('token')
+
+  const handleLogin = () => {
+    window.location.href = '/Login'
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    window.location.reload()
+  }
   return (
     <header className="header sticky-top bg-light shadow-sm">
       <div className="container py-3">
@@ -64,7 +75,9 @@ export default function Header() {
               </ul>
             </div>
 
-            <button className="btn btn-primary">Log out</button>
+            <button className="btn btn-primary" onClick={token ? handleLogout : handleLogin}>
+              {token ? 'Log out' : 'Login'}
+            </button>
           </div>
         </div>
       </div>
