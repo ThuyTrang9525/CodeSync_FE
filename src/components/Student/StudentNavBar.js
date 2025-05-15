@@ -1,54 +1,74 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Home, Target, Edit, Menu, Settings, HelpCircle } from "lucide-react";
 
+const navs = [
+  {
+    label: "Class",
+    icon: <Home size={24} />,
+    path: "/student-home",
+    isLink: true,
+  },
+  {
+    label: "Set Goal Sem",
+    icon: <Target size={24} />,
+    path: "/student-goal",
+    isLink: true,
+  },
+  {
+    label: "Learning Journal",
+    icon: <Edit size={24} />,
+    path: "/student-management",
+    isLink: true,
+  },
+  {
+    label: "Time table",
+    icon: <Menu size={24} />,
+    path: null,
+    isLink: false,
+  },
+  {
+    label: "Setting",
+    icon: <Settings size={24} />,
+    path: null,
+    isLink: false,
+  },
+  {
+    label: "Support",
+    icon: <HelpCircle size={24} />,
+    path: null,
+    isLink: false,
+  },
+];
+
 const Navbar = () => {
-    return (
-        <div className="navbar">
-            <div className="nav-item active">
-            <Link to="/student-home" className="nav-link">
-                <div className="nav-icon">
-                    <Home size={24} />
-                </div>
-                Class
-            </Link>
-            </div>
-            <div className="nav-item">
-                <Link to="/student-goal" className="nav-link">
-                    <div className="nav-icon">
-                        <Target size={24} />
-                    </div>
-                    Set Goal Sem
-                </Link>
-            </div>
-            <div className="nav-item">
-                <Link to="/student-management" className="nav-link">
-                    <div className="nav-icon">
-                        <Edit size={24} />
-                    </div>
-                    Learning Journal
-                </Link>
-            </div>
-            <div className="nav-item">
-                <div className="nav-icon">
-                    <Menu size={24} />
-                </div>
-                Time table
-            </div>
-            <div className="nav-item">
-                <div className="nav-icon">
-                    <Settings size={24} />
-                </div>
-                Setting
-            </div>
-            <div className="nav-item">
-                <div className="nav-icon">
-                    <HelpCircle size={24} />
-                </div>
-                Support
-            </div>
-        </div>
-    );
+  const location = useLocation();
+
+  return (
+    <div className="navbar">
+      {navs.map((nav, idx) => {
+        const isActive = nav.path && location.pathname === nav.path;
+        return (
+          <div
+            className={`nav-item${isActive ? " active" : ""}`}
+            key={nav.label}
+          >
+            {nav.isLink && nav.path ? (
+              <Link to={nav.path} className="nav-link">
+                <div className="nav-icon">{nav.icon}</div>
+                {nav.label}
+              </Link>
+            ) : (
+              <>
+                <div className="nav-icon">{nav.icon}</div>
+                {nav.label}
+              </>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
 };
 
 export default Navbar;
