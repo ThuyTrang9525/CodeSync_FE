@@ -97,88 +97,90 @@ export default function NotificationsTable() {
   
 
   return (
-    <div className="bg-white">
+    <div className="d-flex flex-column min-vh-100 bg-white">
       <Header />
       <Navigation />
-      <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 position-relative">
-        <h2 className="fs-4 fw-semibold mb-0">Recent announcements</h2>
-        <div className="d-flex align-items-center gap-2">
-        <button className="btn btn-outline-secondary" onClick={toggleCalendar}>
-        <FaCalendarAlt />
-        </button>
+      <div className="p-3 container my-3">
+        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 position-relative">
+          <h2 className="fs-4 fw-semibold mb-0">Recent announcements</h2>
+          <div className="d-flex align-items-center gap-2">
+          <button className="btn btn-outline-secondary" onClick={toggleCalendar}>
+          <FaCalendarAlt />
+          </button>
 
-        {openCalendar && (
-          <div className="position-absolute"
-            style={{
-              zIndex: 999,
-              top: '100%', 
-            }}>
-            <DatePicker
-              selected={date}
-              onChange={handleDateChange}
-              inline
-            />
+          {openCalendar && (
+            <div className="position-absolute"
+              style={{
+                zIndex: 999,
+                top: '100%', 
+              }}>
+              <DatePicker
+                selected={date}
+                onChange={handleDateChange}
+                inline
+              />
+            </div>
+            
+          )}
+          <div className="">
+            <h10>Selected Date: {formattedDate}</h10>
           </div>
           
-        )}
-        <div className="">
-          <h10>Selected Date: {formattedDate}</h10>
+          <select
+            className="form-select"
+            value={selectedClass}
+            onChange={handleClassChange}
+            style={{ width: "120px" }}
+          >
+            <option value="All">All</option>
+            <option value="PNV26B">PNV26B</option>
+            <option value="PNV25A">PNV25A</option>
+          </select>
+          </div>
         </div>
-        
-        <select
-          className="form-select"
-          value={selectedClass}
-          onChange={handleClassChange}
-          style={{ width: "120px" }}
-        >
-          <option value="All">All</option>
-          <option value="PNV26B">PNV26B</option>
-          <option value="PNV25A">PNV25A</option>
-        </select>
-        </div>
-      </div>
 
-      <div className="table-responsive border rounded">
-        <table className="table table-hover mb-0">
-          <thead className="table-light">
-            <tr>
-              <th>Name</th>
-              <th>Class</th>
-              <th>Content</th>
-              <th>Time</th>
-              <th className="text-center" style={{ width: "100px" }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {notifications.map((notification) => (
-              <tr key={notification.id}>
-                <td>{notification.name}</td>
-                <td>
-                  <span className="text-danger fw-medium">{notification.class}</span>
-                </td>
-                <td>{notification.content}</td>
-                <td>{notification.time}</td>
-                <td>
-                  <div className="d-flex justify-content-center gap-2">
-                    <button className="btn btn-sm btn-outline-secondary btn-icon">
-                      <i className="bi bi-eye"></i>
-                    </button>
-                    <button className="btn btn-sm btn-outline-secondary btn-icon">
-                      <i className="bi bi-chat-square-text"></i>
-                    </button>
-                  </div>
-                </td>
+        <div className="table-responsive border rounded">
+          <table className="table table-hover mb-0">
+            <thead className="table-light">
+              <tr>
+                <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>Name</th>
+                <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>Class</th>
+                <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>Content</th>
+                <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>Time</th>
+                <th className="text-center" style={{ width: "100px", color: "#6c757d" }}></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {notifications.map((notification) => (
+                <tr key={notification.id}>
+                  <td>{notification.name}</td>
+                  <td>
+                    <span className="text-danger fw-medium">{notification.class}</span>
+                  </td>
+                  <td>{notification.content}</td>
+                  <td>{notification.time}</td>
+                  <td>
+                    <div className="d-flex justify-content-center gap-2">
+                      <button className="btn btn-sm btn-outline-secondary btn-icon">
+                        <i className="bi bi-eye"></i>
+                      </button>
+                      <button className="btn btn-sm btn-outline-secondary btn-icon">
+                        <i className="bi bi-chat-square-text"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-      <div className="d-flex align-items-center justify-content-between mt-3">
-        <div className="d-flex align-items-center gap-1">
-          <button className="btn btn-primary btn-sm px-3">1</button>
-          <button className="btn btn-outline-secondary btn-sm px-3">2</button>
-          <button className="btn btn-outline-secondary btn-sm">Next</button>
+        <div className="d-flex align-items-center justify-content-between mt-3">
+          <div className="d-flex align-items-center gap-1">
+            <button className="btn btn-primary btn-sm px-3">1</button>
+            <button className="btn btn-outline-secondary btn-sm px-3">2</button>
+            <button className="btn btn-outline-secondary btn-sm">Next</button>
+          </div>
         </div>
       </div>
       <Footer />
