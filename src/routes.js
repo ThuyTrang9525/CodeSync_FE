@@ -12,7 +12,7 @@ import StudentTable from './pages/Teacher/TeacherListStudent';
 import Homepage from "./pages/Student/StudentHomepage";
 import Profile from "./pages/Student/StudentProfile";
 import Login from './pages/Login/Login';
-import LandingPage from "./pages/HomePage"
+// import LandingPage from "./pages/HomePage"
 
 const routes = [
     
@@ -77,11 +77,11 @@ const routes = [
         element: <Profile />,
         name: "Student Profile",
     },
-    {
-        path: "/",
-        element: <LandingPage />,
-        name: "HomePage",
-    },
+    // {
+    //     path: "/",
+    //     element: <LandingPage />,
+    //     name: "HomePage",
+    // },
     {
         path: "*",
         element: <h1>404 - Page Not Found</h1>,

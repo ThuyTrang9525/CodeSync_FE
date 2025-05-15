@@ -8,6 +8,7 @@ export default function CreateGoalForm({ addGoal }) {
   const [formData, setFormData] = useState({
     title: "",
     subject: "",
+    week: "",
     semester: "Sem 2/2025",
     deadline: "",
     priority: "2",
@@ -95,6 +96,22 @@ const handleSubmit = async (e) => {
                 required
               />
             </div>
+          </div>
+          <div className="form-group">
+            <label htmlFor="week" className="form-label">Week</label>
+              <div className="input-with-icon">
+                <BookOpen size={18} className="input-icon" />
+                <input
+                  type="text"
+                  className="form-control pl-10"
+                  id="week"
+                  name="week"
+                  value={formData.week}
+                  onChange={handleChange}
+                  placeholder="Enter week"
+                  required
+                />
+              </div>
           </div>
 
           <div className="form-group">
