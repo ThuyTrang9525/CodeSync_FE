@@ -63,7 +63,7 @@ const routes = [
         name: "Notifiation",
     },
     {
-        path: "/teacher-studentList",
+        path: "/teachers/:classId",
         element: <StudentTable />,
         name: "Student List",
     },

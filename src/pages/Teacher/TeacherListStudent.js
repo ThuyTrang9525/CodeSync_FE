@@ -1,36 +1,41 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Navigation from '../../components/Teacher/TeacherNavigation';
+import { useParams } from "react-router-dom";
+import Navigation from '../../components/Teacher/TeacherNavigation'
 import Header from "../../components/header"
 import Footer from "../../components/footer"
 
-const generateStudents = (classId) => {
-  return Array.from({ length: 10 }, (_, i) => ({
-    id: i + 1,
-    name: "Nguyễn Văn A",
-    email: "vinhtrananh@gmail.com",
-    progress: i % 2 === 0 ? (i === 0 ? 0 : 100) : i === 3 ? 50 : i * 10,
-  }))
-}
-
-export default function StudentTable({ classId }) {
-  const [currentPage, setCurrentPage] = useState(1)
+export default function StudentTable() {
+  const { classId } = useParams();
   const [students, setStudents] = useState([])
-  const weekOptions = ["Week 1", "Week 2", "Week 3", "All", "Selected"];
-  const missingOptions = ["Show All", "Show Missing"];
+  const [currentPage, setCurrentPage] = useState(1)
+  const [selectedWeek, setSelectedWeek] = useState("Choose Week")
+  const [missingOption, setMissingOption] = useState("Missing Status")
+  const [showWeekDropdown, setShowWeekDropdown] = useState(false)
+  const [showMissingDropdown, setShowMissingDropdown] = useState(false)
 
-  const [selectedWeek, setSelectedWeek] = useState("Choose Week");
-  const [missingOption, setMissingOption] = useState("Missing Status");
-
-  const [showWeekDropdown, setShowWeekDropdown] = useState(false);
-  const [showMissingDropdown, setShowMissingDropdown] = useState(false);
-  useEffect(() => {
-   
-    setStudents(generateStudents(classId))
-  }, [classId])
+  const weekOptions = ["Week 1", "Week 2", "Week 3", "All", "Selected"]
+  const missingOptions = ["Show All", "Show Missing"]
 
   const formattedClassId = classId ? classId.toUpperCase().replace(/-/g, " ") : "PNV26B"
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await fetch(`/api/classes/${classId}/students`)
+        if (!response.ok) throw new Error("Failed to fetch students")
+        const data = await response.json()
+        setStudents(data)
+      } catch (error) {
+        console.error("Error fetching students:", error)
+      }
+    }
+
+    if (classId) {
+      fetchStudents()
+    }
+  }, [classId])
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-white">
@@ -55,6 +60,7 @@ export default function StudentTable({ classId }) {
                 <input type="text" className="form-control" placeholder="Search..." style={{ width: "180px" }} />
               </div>
             </div>
+
             <div className="dropdown">
               <button
                 className="btn btn-outline-secondary dropdown-toggle"
@@ -69,8 +75,8 @@ export default function StudentTable({ classId }) {
                       <button
                         className="dropdown-item"
                         onClick={() => {
-                          setSelectedWeek(week);
-                          setShowWeekDropdown(false);
+                          setSelectedWeek(week)
+                          setShowWeekDropdown(false)
                         }}
                       >
                         {week}
@@ -80,7 +86,7 @@ export default function StudentTable({ classId }) {
                 </ul>
               )}
             </div>
-            
+
             <div className="dropdown">
               <button
                 className="btn btn-outline-secondary dropdown-toggle"
@@ -95,8 +101,8 @@ export default function StudentTable({ classId }) {
                       <button
                         className="dropdown-item"
                         onClick={() => {
-                          setMissingOption(option);
-                          setShowMissingDropdown(false);
+                          setMissingOption(option)
+                          setShowMissingDropdown(false)
                         }}
                       >
                         {option}
@@ -106,7 +112,6 @@ export default function StudentTable({ classId }) {
                 </ul>
               )}
             </div>
-
           </div>
         </div>
 
@@ -114,9 +119,7 @@ export default function StudentTable({ classId }) {
           <table className="table table-hover mb-0">
             <thead className="table-light">
               <tr>
-                <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>
-                  STT
-                </th>
+                <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>STT</th>
                 <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>Name</th>
                 <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>Email</th>
                 <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>Progress Week 1</th>
@@ -124,9 +127,9 @@ export default function StudentTable({ classId }) {
               </tr>
             </thead>
             <tbody>
-              {students.map((student) => (
+              {students.map((student, index) => (
                 <tr key={student.id}>
-                  <td className="text-center">{student.id}</td>
+                  <td className="text-center">{index + 1}</td>
                   <td>{student.name}</td>
                   <td>{student.email}</td>
                   <td>
@@ -135,13 +138,13 @@ export default function StudentTable({ classId }) {
                         <div
                           className="progress-bar"
                           role="progressbar"
-                          style={{ width: `${student.progress}%`, backgroundColor: "#009688" }}
-                          aria-valuenow={student.progress}
+                          style={{ width: `${student.progress || 0}%`, backgroundColor: "#009688" }}
+                          aria-valuenow={student.progress || 0}
                           aria-valuemin="0"
                           aria-valuemax="100"
                         ></div>
                       </div>
-                      <span className="text-nowrap small">{student.progress}%</span>
+                      <span className="text-nowrap small">{student.progress || 0}%</span>
                     </div>
                   </td>
                   <td>

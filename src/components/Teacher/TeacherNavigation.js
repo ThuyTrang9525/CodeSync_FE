@@ -4,7 +4,7 @@ export default function Navigation({ activeTab = "class" }) {
         <div className="container d-flex justify-content-between">
           <NavItem href="/teacher-home" icon="bi-people-fill" label="Class" active={activeTab === "class"} />
           <NavItem href="/timetable" icon="bi-calendar-week" label="Timetable" active={activeTab === "timetable"} />
-          <NavItem href="/teacher-studentList" icon="bi-person-fill" label="Students" active={activeTab === "students"} />
+          <NavItem href="/teachers/${classId}" icon="bi-person-fill" label="Students" active={activeTab === "students"} />
           <NavItem
             href="/teacher-notification"
             icon="bi-bell-fill"

@@ -35,7 +35,7 @@ function ClassesGrid() {
   }, [])
 
   const handleClassClick = (classId) => {
-    navigate(`/students/${classId}`)
+    navigate(`/teachers/${classId}`)
   }
 
   useEffect(() => {
