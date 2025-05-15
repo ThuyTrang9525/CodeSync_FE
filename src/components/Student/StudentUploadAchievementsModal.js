@@ -1,11 +1,7 @@
 import { useState } from 'react';
 import Modal from 'react-modal';
 
-
-
 Modal.setAppElement('#root');
-
-
 export default function UploadAchievementsModal({ isOpen, onRequestClose }) {
   const [selectedFile, setSelectedFile] = useState(null);
 
