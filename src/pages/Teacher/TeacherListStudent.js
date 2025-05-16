@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
-import Navigation from '../../components/Teacher/TeacherNavigation'
+import NavBar from '../../components/Teacher/TeacherNavBar'
 import Header from "../../components/header"
 import Footer from "../../components/footer"
 
@@ -60,16 +60,16 @@ export default function StudentTable() {
   return (
     <div className="d-flex flex-column min-vh-100 bg-white">
       <Header />
-      <Navigation />
+      <NavBar />
       <div className="p-3 container my-3">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
           <div className="d-flex gap-3">
-            <button
+            {/* <button
               className="px-3 py-2 fw-medium border-0 border-bottom bg-transparent"
               style={{ color: "#009688", borderColor: "#009688" }}
             >
               {formattedClassId}
-            </button>
+            </button> */}
           </div>
 
           <div className="d-flex align-items-center gap-2">
@@ -178,9 +178,6 @@ export default function StudentTable() {
                         <div className="d-flex justify-content-center gap-2">
                           <button className="btn btn-sm btn-outline-secondary btn-icon">
                             <i className="bi bi-eye"></i>
-                          </button>
-                          <button className="btn btn-sm btn-outline-secondary btn-icon">
-                            <i className="bi bi-chat-square-text"></i>
                           </button>
                         </div>
                       </td>
