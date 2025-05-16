@@ -1,339 +1,263 @@
-"use client";
-
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Plus } from "lucide-react";
 
-export default function SelfStudyTable() {
-  const [selfStudyData, setSelfStudyData] = useState([]);
-  const [semester, setSemester] = useState(1); // hoặc giá trị mặc định phù hợp
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const API_BASE_URL = "http://localhost:8000/api/student/inclass-plans";
+const DEFAULT_SEMESTER = "2025-1";
+const DEFAULT_WEEK = 1;
+const USER_ID = 1; // Cập nhật theo user đăng nhập thực tế
 
-  const [editingCell, setEditingCell] = useState({ id: null, field: null });
-  const [editValue, setEditValue] = useState("");
+const SelfStudyTable = () => {
+  const [selfStudyData, setSelfStudyData] = useState([]);
   const [newEntry, setNewEntry] = useState({
     date: "",
     skill: "",
     lesson: "",
-    timeAllocation: "",
-    learningResources: "",
-    learningActivity: "",
+    time_allocation: "",
+    resources: "",
+    activities: "",
     evaluation: "",
+    notes: "",
+    concentration: "",
   });
+  const [editingCell, setEditingCell] = useState({ id: null, field: null });
+  const [editValue, setEditValue] = useState("");
 
-  const token = localStorage.getItem("token");
-
-  // Lấy dữ liệu từ API khi load hoặc đổi semester
   useEffect(() => {
-    const fetchSelfStudyPlans = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(
-          `http://localhost:8000/api/student/study-plans/semester/${semester}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: "application/json",
-            },
-          }
-        );
-        // Nếu API trả về {data: [...]}, dùng response.data.data
-        setSelfStudyData(Array.isArray(response.data) ? response.data : response.data.data);
-      } catch (err) {
-        setError("Lỗi khi lấy dữ liệu từ server");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    axios
+      .get(`${API_BASE_URL}/semester/${DEFAULT_SEMESTER}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((response) => {
+        setSelfStudyData(response.data);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch data", error);
+      });
+  }, []);
 
-    fetchSelfStudyPlans();
-  }, [semester, token]);
-
-  // Bắt đầu chỉnh sửa
-  const handleEdit = (id, field, value) => {
-    setEditingCell({ id, field });
-    setEditValue(value);
-  };
-
-  // Lưu chỉnh sửa lên server
-  const handleSave = async (id, field) => {
-    const updatedItem = selfStudyData.find((item) => item.id === id);
-    if (!updatedItem) return;
-    const updated = { ...updatedItem, [field]: editValue };
-    try {
-      await axios.put(
-        `http://localhost:8000/api/student/study-plans/${id}`,
-        updated,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        }
-      );
-      setSelfStudyData(
-        selfStudyData.map((item) => (item.id === id ? updated : item))
-      );
-    } catch (err) {
-      setError("Lỗi khi cập nhật");
-      console.error(err);
-    }
-    setEditingCell({ id: null, field: null });
-    setEditValue("");
-  };
-
-  // Xử lý thay đổi input khi thêm mới
   const handleNewEntryChange = (field, value) => {
-    setNewEntry({
-      ...newEntry,
-      [field]: value,
-    });
+    setNewEntry({ ...newEntry, [field]: value });
   };
 
-  // Thêm mới lên server
-  const handleAddEntry = async (e) => {
-    e.preventDefault();
-    if (!newEntry.date || !newEntry.skill) return;
-    try {
-      const response = await axios.post(
-        "http://localhost:8000/api/student/study-plans",
-        { ...newEntry, semester },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        }
-      );
-      // Nếu API trả về object mới, thêm vào state
+const handleAddEntry = () => {
+  if (!newEntry.date || !newEntry.skill) {
+    console.warn("Missing required fields: date or skill");
+    return;
+  }
+
+  const dataToSend = {
+    userID: USER_ID,
+    semester: DEFAULT_SEMESTER,
+    week: DEFAULT_WEEK,
+    date: newEntry.date,
+    skill: newEntry.skill,
+    lessonSummary: newEntry.lesson,
+    time_allocation: newEntry.time_allocation,
+    resources: newEntry.resources,
+    activities: newEntry.activities,
+    evaluation: newEntry.evaluation,
+    concentration: "",
+    notes: "",
+  };
+
+  console.log("Sending data:", dataToSend);
+
+  axios
+    .post(API_BASE_URL, dataToSend, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    })
+    .then((response) => {
+      console.log("Created successfully:", response.data);
       setSelfStudyData([...selfStudyData, response.data]);
       setNewEntry({
         date: "",
         skill: "",
         lesson: "",
-        timeAllocation: "",
-        learningResources: "",
-        learningActivity: "",
+        time_allocation: "",
+        resources: "",
+        activities: "",
         evaluation: "",
       });
-    } catch (err) {
-      setError("Lỗi khi thêm mới");
-      console.error(err);
-    }
+    })
+    .catch((error) => {
+      if (error.response) {
+        console.error("Server responded with error:", error.response.data);
+      } else if (error.request) {
+        console.error("Request made but no response received:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
+    });
+};
+
+
+  const handleEdit = (id, field, value) => {
+    setEditingCell({ id, field });
+    setEditValue(value);
   };
 
-  if (loading) return <div>Đang tải dữ liệu...</div>;
-  if (error) return <div>{error}</div>;
+  const handleSave = (id, field) => {
+    const updatedItem = selfStudyData.find((item) => item.planID === id);
+    if (!updatedItem) return;
+
+    const updatedValue = {
+      ...updatedItem,
+      [field]: editValue,
+    };
+
+    axios
+      .put(`${API_BASE_URL}/${id}`, updatedValue, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then(() => {
+        setSelfStudyData(
+          selfStudyData.map((item) => (item.planID === id ? updatedValue : item))
+        );
+        setEditingCell({ id: null, field: null });
+      })
+      .catch((error) => {
+        console.error("Failed to update entry", error);
+      });
+  };
+
+  const handleDelete = (id) => {
+    axios
+      .delete(`${API_BASE_URL}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then(() => {
+        setSelfStudyData(selfStudyData.filter((item) => item.planID !== id));
+      })
+      .catch((error) => {
+        console.error("Failed to delete entry", error);
+      });
+  };
+
+  const renderCell = (item, field) => {
+    const value = item[field];
+    if (editingCell.id === item.planID && editingCell.field === field) {
+      return (
+        <input
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onBlur={() => handleSave(item.planID, field)}
+          autoFocus
+        />
+      );
+    }
+    return (
+      <div onClick={() => handleEdit(item.planID, field, value)}>{value}</div>
+    );
+  };
 
   return (
-    <div className="">
-      <table className="full-width-table">
+    <div className="overflow-x-auto">
+      <table className="min-w-full border border-gray-300 text-sm">
         <thead>
-          <tr>
-            <th>Date</th>
-            <th>Skill/ Module</th>
-            <th>My Lesson</th>
-            <th>Time allocation</th>
-            <th>Learning resources</th>
-            <th>Learning activity</th>
-            <th>Evaluation of work</th>
+          <tr className="bg-gray-100 text-xs text-left">
+            <th className="p-2 border">Date</th>
+            <th className="p-2 border">Skill/Module</th>
+            <th className="p-2 border">My Lesson</th>
+            <th className="p-2 border">Time Allocation</th>
+            <th className="p-2 border">Resources</th>
+            <th className="p-2 border">Activities</th>
+            <th className="p-2 border">Evaluation</th>
+            <th className="p-2 border">Actions</th>
           </tr>
         </thead>
         <tbody>
           {selfStudyData.map((item) => (
-            <tr key={item.id}>
-              <td
-                className={editingCell.id === item.id && editingCell.field === "date" ? "" : "editable-cell"}
-                onClick={() => handleEdit(item.id, "date", item.date)}
-              >
-                {editingCell.id === item.id && editingCell.field === "date" ? (
-                  <input
-                    className="editable-input"
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={() => handleSave(item.id, "date")}
-                    onKeyDown={(e) => e.key === "Enter" && handleSave(item.id, "date")}
-                    autoFocus
-                  />
-                ) : (
-                  item.date
-                )}
-              </td>
-              <td
-                className={editingCell.id === item.id && editingCell.field === "skill" ? "" : "editable-cell"}
-                onClick={() => handleEdit(item.id, "skill", item.skill)}
-              >
-                {editingCell.id === item.id && editingCell.field === "skill" ? (
-                  <input
-                    className="editable-input"
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={() => handleSave(item.id, "skill")}
-                    onKeyDown={(e) => e.key === "Enter" && handleSave(item.id, "skill")}
-                    autoFocus
-                  />
-                ) : (
-                  item.skill
-                )}
-              </td>
-              <td
-                className={`whitespace-pre-line ${editingCell.id === item.id && editingCell.field === "lesson" ? "" : "editable-cell"}`}
-                onClick={() => handleEdit(item.id, "lesson", item.lesson)}
-              >
-                {editingCell.id === item.id && editingCell.field === "lesson" ? (
-                  <textarea
-                    className="editable-input"
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={() => handleSave(item.id, "lesson")}
-                    rows={3}
-                    autoFocus
-                  />
-                ) : (
-                  item.lesson
-                )}
-              </td>
-              <td
-                className={editingCell.id === item.id && editingCell.field === "timeAllocation" ? "" : "editable-cell"}
-                onClick={() => handleEdit(item.id, "timeAllocation", item.timeAllocation)}
-              >
-                {editingCell.id === item.id && editingCell.field === "timeAllocation" ? (
-                  <input
-                    className="editable-input"
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={() => handleSave(item.id, "timeAllocation")}
-                    onKeyDown={(e) => e.key === "Enter" && handleSave(item.id, "timeAllocation")}
-                    autoFocus
-                  />
-                ) : (
-                  item.timeAllocation
-                )}
-              </td>
-              <td
-                className={editingCell.id === item.id && editingCell.field === "learningResources" ? "" : "editable-cell"}
-                onClick={() => handleEdit(item.id, "learningResources", item.learningResources)}
-              >
-                {editingCell.id === item.id && editingCell.field === "learningResources" ? (
-                  <input
-                    className="editable-input"
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={() => handleSave(item.id, "learningResources")}
-                    onKeyDown={(e) => e.key === "Enter" && handleSave(item.id, "learningResources")}
-                    autoFocus
-                  />
-                ) : (
-                  item.learningResources
-                )}
-              </td>
-              <td
-                className={editingCell.id === item.id && editingCell.field === "learningActivity" ? "" : "editable-cell"}
-                onClick={() => handleEdit(item.id, "learningActivity", item.learningActivity)}
-              >
-                {editingCell.id === item.id && editingCell.field === "learningActivity" ? (
-                  <textarea
-                    className="editable-input"
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={() => handleSave(item.id, "learningActivity")}
-                    rows={3}
-                    autoFocus
-                  />
-                ) : (
-                  item.learningActivity
-                )}
-              </td>
-              <td
-                className={editingCell.id === item.id && editingCell.field === "evaluation" ? "" : "editable-cell"}
-                onClick={() => handleEdit(item.id, "evaluation", item.evaluation)}
-              >
-                {editingCell.id === item.id && editingCell.field === "evaluation" ? (
-                  <textarea
-                    className="editable-input"
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={() => handleSave(item.id, "evaluation")}
-                    rows={3}
-                    autoFocus
-                  />
-                ) : (
-                  item.evaluation
-                )}
+            <tr key={item.planID} className="border-t hover:bg-gray-50">
+              <td className="p-2 border">{renderCell(item, "date")}</td>
+              <td className="p-2 border">{renderCell(item, "skill")}</td>
+              <td className="p-2 border">{renderCell(item, "lessonSummary")}</td>
+              <td className="p-2 border">{renderCell(item, "time_allocation")}</td>
+              <td className="p-2 border">{renderCell(item, "resources")}</td>
+              <td className="p-2 border">{renderCell(item, "activities")}</td>
+              <td className="p-2 border">{renderCell(item, "evaluation")}</td>
+              <td className="p-2 border">
+                <button
+                  onClick={() => handleDelete(item.planID)}
+                  className="text-red-500 hover:underline text-xs"
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
-          {/* New row for adding data */}
-          <tr className="bg-[#e0f2f1]">
-            <td>
+          <tr className="bg-gray-50">
+            <td className="p-2 border">
               <input
-                className="w-full p-2 border border-[#009688] rounded"
-                placeholder="Date"
+                type="date"
                 value={newEntry.date}
                 onChange={(e) => handleNewEntryChange("date", e.target.value)}
+                className="w-full text-xs"
               />
             </td>
-            <td>
+            <td className="p-2 border">
               <input
-                className="w-full p-2 border border-[#009688] rounded"
-                placeholder="Skill/Module"
                 value={newEntry.skill}
                 onChange={(e) => handleNewEntryChange("skill", e.target.value)}
+                className="w-full text-xs"
               />
             </td>
-            <td>
-              <textarea
-                className="w-full p-2 border border-[#009688] rounded"
-                placeholder="Lesson"
-                rows={2}
+            <td className="p-2 border">
+              <input
                 value={newEntry.lesson}
                 onChange={(e) => handleNewEntryChange("lesson", e.target.value)}
+                className="w-full text-xs"
               />
             </td>
-            <td>
+            <td className="p-2 border">
               <input
-                className="w-full p-2 border border-[#009688] rounded"
-                placeholder="Time allocation"
-                value={newEntry.timeAllocation}
-                onChange={(e) => handleNewEntryChange("timeAllocation", e.target.value)}
+                value={newEntry.time_allocation}
+                onChange={(e) => handleNewEntryChange("time_allocation", e.target.value)}
+                className="w-full text-xs"
               />
             </td>
-            <td>
+            <td className="p-2 border">
               <input
-                className="w-full p-2 border border-[#009688] rounded"
-                placeholder="Learning resources"
-                value={newEntry.learningResources}
-                onChange={(e) => handleNewEntryChange("learningResources", e.target.value)}
+                value={newEntry.resources}
+                onChange={(e) => handleNewEntryChange("resources", e.target.value)}
+                className="w-full text-xs"
               />
             </td>
-            <td>
-              <textarea
-                className="w-full p-2 border border-[#009688] rounded"
-                placeholder="Learning activity"
-                rows={2}
-                value={newEntry.learningActivity}
-                onChange={(e) => handleNewEntryChange("learningActivity", e.target.value)}
+            <td className="p-2 border">
+              <input
+                value={newEntry.activities}
+                onChange={(e) => handleNewEntryChange("activities", e.target.value)}
+                className="w-full text-xs"
               />
             </td>
-            <td>
-              <div className="flex flex-col space-y-2">
-                <textarea
-                  className="w-full p-2 border border-[#009688] rounded"
-                  placeholder="Evaluation"
-                  rows={2}
-                  value={newEntry.evaluation}
-                  onChange={(e) => handleNewEntryChange("evaluation", e.target.value)}
-                />
-                <button className="w-full bg-[#009688] hover:bg-[#00796b]" size="sm" onClick={handleAddEntry}>
-                  <Plus className="h-4 w-4 mr-1" /> Add
-                </button>
-              </div>
+            <td className="p-2 border">
+              <input
+                value={newEntry.evaluation}
+                onChange={(e) => handleNewEntryChange("evaluation", e.target.value)}
+                className="w-full text-xs"
+              />
+            </td>
+            <td className="p-2 border text-center">
+              <button
+                onClick={handleAddEntry}
+                className="bg-green-500 hover:bg-green-600 text-white text-xs px-2 py-1 rounded"
+              >
+                <Plus size={14} />
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
   );
-}
+};
+
+export default SelfStudyTable;

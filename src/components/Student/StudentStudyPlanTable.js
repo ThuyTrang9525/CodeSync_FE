@@ -1,307 +1,399 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { Plus } from "lucide-react";
+import { useState, useEffect } from "react"
+import axios from "axios"
+import { Plus } from "lucide-react"
 
-const StudyPlans = () => {
-  const [studyPlans, setStudyPlans] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [semester, setSemester] = useState(1); // Có thể đổi semester nếu cần
-  const [error, setError] = useState(null);
+const DEFAULT_SEMESTER = "2025-1"
+const DEFAULT_WEEK = 1
 
-  // Các state cho chức năng chỉnh sửa và thêm mới
-  const [editingCell, setEditingCell] = useState({ id: null, field: null });
-  const [editValue, setEditValue] = useState("");
+const StudyPlanTable = () => {
+  const [studyPlans, setStudyPlans] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  const [editingCell, setEditingCell] = useState({ id: null, field: null })
+  const [editValue, setEditValue] = useState("")
   const [newEntry, setNewEntry] = useState({
     date: "",
     skill: "",
-    lesson: "",
+    lessonSummary: "",
     selfAssessment: "",
-    difficulty: "",
-    plan: "",
+    difficulties: "",
+    planToImprove: "",
     problemSolved: "Yes",
-  });
+    semester: DEFAULT_SEMESTER,
+    week: DEFAULT_WEEK,
+  })
 
-  const token = localStorage.getItem("token");
+  // Lấy token từ localStorage (chỉ chạy client-side)
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
 
   useEffect(() => {
+    if (!token) {
+      setError("Chưa đăng nhập")
+      setLoading(false)
+      return
+    }
+
     const fetchStudyPlans = async () => {
+      setLoading(true)
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/student/inclass-plans/semester/${semester}`,
+          `http://localhost:8000/api/student/study-plans/semester/${DEFAULT_SEMESTER}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
               Accept: "application/json",
             },
           }
-        );
-        setStudyPlans(response.data); // Đảm bảo API trả về mảng
+        )
+
+        const data = Array.isArray(response.data) ? response.data : response.data.data
+        const filteredData = data.filter((item) => item.week === DEFAULT_WEEK)
+        setStudyPlans(filteredData)
+        setError(null)
       } catch (err) {
-        setError("Lỗi khi lấy dữ liệu từ server");
-        console.error(err);
+        setError("Lỗi khi lấy dữ liệu từ server")
+        console.error(err)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchStudyPlans();
-  }, [semester, token]);
+    fetchStudyPlans()
+  }, [token])
 
-  // Các hàm xử lý chỉnh sửa và thêm mới (giữ nguyên logic cũ)
   const handleEdit = (id, field, value) => {
-    setEditingCell({ id, field });
-    setEditValue(value);
-  };
+    setEditingCell({ id, field })
+    setEditValue(value || "")
+  }
 
-  const handleSave = (id, field) => {
-    setStudyPlans((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, [field]: editValue } : item
+  const handleSave = async (id, field) => {
+    const updatedItem = studyPlans.find((item) => item.id === id)
+    if (!updatedItem) return
+
+    if (editValue === updatedItem[field]) {
+      // Không có thay đổi, chỉ đóng chế độ chỉnh sửa
+      setEditingCell({ id: null, field: null })
+      return
+    }
+
+    const updated = { ...updatedItem, [field]: editValue }
+
+    try {
+      await axios.put(
+        `http://localhost:8000/api/student/study-plans/${id}`,
+        updated,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
       )
-    );
-    setEditingCell({ id: null, field: null });
-    setEditValue("");
-  };
+      setStudyPlans((prev) =>
+        prev.map((item) => (item.id === id ? updated : item))
+      )
+      setError(null)
+    } catch (err) {
+      setError("Lỗi khi cập nhật")
+      console.error(err)
+    }
+
+    setEditingCell({ id: null, field: null })
+    setEditValue("")
+  }
 
   const handleNewEntryChange = (field, value) => {
-    setNewEntry((prev) => ({ ...prev, [field]: value }));
+    setNewEntry((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const validateEntry = (entry) => {
+    const errors = [];
+
+    if (!entry.date) {
+      errors.push("date is missing");
+    } else if (isNaN(Date.parse(entry.date))) {
+      errors.push("date is invalid");
+    }
+
+    if (!entry.skill || entry.skill.trim() === "") {
+      errors.push("skill is missing or empty");
+    }
+
+    if (!entry.lessonSummary|| entry.lessonSummary.trim() === "") {
+      errors.push("lesson is missing or empty");
+    }
+
+    if (
+      entry.selfAssessment=== "" ||
+      isNaN(parseInt(entry.selfAssessment)) ||
+      parseInt(entry.selfAssessment) < 1 ||
+      parseInt(entry.selfAssessment) > 5
+    ) {
+      errors.push("selfAssessment must be a number from 1 to 5");
+    }
+
+    if (!entry.difficulties || entry.difficulty.trim() === "") {
+      errors.push("difficulty is missing or empty");
+    }
+
+    if (!entry.planToImprove || entry.plan.trim() === "") {
+      errors.push("plan is missing or empty");
+    }
+
+    if (entry.problemSolved !== "Yes" && entry.problemSolved !== "No") {
+      errors.push("problemSolved must be 'Yes' or 'No'");
+    }
+
+    return errors;
   };
 
-  const handleAddEntry = (e) => {
+  const handleAddEntry = async (e) => {
     e.preventDefault();
-    setStudyPlans((prev) => [
-      ...prev,
-      { ...newEntry, id: Date.now() }
-    ]);
-    setNewEntry({
-      date: "",
-      skill: "",
-      lesson: "",
-      selfAssessment: "",
-      difficulty: "",
-      plan: "",
-      problemSolved: "Yes",
-    });
+
+    const validationErrors = validateEntry(newEntry);
+    if (validationErrors.length > 0) {
+      console.error("❌ Invalid input:", validationErrors);
+      setError("Dữ liệu không hợp lệ: " + validationErrors.join(", "));
+      return;
+    }
+
+    const payload = {
+      date: newEntry.date,
+  semester: DEFAULT_SEMESTER,
+  week: DEFAULT_WEEK,
+  skill: newEntry.skill,
+  lessonSummary: newEntry.lessonSummary,
+  selfAssessment: parseInt(newEntry.selfAssessment),
+  difficulties: newEntry.difficulties,
+  planToImprove: newEntry.planToImprove,
+  problemSolved: newEntry.problemSolved === "Yes",
+    };
+
+    console.log("🔍 Data sent to server:", payload);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/student/study-plans",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        }
+      );
+
+      setStudyPlans((prev) => [...prev, response.data]);
+
+      setNewEntry({
+        date: "",
+        skill: "",
+        lessonSummary: "",
+        selfAssessment: "",
+        difficulties: "",
+        planToImprove: "",
+        problemSolved: "Yes",
+      });
+
+      setError(null);
+    } catch (err) {
+      if (err.response && err.response.data) {
+        console.error("💥 Server responded with validation errors:", err.response.data);
+        setError("Lỗi từ server: " + JSON.stringify(err.response.data));
+      } else {
+        console.error("❌ Unknown error:", err);
+        setError("Lỗi không xác định");
+      }
+    }
   };
 
-  if (loading) return <p>Đang tải dữ liệu...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <p>Đang tải dữ liệu...</p>
+  if (error) return <p className="text-red-600">{error}</p>
 
   return (
-    <table className="full-width-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Skill/ Module</th>
-          <th>My Lesson</th>
-          <th>Self - assessment (1-3)</th>
-          <th>My difficult</th>
-          <th>My plan</th>
-          <th>Problem solved</th>
-        </tr>
-      </thead>
-      <tbody>
-        {studyPlans.map((item) => (
-          <tr key={item.id}>
-            <td
-              className={editingCell.id === item.id && editingCell.field === "date" ? "" : "editable-cell"}
-              onClick={() => handleEdit(item.id, "date", item.date)}
-            >
-              {editingCell.id === item.id && editingCell.field === "date" ? (
-                <input
-                  className="editable-input"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleSave(item.id, "date")}
-                  onKeyDown={(e) => e.key === "Enter" && handleSave(item.id, "date")}
-                  autoFocus
-                />
-              ) : (
-                item.date
-              )}
-            </td>
-            <td
-              className={editingCell.id === item.id && editingCell.field === "skill" ? "" : "editable-cell"}
-              onClick={() => handleEdit(item.id, "skill", item.skill)}
-            >
-              {editingCell.id === item.id && editingCell.field === "skill" ? (
-                <input
-                  className="editable-input"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleSave(item.id, "skill")}
-                  onKeyDown={(e) => e.key === "Enter" && handleSave(item.id, "skill")}
-                  autoFocus
-                />
-              ) : (
-                item.skill
-              )}
-            </td>
-            <td
-              className={`whitespace-pre-line ${editingCell.id === item.id && editingCell.field === "lesson" ? "" : "editable-cell"}`}
-              onClick={() => handleEdit(item.id, "lesson", item.lesson)}
-            >
-              {editingCell.id === item.id && editingCell.field === "lesson" ? (
-                <textarea
-                  className="editable-input"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleSave(item.id, "lesson")}
-                  rows={3}
-                  autoFocus
-                />
-              ) : (
-                item.lesson
-              )}
-            </td>
-            <td
-              className={editingCell.id === item.id && editingCell.field === "selfAssessment" ? "" : "editable-cell"}
-              onClick={() => handleEdit(item.id, "selfAssessment", item.selfAssessment)}
-            >
-              {editingCell.id === item.id && editingCell.field === "selfAssessment" ? (
-                <input
-                  className="editable-input"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleSave(item.id, "selfAssessment")}
-                  onKeyDown={(e) => e.key === "Enter" && handleSave(item.id, "selfAssessment")}
-                  autoFocus
-                />
-              ) : (
-                item.selfAssessment
-              )}
-            </td>
-            <td
-              className={editingCell.id === item.id && editingCell.field === "difficulty" ? "" : "editable-cell"}
-              onClick={() => handleEdit(item.id, "difficulty", item.difficulty)}
-            >
-              {editingCell.id === item.id && editingCell.field === "difficulty" ? (
-                <textarea
-                  className="editable-input"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleSave(item.id, "difficulty")}
-                  rows={3}
-                  autoFocus
-                />
-              ) : (
-                item.difficulty
-              )}
-            </td>
-            <td
-              className={editingCell.id === item.id && editingCell.field === "plan" ? "" : "editable-cell"}
-              onClick={() => handleEdit(item.id, "plan", item.plan)}
-            >
-              {editingCell.id === item.id && editingCell.field === "plan" ? (
-                <textarea
-                  className="editable-input"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleSave(item.id, "plan")}
-                  rows={3}
-                  autoFocus
-                />
-              ) : (
-                item.plan
-              )}
-            </td>
-            <td
-              className={editingCell.id === item.id && editingCell.field === "problemSolved" ? "" : "editable-cell"}
-              onClick={() => handleEdit(item.id, "problemSolved", item.problemSolved)}
-            >
-              {editingCell.id === item.id && editingCell.field === "problemSolved" ? (
-                <select
-                  className="editable-input"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                  onBlur={() => handleSave(item.id, "problemSolved")}
-                  autoFocus
-                >
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                  <option value="Partially">Partially</option>
-                </select>
-              ) : (
-                item.problemSolved
-              )}
-            </td>
+    <div>
+      <table className="w-full border-collapse border border-gray-300">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border border-gray-300 p-2">Date</th>
+            <th className="border border-gray-300 p-2">Skill/ Module</th>
+            <th className="border border-gray-300 p-2">My Lesson</th>
+            <th className="border border-gray-300 p-2">Self - assessment (1-3)</th>
+            <th className="border border-gray-300 p-2">My difficult</th>
+            <th className="border border-gray-300 p-2">My plan</th>
+            <th className="border border-gray-300 p-2">Problem solved</th>
           </tr>
-        ))}
-        {/* New row for adding data */}
-        <tr className="bg-[#e0f2f1]">
-          <td>
-            <input
-              className="w-full p-2 border border-[#009688] rounded"
-              placeholder="Date"
-              value={newEntry.date}
-              onChange={(e) => handleNewEntryChange("date", e.target.value)}
-            />
-          </td>
-          <td>
-            <input
-              className="w-full p-2 border border-[#009688] rounded"
-              placeholder="Skill/Module"
-              value={newEntry.skill}
-              onChange={(e) => handleNewEntryChange("skill", e.target.value)}
-            />
-          </td>
-          <td>
-            <textarea
-              className="w-full p-2 border border-[#009688] rounded"
-              placeholder="Lesson"
-              rows={2}
-              value={newEntry.lesson}
-              onChange={(e) => handleNewEntryChange("lesson", e.target.value)}
-            />
-          </td>
-          <td>
-            <input
-              className="w-full p-2 border border-[#009688] rounded"
-              placeholder="1-3"
-              value={newEntry.selfAssessment}
-              onChange={(e) => handleNewEntryChange("selfAssessment", e.target.value)}
-            />
-          </td>
-          <td>
-            <textarea
-              className="w-full p-2 border border-[#009688] rounded"
-              placeholder="Difficulty"
-              rows={2}
-              value={newEntry.difficulty}
-              onChange={(e) => handleNewEntryChange("difficulty", e.target.value)}
-            />
-          </td>
-          <td>
-            <textarea
-              className="w-full p-2 border border-[#009688] rounded"
-              placeholder="Plan"
-              rows={2}
-              value={newEntry.plan}
-              onChange={(e) => handleNewEntryChange("plan", e.target.value)}
-            />
-          </td>
-          <td>
-            <div className=" flex-col space-y-2">
+        </thead>
+        <tbody>
+          {studyPlans.map((item) => (
+<tr key={item.id} className="hover:bg-gray-50">
+  {[
+    "date",
+    "skill",
+    "lessonSummary",
+    "selfAssessment",
+    "difficulties",
+    "planToImprove",
+    "problemSolved",
+  ].map((field) => (
+    <td
+      key={`${item.id}-${field}`} // ✅ Đây là chỗ cần sửa
+      className={`border border-gray-300 p-2 ${
+        editingCell.id === item.id && editingCell.field === field
+          ? ""
+          : "cursor-pointer"
+      }`}
+      onClick={() => handleEdit(item.id, field, item[field])}
+    >
+      {editingCell.id === item.id && editingCell.field === field ? (
+        ["lessonSummary", "difficulties", "planToImprove"].includes(field) ? (
+          <textarea
+            className="w-full p-1 border border-teal-400 rounded"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={() => handleSave(item.id, field)}
+            rows={3}
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                setEditingCell({ id: null, field: null })
+              }
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault()
+                handleSave(item.id, field)
+              }
+            }}
+          />
+        ) : field === "problemSolved" ? (
+          <select
+            className="w-full p-1 border border-teal-400 rounded"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={() => handleSave(item.id, field)}
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                setEditingCell({ id: null, field: null })
+              }
+              if (e.key === "Enter") {
+                handleSave(item.id, field)
+              }
+            }}
+          >
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+            <option value="Partially">Partially</option>
+          </select>
+        ) : (
+          <input
+            className="w-full p-1 border border-teal-400 rounded"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            onBlur={() => handleSave(item.id, field)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                setEditingCell({ id: null, field: null })
+              }
+              if (e.key === "Enter") {
+                handleSave(item.id, field)
+              }
+            }}
+            autoFocus
+          />
+        )
+      ) : (
+        item[field]
+      )}
+    </td>
+  ))}
+</tr>
+
+          ))}
+
+          {/* New row for adding data */}
+          <tr className="bg-[#e0f2f1]">
+            <td>
+              <input
+                className="w-full p-2 border border-[#009688] rounded"
+                placeholder="Date"
+                value={newEntry.date}
+                onChange={(e) => handleNewEntryChange("date", e.target.value)}
+              />
+            </td>
+            <td>
+              <input
+                className="w-full p-2 border border-[#009688] rounded"
+                placeholder="Skill/Module"
+                value={newEntry.skill}
+                onChange={(e) => handleNewEntryChange("skill", e.target.value)}
+              />
+            </td>
+            <td>
+              <textarea
+                className="w-full p-2 border border-[#009688] rounded"
+                placeholder="Lesson"
+                rows={2}
+                value={newEntry.lessonSummary}
+                onChange={(e) => handleNewEntryChange("lesson", e.target.value)}
+              />
+            </td>
+            <td>
+              <input
+                className="w-full p-2 border border-[#009688] rounded"
+                placeholder="1-3"
+                value={newEntry.selfAssessment}
+                onChange={(e) =>
+                  handleNewEntryChange("selfAssessment", e.target.value)
+                }
+              />
+            </td>
+            <td>
+              <textarea
+                className="w-full p-2 border border-[#009688] rounded"
+                placeholder="Difficulty"
+                rows={2}
+                value={newEntry.difficulties}
+                onChange={(e) => handleNewEntryChange("difficulty", e.target.value)}
+              />
+            </td>
+            <td>
+              <textarea
+                className="w-full p-2 border border-[#009688] rounded"
+                placeholder="Plan"
+                rows={2}
+                value={newEntry.planToImprove}
+                onChange={(e) => handleNewEntryChange("plan", e.target.value)}
+              />
+            </td>
+            <td>
               <select
                 className="w-full p-2 border border-[#009688] rounded"
                 value={newEntry.problemSolved}
-                onChange={(e) => handleNewEntryChange("problemSolved", e.target.value)}
+                onChange={(e) =>
+                  handleNewEntryChange("problemSolved", e.target.value)
+                }
               >
                 <option value="Yes">Yes</option>
                 <option value="No">No</option>
                 <option value="Partially">Partially</option>
               </select>
-              <button className="w-full bg-[#009688] hover:bg-[#00796b]" size="sm" onClick={handleAddEntry}>
-                <Plus className="h-4 w-4 mr-1" /> Add
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  );
-};
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-export default StudyPlans;
+      <button
+        onClick={handleAddEntry}
+        className="mt-4 px-4 py-2 bg-teal-600 text-white rounded flex items-center gap-2 hover:bg-teal-700 transition"
+      >
+        <Plus size={16} />
+        Add Entry
+      </button>
+    </div>
+  )
+}
+
+export default StudyPlanTable
