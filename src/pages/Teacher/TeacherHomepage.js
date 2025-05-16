@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useNavigate } from 'react-router-dom'
-import Navigation from '../../components/Teacher/TeacherNavigation'
+import NavBar from '../../components/Teacher/TeacherNavBar'
 import Header from "../../components/header"
 import Footer from "../../components/footer"
 
@@ -49,7 +49,7 @@ function ClassesGrid() {
   return (
     <div className="d-flex flex-column min-vh-100 bg-white">
       <Header />
-      <Navigation />
+      <NavBar />
       <div className="p-3 container my-3">
         <div className="w-100">
           {/* Banner */}

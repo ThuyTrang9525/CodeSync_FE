@@ -30,10 +30,12 @@ function LoginPage() {
 ;
     const userRole = response.data.user.role; 
     const token = response.data.access_token;
+    const user = response.data.user.userID;
     console.log("API Response:", response.data);
     console.log("User Role:", userRole);
     // Lưu token để dùng các request sau
     localStorage.setItem('token', token);
+    localStorage.setItem("userID", user);
      console.log('Token:', token);
 
     // Điều hướng theo role
@@ -42,7 +44,7 @@ function LoginPage() {
     } else if (userRole === "STUDENT") {
       navigate(`/student-home`);
     } else if (userRole === "ADMIN") {
-      navigate(`/admin-home`);
+      navigate(`/admin-dashboard`);
     }
     
 
@@ -86,7 +88,6 @@ function LoginPage() {
             <form className="login-form" onSubmit={handleLogin}>
               <div className="form-group">
                 <label htmlFor="email" className="form-label">Email address</label>
-                <div className="input-wrapper">
                   <input
                     id="email"
                     type="email"
@@ -96,12 +97,10 @@ function LoginPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
-                </div>
               </div>
 
               <div className="form-group">
                 <label htmlFor="password" className="form-label">Password</label>
-                <div className="input-wrapper">
                   <input
                     id="password"
                     type="password"
@@ -110,18 +109,19 @@ function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                   />
-                </div>
               </div>
 
-              <div className="form-group">
+              <div className="form-group-sl">
                 <label className="form-label">Role</label>
                 <select
-                  className="form-input"
+                  className="form-input-sl"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                 >
                   <option value="STUDENT">Student</option>
                   <option value="TEACHER">Teacher</option>
+                  <option value="ADMIN">Admin</option>
+
                 </select>
               </div>
 

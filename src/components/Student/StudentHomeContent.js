@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react"
 import axios from "axios"
 import { LogOut } from "lucide-react"
 import "../../assets/css/StudentHomepage.css"
-
 export default function StudentHomeContent() {
   const [student, setStudent] = useState("")
   const [classes, setClasses] = useState([])
