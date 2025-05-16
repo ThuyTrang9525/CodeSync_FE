@@ -14,7 +14,6 @@ body {
     "Helvetica Neue", sans-serif;
   color: var(--text-dark);
   line-height: 1.6;
-  padding-top: 76px; /* For fixed navbar */
 }
 
 /* Override Bootstrap primary color */

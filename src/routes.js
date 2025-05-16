@@ -13,6 +13,7 @@ import Homepage from "./pages/Student/StudentHomepage";
 import Profile from "./pages/Student/StudentProfile";
 import Login from './pages/Login/Login';
 import LandingPage from "./pages/HomePage"
+import NotFound from "./pages/404NotFound";
 
 const routes = [
 
@@ -84,7 +85,7 @@ const routes = [
     },
     {
         path: "*",
-        element: <h1>404 - Page Not Found</h1>,
+        element: <NotFound />,
         name: "404",
     },
 ];

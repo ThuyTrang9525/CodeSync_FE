@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import RoleFilter from "./AdminRoleFilter";
 
 const API_URL = "http://127.0.0.1:8000/api/admin/classes";
 
 const ClassTable = () => {
   const [classes, setClasses] = useState([]);
-  const [filteredRole, setFilteredRole] = useState("all");
   const [showModal, setShowModal] = useState(false);
   const [editingClass, setEditingClass] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -15,7 +13,7 @@ const ClassTable = () => {
   const [formData, setFormData] = useState({
     className: "",
     name: "",
-    quantity: "", // Số lượng học sinh có thể để trống
+    quantity: "",
   });
 
   useEffect(() => {
@@ -36,7 +34,7 @@ const ClassTable = () => {
     setFormData({
       className: classItem.className || "",
       name: classItem.name || "",
-      quantity: classItem.numStudents?.toString() || "", // Đảm bảo là chuỗi để hiển thị trong input
+      quantity: classItem.numStudents?.toString() || "",
     });
     setShowModal(true);
   };
@@ -74,15 +72,11 @@ const ClassTable = () => {
     }
   };
 
-  const filteredClasses = classes.filter((item) =>
-    filteredRole === "all" ? true : item.role === filteredRole
-  );
-
-  const currentClasses = filteredClasses.slice(
-    (currentPage - 1) * classesPerPage,
-    currentPage * classesPerPage
-  );
-  const totalPages = Math.ceil(filteredClasses.length / classesPerPage);
+  // Pagination logic
+  const indexOfLast = currentPage * classesPerPage;
+  const indexOfFirst = indexOfLast - classesPerPage;
+  const currentClasses = classes.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(classes.length / classesPerPage);
 
   return (
     <div style={styles.container}>
@@ -91,7 +85,6 @@ const ClassTable = () => {
           <div style={styles.title}>Class Management</div>
           <div style={styles.border}></div>
         </div>
-        <RoleFilter onFilterChange={setFilteredRole} />
       </div>
 
       <div style={styles.tableContainer}>
@@ -128,7 +121,9 @@ const ClassTable = () => {
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            style={currentPage === 1 ? styles.disabledBtn : styles.pageButton}
+            style={
+              currentPage === 1 ? styles.disabledBtn : styles.pageButton
+            }
           >
             Prev
           </button>
@@ -136,7 +131,11 @@ const ClassTable = () => {
             <button
               key={idx}
               onClick={() => setCurrentPage(idx + 1)}
-              style={currentPage === idx + 1 ? styles.activePage : styles.pageButton}
+              style={
+                currentPage === idx + 1
+                  ? styles.activePage
+                  : styles.pageButton
+              }
             >
               {idx + 1}
             </button>
@@ -144,7 +143,11 @@ const ClassTable = () => {
           <button
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            style={currentPage === totalPages ? styles.disabledBtn : styles.pageButton}
+            style={
+              currentPage === totalPages
+                ? styles.disabledBtn
+                : styles.pageButton
+            }
           >
             Next
           </button>
@@ -158,7 +161,7 @@ const ClassTable = () => {
             <h2>Edit Class</h2>
             <form onSubmit={handleSubmit}>
               <div style={styles.inputGroup}>
-                <label>Class Name</label>
+                <label style={styles.label}>Class Name</label>
                 <input
                   type="text"
                   name="className"
@@ -169,7 +172,7 @@ const ClassTable = () => {
                 />
               </div>
               <div style={styles.inputGroup}>
-                <label>Teacher</label>
+                <label style={styles.label}>Teacher</label>
                 <input
                   type="text"
                   name="name"
@@ -180,7 +183,7 @@ const ClassTable = () => {
                 />
               </div>
               <div style={styles.inputGroup}>
-                <label>Quantity</label>
+                <label style={styles.label}>Quantity</label>
                 <input
                   type="number"
                   name="quantity"
@@ -193,7 +196,11 @@ const ClassTable = () => {
               </div>
 
               <div style={styles.buttonContainer}>
-                <button type="button" onClick={() => setShowModal(false)} style={styles.cancelButton}>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  style={styles.cancelButton}
+                >
                   Cancel
                 </button>
                 <button type="submit" style={styles.saveButton}>
@@ -214,8 +221,6 @@ const styles = {
   },
   header: {
     marginTop: "20px",
-    display: "flex",
-    justifyContent: "space-between",
   },
   title: {
     fontSize: "36px",
@@ -230,11 +235,6 @@ const styles = {
     marginBottom: "20px",
     borderRadius: "1px",
   },
-  filterContainer: {
-    display: "flex",
-    justifyContent: "center",
-    margin: "20px 0",
-  },
   tableContainer: {
     overflowX: "auto",
   },
@@ -248,13 +248,6 @@ const styles = {
   },
   tableRow: {
     borderBottom: "1px solid #ddd",
-  },
-  tableCell: {
-    padding: "12px",
-  },
-  tableCell1: {
-    padding: "12px",
-    textAlign: "center",
   },
   editButton: {
     backgroundColor: "#0F7268",
@@ -273,94 +266,82 @@ const styles = {
     borderRadius: "4px",
     cursor: "pointer",
   },
-  // Cập nhật phần modalOverlay và modalContent trong styles của "edit"
-modalOverlay: {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  width: "100vw",
-  height: "100vh",
-  background: "rgba(0, 0, 0, 0.45)",
-  backdropFilter: "blur(6px)",
-  WebkitBackdropFilter: "blur(6px)",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  zIndex: 1000,
-  transition: "opacity 0.3s ease",
-},
-
-modalContent: {
-  background: "rgba(255, 255, 255, 0.95)",
-  borderRadius: "20px",
-  padding: "48px 40px 36px",
-  width: "520px",
-  boxShadow: "0 16px 40px rgba(0, 0, 0, 0.25)",
-  fontFamily: "'Poppins', sans-serif",
-  position: "relative",
-  animation: "fadeInScale 0.35s ease forwards",
-  border: "1px solid rgba(255, 255, 255, 0.25)",
-  textAlign: "center",
-},
-
-  inputGroup: {
-    // marginBottom: "15px",
-    display: "grid",
-    gridTemplateColumns: "70px 850px", // First column is 30px, second takes up the remaining space
-    gap: "10px", // Adds space between grid items
+  modalOverlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    background: "rgba(0, 0, 0, 0.45)",
+    backdropFilter: "blur(6px)",
+    WebkitBackdropFilter: "blur(6px)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+    transition: "opacity 0.3s ease",
   },
- label: {
-    fontWeight: "bold", // Để label đậm
-    fontSize: "16px", // Kích thước phông chữ
-    color: "#333", // Màu sắc của văn bản
-    display: "flex", // Sử dụng flex để căn giữa nội dung
-    justifyContent: "center", // Căn giữa nội dung theo chiều ngang
-    alignItems: "center", // Căn giữa nội dung theo chiều dọc
-    height: "100%", // Đảm bảo chiều cao của label bằng với container
+  modalContent: {
+    background: "rgba(255, 255, 255, 0.95)",
+    borderRadius: "20px",
+    padding: "48px 40px 36px",
+    width: "520px",
+    boxShadow: "0 16px 40px rgba(0, 0, 0, 0.25)",
+    fontFamily: "'Poppins', sans-serif",
+    position: "relative",
+    animation: "fadeInScale 0.35s ease forwards",
+    border: "1px solid rgba(255, 255, 255, 0.25)",
+    textAlign: "center",
+  },
+  inputGroup: {
+    display: "grid",
+    gridTemplateColumns: "120px 1fr",
+    gap: "10px",
+    alignItems: "center",
+    marginBottom: "15px",
+  },
+  label: {
+    fontWeight: "bold",
+    fontSize: "16px",
+    color: "#333",
   },
   input: {
-  width: "40%",
-  padding: "14px",
-  marginBottom: "18px",
-  fontSize: "16px",
-  borderRadius: "10px",
-  border: "1px solid #ccc",
-  outline: "none",
-  backgroundColor: "#f9f9f9",
-  transition: "all 0.3s ease",
-},
-
-cancelButton: {
-  background: "#e0e0e0",
-  color: "#333",
-  padding: "12px 24px",
-  border: "none",
-  borderRadius: "8px",
-  fontWeight: "500",
-  fontSize: "15px",
-  cursor: "pointer",
-  transition: "background 0.3s ease",
-},
-
-saveButton: {
-  background: "linear-gradient(135deg, #00bfa5, #00796b)",
-  color: "#fff",
-  padding: "12px 24px",
-  border: "none",
-  borderRadius: "8px",
-  fontWeight: "600",
-  fontSize: "15px",
-  cursor: "pointer",
-  transition: "background 0.3s ease",
-},
-buttonContainer:{
-  display: "flex",
-  justifyContent: "space-between",
-  marginTop: "20px",
-  marginBottom: "20px",
-  gap: "10px",
-},
-
+    width: "100%",
+    padding: "14px",
+    fontSize: "16px",
+    borderRadius: "10px",
+    border: "1px solid #ccc",
+    outline: "none",
+    backgroundColor: "#f9f9f9",
+    transition: "all 0.3s ease",
+  },
+  cancelButton: {
+    background: "#e0e0e0",
+    color: "#333",
+    padding: "12px 24px",
+    border: "none",
+    borderRadius: "8px",
+    fontWeight: "500",
+    fontSize: "15px",
+    cursor: "pointer",
+    transition: "background 0.3s ease",
+  },
+  saveButton: {
+    background: "linear-gradient(135deg, #00bfa5, #00796b)",
+    color: "#fff",
+    padding: "12px 24px",
+    border: "none",
+    borderRadius: "8px",
+    fontWeight: "600",
+    fontSize: "15px",
+    cursor: "pointer",
+    transition: "background 0.3s ease",
+  },
+  buttonContainer: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "10px",
+  },
   pagination: {
     display: "flex",
     justifyContent: "center",
@@ -369,12 +350,32 @@ buttonContainer:{
   },
   pageButton: {
     backgroundColor: "#fff",
-    color: "#3498db",
+    color: "#009688",
     border: "1px solid #009688",
     padding: "10px 20px",
     margin: "0 5px",
     borderRadius: "4px",
     cursor: "pointer",
+    fontSize: "16px",
+  },
+  activePage: {
+    backgroundColor: "#009688",
+    color: "#fff",
+    border: "none",
+    padding: "10px 20px",
+    margin: "0 5px",
+    borderRadius: "4px",
+    cursor: "default",
+    fontSize: "16px",
+  },
+  disabledBtn: {
+    backgroundColor: "#f0f0f0",
+    color: "#ccc",
+    border: "1px solid #ddd",
+    padding: "10px 20px",
+    margin: "0 5px",
+    borderRadius: "4px",
+    cursor: "not-allowed",
     fontSize: "16px",
   },
 };

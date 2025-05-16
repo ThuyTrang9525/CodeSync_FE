@@ -13,9 +13,7 @@ export default class AdminClass extends Component {
       <div className='container'>
         <Header />
         <Nav />
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
         <SearchForm onSearch={(query) => console.log(`Search query: ${query}`)} />
-        </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
 
