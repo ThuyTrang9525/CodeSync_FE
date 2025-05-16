@@ -38,8 +38,10 @@ export default function Header() {
           {/* Notifications and User Menu */}
           <div className="col-auto d-flex align-items-center gap-4">
             <div className="position-relative">
-              <Bell className="text-muted" size={20} />
-              <span className="notification-badge">2</span>
+              <Link to="/student-notifications" className="text-decoration-none">
+                <Bell className="text-muted" size={20} />
+                <span className="notification-badge">2</span>
+              </Link>
             </div>
 
             <div className="dropdown">
