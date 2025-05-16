@@ -11,9 +11,7 @@ export default class AdminNotification extends Component {
         <Nav /> 
         <div style={{ marginTop: '20px' }}>
             <Notification />
-
         </div>
-        <Pagination />
       </div>
     )
   }
