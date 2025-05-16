@@ -17,12 +17,13 @@ export default function NotificationsTable() {
   const [selectedClass, setSelectedClass] = useState("All");
   const [openCalendar, setOpenCalendar] = useState(false);
 
-  const receiverID = 7;
+  const receiverID = localStorage.getItem("userID");
+ console.log(receiverID);
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/notifications/${receiverID}`);
+        const response = await fetch(`http://localhost:8000/api/student/notifications/${receiverID}`);
         const data = await response.json();
 
         if (data.status === "success") {
