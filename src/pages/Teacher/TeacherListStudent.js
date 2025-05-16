@@ -32,6 +32,7 @@ export default function StudentTable() {
 
         const data = await response.json()
         console.log("Fetched data:", data)
+        
 
         // Nếu API trả về { students: [...] }
         if (Array.isArray(data.students)) {
