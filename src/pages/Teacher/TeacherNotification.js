@@ -1,84 +1,45 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Navigation from '../../components/Teacher/TeacherNavigation';
-import Header from "../../components/header"
-import Footer from "../../components/footer"
+import { useState, useEffect } from "react";
+import NavBar from '../../components/Teacher/TeacherNavBar'
+import Header from "../../components/header";
+import Footer from "../../components/footer";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { FaCalendarAlt } from "react-icons/fa"; 
-
-const notifications = [
-  {
-    id: 1,
-    name: "Nguyễn Văn A",
-    class: "PNV26B",
-    content: "I don't understand",
-    time: "29/9/2023",
-  },
-  {
-    id: 2,
-    name: "Nguyễn Văn A",
-    class: "PNV26B",
-    content: "I don't understand",
-    time: "29/9/2023",
-  },
-  {
-    id: 3,
-    name: "Nguyễn Văn A",
-    class: "PNV26B",
-    content: "I got it",
-    time: "29/9/2023",
-  },
-  {
-    id: 4,
-    name: "Nguyễn Văn A",
-    class: "PNV26B",
-    content: "I got it",
-    time: "29/9/2023",
-  },
-  {
-    id: 5,
-    name: "Nguyễn Văn A",
-    class: "PNV26B",
-    content: "I don't understand",
-    time: "29/9/2023",
-  },
-  {
-    id: 6,
-    name: "Nguyễn Văn A",
-    class: "PNV26B",
-    content: "I got it",
-    time: "29/9/2023",
-  },
-  {
-    id: 7,
-    name: "Nguyễn Văn A",
-    class: "PNV26B",
-    content: "I got it",
-    time: "29/9/2023",
-  },
-  {
-    id: 8,
-    name: "Nguyễn Văn A",
-    class: "PNV26B",
-    content: "I don't understand",
-    time: "29/9/2023",
-  },
-  {
-    id: 9,
-    name: "Nguyễn Văn A",
-    class: "PNV26B",
-    content: "I don't understand",
-    time: "29/9/2023",
-  },
-]
+import { FaCalendarAlt } from "react-icons/fa";
 
 export default function NotificationsTable() {
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [date, setDate] = useState(new Date());
   const [selectedClass, setSelectedClass] = useState("All");
   const [openCalendar, setOpenCalendar] = useState(false);
+
+ const receiverID = localStorage.getItem("userID");
+ console.log(receiverID);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/api/notifications/${receiverID}`);
+        const data = await response.json();
+
+        if (data.status === "success") {
+          setNotifications(data.data); 
+        } else {
+          setError(data.message || "Failed to load notifications.");
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
 
   const toggleCalendar = () => {
     setOpenCalendar(!openCalendar);
@@ -86,7 +47,7 @@ export default function NotificationsTable() {
 
   const handleDateChange = (newDate) => {
     setDate(newDate);
-    setOpenCalendar(false); 
+    setOpenCalendar(false);
   };
 
   const handleClassChange = (e) => {
@@ -94,48 +55,43 @@ export default function NotificationsTable() {
   };
 
   const formattedDate = date.toLocaleDateString();
-  
+
+  const filteredNotifications = notifications.filter((n) =>
+    selectedClass === "All" || n.class_name === selectedClass
+  );
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-white">
       <Header />
-      <Navigation />
+      <NavBar />
       <div className="p-3 container my-3">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 position-relative">
           <h2 className="fs-4 fw-semibold mb-0">Recent announcements</h2>
           <div className="d-flex align-items-center gap-2">
-          <button className="btn btn-outline-secondary" onClick={toggleCalendar}>
-          <FaCalendarAlt />
-          </button>
+            <button className="btn btn-outline-secondary" onClick={toggleCalendar}>
+              <FaCalendarAlt />
+            </button>
 
-          {openCalendar && (
-            <div className="position-absolute"
-              style={{
-                zIndex: 999,
-                top: '100%', 
-              }}>
-              <DatePicker
-                selected={date}
-                onChange={handleDateChange}
-                inline
-              />
+            {openCalendar && (
+              <div className="position-absolute" style={{ zIndex: 999, top: '100%' }}>
+                <DatePicker selected={date} onChange={handleDateChange} inline />
+              </div>
+            )}
+
+            <div>
+              <small>Selected Date: {formattedDate}</small>
             </div>
-            
-          )}
-          <div className="">
-            <h10>Selected Date: {formattedDate}</h10>
-          </div>
-          
-          <select
-            className="form-select"
-            value={selectedClass}
-            onChange={handleClassChange}
-            style={{ width: "120px" }}
-          >
-            <option value="All">All</option>
-            <option value="PNV26B">PNV26B</option>
-            <option value="PNV25A">PNV25A</option>
-          </select>
+
+            <select
+              className="form-select"
+              value={selectedClass}
+              onChange={handleClassChange}
+              style={{ width: "120px" }}
+            >
+              <option value="All">All</option>
+              <option value="PNV26B">PNV26B</option>
+              <option value="PNV25A">PNV25A</option>
+            </select>
           </div>
         </div>
 
@@ -143,22 +99,39 @@ export default function NotificationsTable() {
           <table className="table table-hover mb-0">
             <thead className="table-light">
               <tr>
-                <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>Name</th>
-                <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>Class</th>
-                <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>Content</th>
-                <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>Time</th>
-                <th className="text-center" style={{ width: "100px", color: "#6c757d" }}></th>
+                <th className="text-center" style={{ color: "#6c757d" }}>Name</th>
+                <th className="text-center" style={{ color: "#6c757d" }}>Class</th>
+                <th className="text-center" style={{ color: "#6c757d" }}>Content</th>
+                <th className="text-center" style={{ color: "#6c757d" }}>Time</th>
+                <th className="text-center" style={{ color: "#6c757d" }}></th>
               </tr>
             </thead>
             <tbody>
-              {notifications.map((notification) => (
+              {loading && (
+                <tr>
+                  <td colSpan="5" className="text-center py-3">Loading notifications...</td>
+                </tr>
+              )}
+              {error && (
+                <tr>
+                  <td colSpan="5" className="text-center text-danger py-3">Error: {error}</td>
+                </tr>
+              )}
+              {!loading && !error && filteredNotifications.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="text-center py-3">No notifications found.</td>
+                </tr>
+              )}
+              {!loading && !error && filteredNotifications.map((notification) => (
                 <tr key={notification.id}>
-                  <td>{notification.name}</td>
-                  <td>
-                    <span className="text-danger fw-medium">{notification.class}</span>
-                  </td>
+                  <td>{notification.name || "N/A"}</td>
+                  <td className="text-danger fw-medium text-center">{notification.className || "N/A"}</td>
                   <td>{notification.content}</td>
-                  <td>{notification.time}</td>
+                  <td className="text-center">
+                    {notification.createdAt
+                      ? new Date(notification.createdAt).toLocaleDateString()
+                      : "N/A"}
+                  </td>
                   <td>
                     <div className="d-flex justify-content-center gap-2">
                       <button className="btn btn-sm btn-outline-secondary btn-icon">
@@ -185,5 +158,5 @@ export default function NotificationsTable() {
       </div>
       <Footer />
     </div>
-  )
+  );
 }
