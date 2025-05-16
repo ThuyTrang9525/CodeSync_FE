@@ -81,17 +81,6 @@ export default function NotificationsTable() {
             <div>
               <small>Selected Date: {formattedDate}</small>
             </div>
-
-            <select
-              className="form-select"
-              value={selectedClass}
-              onChange={handleClassChange}
-              style={{ width: "120px" }}
-            >
-              <option value="All">All</option>
-              <option value="PNV26B">PNV26B</option>
-              <option value="PNV25A">PNV25A</option>
-            </select>
           </div>
         </div>
 
