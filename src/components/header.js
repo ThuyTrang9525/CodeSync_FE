@@ -14,7 +14,7 @@ export default function Header() {
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-    window.location.reload()
+    window.location.href = "/";
   }
   return (
     <header className="header sticky-top bg-light shadow-sm">
