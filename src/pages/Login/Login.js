@@ -30,10 +30,12 @@ function LoginPage() {
 ;
     const userRole = response.data.user.role; 
     const token = response.data.access_token;
+    const user = response.data.user.userID;
     console.log("API Response:", response.data);
     console.log("User Role:", userRole);
     // Lưu token để dùng các request sau
     localStorage.setItem('token', token);
+    localStorage.setItem("userID", user);
      console.log('Token:', token);
 
     // Điều hướng theo role

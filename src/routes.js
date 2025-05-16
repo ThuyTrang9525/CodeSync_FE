@@ -12,17 +12,16 @@ import StudentTable from './pages/Teacher/TeacherListStudent';
 import Homepage from "./pages/Student/StudentHomepage";
 import Profile from "./pages/Student/StudentProfile";
 import Login from './pages/Login/Login';
-import LandingPage from "./pages/HomePage"
+import LandingPage from "./pages/HomePage";
+import NotificationsTableStudent from "./pages/Student/StudentNotification"; // Thêm dòng này
 import NotFound from "./pages/404NotFound";
 
 const routes = [
-
     {
         path: "/Login",
         element: <Login />,
         name: "Login",
     },
-
     {
         path: "/admin-dashboard",
         element: <AdminDashboard />,
@@ -77,6 +76,11 @@ const routes = [
         path: "/student-profile",
         element: <Profile />,
         name: "Student Profile",
+    },
+    {
+        path: "/student-notifications", // Thêm route này
+        element: <NotificationsTableStudent />,
+        name: "Student Notifications",
     },
     {
         path: "/",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import NavBar from '../../components/Teacher/TeacherNavBar'
+import NavBar from '../../components/Student/StudentNavBar';
 import Header from "../../components/header";
 import Footer from "../../components/footer";
 import DatePicker from "react-datepicker";
@@ -17,13 +17,13 @@ export default function NotificationsTable() {
   const [selectedClass, setSelectedClass] = useState("All");
   const [openCalendar, setOpenCalendar] = useState(false);
 
- const receiverID = localStorage.getItem("userID");
+  const receiverID = localStorage.getItem("userID");
  console.log(receiverID);
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/notifications/${receiverID}`);
+        const response = await fetch(`http://localhost:8000/api/student/notifications/${receiverID}`);
         const data = await response.json();
 
         if (data.status === "success") {
@@ -99,7 +99,7 @@ export default function NotificationsTable() {
           <table className="table table-hover mb-0">
             <thead className="table-light">
               <tr>
-                <th className="text-center" style={{ color: "#6c757d" }}>Name</th>
+                {/* <th className="text-center" style={{ color: "#6c757d" }}>Name</th> */}
                 <th className="text-center" style={{ color: "#6c757d" }}>Class</th>
                 <th className="text-center" style={{ color: "#6c757d" }}>Content</th>
                 <th className="text-center" style={{ color: "#6c757d" }}>Time</th>
@@ -123,8 +123,8 @@ export default function NotificationsTable() {
                 </tr>
               )}
               {!loading && !error && filteredNotifications.map((notification) => (
-                <tr key={notification.id}>
-                  <td>{notification.name || "N/A"}</td>
+                <tr key={notification.notificationID}>
+                  {/* <td>{notification.name || "N/A"}</td> */}
                   <td className="text-danger fw-medium text-center">{notification.className || "N/A"}</td>
                   <td>{notification.content}</td>
                   <td className="text-center">
@@ -134,12 +134,12 @@ export default function NotificationsTable() {
                   </td>
                   <td>
                     <div className="d-flex justify-content-center gap-2">
-                      <button className="btn btn-sm btn-outline-secondary btn-icon">
-                        <i className="bi bi-eye"></i>
-                      </button>
-                      <button className="btn btn-sm btn-outline-secondary btn-icon">
-                        <i className="bi bi-chat-square-text"></i>
-                      </button>
+                        <button className="btn btn-sm btn-outline-secondary btn-icon" title="Xem">
+                            <i className="bi bi-eye"></i>
+                        </button>
+                        <button className="btn btn-sm btn-outline-danger btn-icon" title="Xóa">
+                            <i className="bi bi-trash"></i>
+                        </button>
                     </div>
                   </td>
                 </tr>
