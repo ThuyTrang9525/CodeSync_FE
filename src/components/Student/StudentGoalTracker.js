@@ -5,29 +5,29 @@ import GoalList from "./StudentGoalList"
 import CreateGoalForm from "./StudentCreateFormGoal"
 import GoalStats from "./StudentGoalStats"
 import { GoalStatus } from "../../types/goal"
+import {
+  fetchGoals,
+  createGoal,
+  updateGoalStatus,
+  deleteGoal as apiDeleteGoal,
+  editGoal as apiEditGoal,
+} from "../../service/api"
 
 export default function GoalTracker() {
   const [goals, setGoals] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
-  
-  const API_URL = "http://localhost:8000/api/goals" // Replace with your actual API endpoint
-  // Replace with your actual API endpoint
 
   // Fetch goals from API
   useEffect(() => {
     const token = localStorage.getItem("token")
-    axios
-      .get("http://localhost:8000/api/goals", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+    fetchGoals(token)
       .then((res) => {
         setGoals(res.data.data)
-        console.log("Goals from API:", res.data)
+        // console.log("Goals from API:", res.data)
       })
       .catch((err) => {
+        setError("Error fetching goals")
         console.error("Error fetching goals:", err)
       })
       .finally(() => {
@@ -37,8 +37,9 @@ export default function GoalTracker() {
 
   const addGoal = async (goal) => {
     try {
-      const res = await axios.post(API_URL, goal)
-      setGoals((prev) => [...prev, res.data])
+      const token = localStorage.getItem("token")
+      const res = await createGoal(goal, token)
+      setGoals((prev) => [...prev, res.data.data])
     } catch (err) {
       console.error("Failed to add goal:", err)
     }
@@ -46,34 +47,37 @@ export default function GoalTracker() {
 
   const updateGoalStatus = async (id, status) => {
     try {
-      const updatedGoal = goals.find((g) => g.id === id)
-      const res = await axios.put(`${API_URL}/${id}`, { ...updatedGoal, status })
-      setGoals(goals.map((goal) => (goal.id === id ? res.data : goal)))
+      const token = localStorage.getItem("token")
+      const res = await updateGoalStatus(id, status, token)
+      setGoals(goals.map((goal) => (goal.goalID === id ? res.data.data : goal)))
     } catch (err) {
       console.error("Failed to update status:", err)
     }
   }
 
   const deleteGoal = async (id) => {
-    try {
-      await axios.delete(`${API_URL}/${id}`)
-      setGoals(goals.filter((goal) => goal.id !== id))
+      try {
+      const token = localStorage.getItem("token")
+      await apiDeleteGoal(id, token)
+      setGoals(goals.filter((goal) => goal.goalID !== id))
     } catch (err) {
       console.error("Failed to delete goal:", err)
     }
   }
 
+
   const editGoal = async (updatedGoal) => {
-    try {
-      const res = await axios.put(`${API_URL}/${updatedGoal.id}`, updatedGoal)
-      setGoals(goals.map((goal) => (goal.id === updatedGoal.id ? res.data : goal)))
+      try {
+      const token = localStorage.getItem("token")
+      const res = await apiEditGoal(updatedGoal, token)
+      setGoals(goals.map((goal) => (goal.goalID === updatedGoal.goalID ? res.data.data : goal)))
     } catch (err) {
       console.error("Failed to edit goal:", err)
     }
   }
 
   // Statistics
-  const semesterGoals = goals.filter((goal) => goal.semester === "Sem 2/2025")
+  const semesterGoals = goals.filter((goal) => goal.semester === "2025-1")
   const completedGoals = semesterGoals.filter((goal) => goal.status === GoalStatus.Completed)
   const inProgressGoals = semesterGoals.filter((goal) => goal.status === GoalStatus.InProgress)
   const notStartedGoals = semesterGoals.filter((goal) => goal.status === GoalStatus.NotStarted)
