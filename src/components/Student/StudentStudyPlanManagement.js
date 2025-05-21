@@ -37,10 +37,10 @@ export default function StudyPlanManagement() {
 
       {/* Add the semester and week selector */}
       <SemesterWeekSelector
-        onSemesterChange={handleSemesterChange}
-        onWeekChange={handleWeekChange}
         currentSemester={semester}
         currentWeek={week}
+        onSemesterChange={setSemester}
+        onWeekChange={setWeek}
       />
 
       <div className="mt-8">
