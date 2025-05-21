@@ -2,12 +2,15 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Plus } from "lucide-react";
 
-const API_BASE_URL = "http://localhost:8000/api/student/inclass-plans";
-const DEFAULT_SEMESTER = "2025-1";
-const DEFAULT_WEEK = 1;
+import {
+  getSelfStudyPlans,
+  createSelfStudyPlan,
+  updateSelfStudyPlan,
+  deleteSelfStudyPlan,
+} from "../../service/api"
 const USER_ID = 1; // Cập nhật theo user đăng nhập thực tế
 
-const SelfStudyTable = () => {
+const SelfStudyTable = ({ semester, week }) => {
   const [selfStudyData, setSelfStudyData] = useState([]);
   const [newEntry, setNewEntry] = useState({
     date: "",
@@ -23,20 +26,16 @@ const SelfStudyTable = () => {
   const [editingCell, setEditingCell] = useState({ id: null, field: null });
   const [editValue, setEditValue] = useState("");
 
-  useEffect(() => {
-    axios
-      .get(`${API_BASE_URL}/semester/${DEFAULT_SEMESTER}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
+   useEffect(() => {
+    const token = localStorage.getItem("token")
+    getSelfStudyPlans(semester, token)
       .then((response) => {
-        setSelfStudyData(response.data);
+        setSelfStudyData(response.data.filter(item => String(item.week) === String(week)))
       })
       .catch((error) => {
-        console.error("Failed to fetch data", error);
-      });
-  }, []);
+        console.error("Failed to fetch data", error)
+      })
+  }, [semester, week])
 
   const handleNewEntryChange = (field, value) => {
     setNewEntry({ ...newEntry, [field]: value });
@@ -47,11 +46,11 @@ const handleAddEntry = () => {
     console.warn("Missing required fields: date or skill");
     return;
   }
-
+    const token = localStorage.getItem("token")
   const dataToSend = {
     userID: USER_ID,
-    semester: DEFAULT_SEMESTER,
-    week: DEFAULT_WEEK,
+    semester,
+    week,
     date: newEntry.date,
     skill: newEntry.skill,
     lessonSummary: newEntry.lesson,
@@ -62,39 +61,33 @@ const handleAddEntry = () => {
     concentration: "",
     notes: "",
   };
-
-  console.log("Sending data:", dataToSend);
-
-  axios
-    .post(API_BASE_URL, dataToSend, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    })
-    .then((response) => {
-      console.log("Created successfully:", response.data);
-      setSelfStudyData([...selfStudyData, response.data]);
-      setNewEntry({
-        date: "",
-        skill: "",
-        lesson: "",
-        time_allocation: "",
-        resources: "",
-        activities: "",
-        evaluation: "",
-      });
-    })
-    .catch((error) => {
-      if (error.response) {
-        console.error("Server responded with error:", error.response.data);
-      } else if (error.request) {
-        console.error("Request made but no response received:", error.request);
-      } else {
-        console.error("Error setting up request:", error.message);
-      }
-    });
-};
-
+createSelfStudyPlan(dataToSend, token)
+      .then((response) => {
+        setSelfStudyData([...selfStudyData, response.data])
+        setNewEntry({
+          date: "",
+          skill: "",
+          lesson: "",
+          time_allocation: "",
+          resources: "",
+          activities: "",
+          evaluation: "",
+          notes: "",
+          concentration: "",
+        })
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.error("Server responded with error:", error.response.data)
+        } else if (error.request) {
+          console.error("Request made but no response received:", error.request)
+        } else {
+          console.error("Error setting up request:", error.message)
+        }
+      })
+  }
+ 
+ 
 
   const handleEdit = (id, field, value) => {
     setEditingCell({ id, field });
@@ -102,48 +95,37 @@ const handleAddEntry = () => {
   };
 
   const handleSave = (id, field) => {
-    const updatedItem = selfStudyData.find((item) => item.planID === id);
-    if (!updatedItem) return;
-
+    const updatedItem = selfStudyData.find((item) => item.planID === id)
+    if (!updatedItem) return
+    const token = localStorage.getItem("token")
     const updatedValue = {
       ...updatedItem,
       [field]: editValue,
-    };
-
-    axios
-      .put(`${API_BASE_URL}/${id}`, updatedValue, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
+    }
+    updateSelfStudyPlan(id, updatedValue, token)
       .then(() => {
         setSelfStudyData(
           selfStudyData.map((item) => (item.planID === id ? updatedValue : item))
-        );
-        setEditingCell({ id: null, field: null });
+        )
+        setEditingCell({ id: null, field: null })
       })
       .catch((error) => {
-        console.error("Failed to update entry", error);
-      });
-  };
-
+        console.error("Failed to update entry", error)
+      })
+  }
   const handleDelete = (id) => {
-    axios
-      .delete(`${API_BASE_URL}/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      })
+    const token = localStorage.getItem("token")
+    deleteSelfStudyPlan(id, token)
       .then(() => {
-        setSelfStudyData(selfStudyData.filter((item) => item.planID !== id));
+        setSelfStudyData(selfStudyData.filter((item) => item.planID !== id))
       })
       .catch((error) => {
-        console.error("Failed to delete entry", error);
-      });
-  };
+        console.error("Failed to delete entry", error)
+      })
+  }
 
-  const renderCell = (item, field) => {
-    const value = item[field];
+ const renderCell = (item, field) => {
+    const value = item[field]
     if (editingCell.id === item.planID && editingCell.field === field) {
       return (
         <input
@@ -152,12 +134,12 @@ const handleAddEntry = () => {
           onBlur={() => handleSave(item.planID, field)}
           autoFocus
         />
-      );
+      )
     }
     return (
       <div onClick={() => handleEdit(item.planID, field, value)}>{value}</div>
-    );
-  };
+    )
+  }
 
   return (
     <div className="overflow-x-auto">

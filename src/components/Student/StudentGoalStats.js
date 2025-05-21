@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { fetchGoals } from "../../service/api"
 
 export default function GoalStats() {
   const [stats, setStats] = useState({
@@ -10,25 +11,20 @@ export default function GoalStats() {
     completionRate: 0,
   });
 
-    useEffect(() => {
-    const fetchGoals = async () => {
+ useEffect(() => {
+    const getGoals = async () => {
       try {
-        const token = localStorage.getItem("token"); // Lấy token từ localStorage
-        const res = await axios.get("http://localhost:8000/api/goals", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const token = localStorage.getItem("token")
+        const res = await fetchGoals(token)
+        const goals = res.data.data
 
-        const goals = res.data.data;
-
-        const totalGoals = goals.length;
-        const completedGoals = goals.filter((goal) => goal.status === "completed").length;
-        const inProgressGoals = goals.filter((goal) => goal.status === "in-progress").length;
-        const notStartedGoals = goals.filter((goal) => goal.status === "not-started").length;
+        const totalGoals = goals.length
+        const completedGoals = goals.filter((goal) => goal.status === "completed").length
+        const inProgressGoals = goals.filter((goal) => goal.status === "in-progress").length
+        const notStartedGoals = goals.filter((goal) => goal.status === "not-started").length
         const completionRate = totalGoals
           ? ((completedGoals / totalGoals) * 100).toFixed(2)
-          : 0;
+          : 0
 
         setStats({
           totalGoals,
@@ -36,13 +32,13 @@ export default function GoalStats() {
           inProgressGoals,
           notStartedGoals,
           completionRate,
-        });
+        })
       } catch (error) {
-        console.error("Error fetching stats:", error);
+        console.error("Error fetching stats:", error)
       }
-    };
+    }
 
-    fetchGoals(); // Gọi hàm fetchGoals
+    getGoals()
   }, []);
 
   const { totalGoals, completedGoals, inProgressGoals, notStartedGoals, completionRate } = stats;
