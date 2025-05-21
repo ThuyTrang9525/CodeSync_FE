@@ -4,6 +4,7 @@ import React, { useState } from "react"
 import { useEffect } from "react"; // Import useEffect từ React
 import axios from "axios"; // Import axios để thực hiện các yêu cầu HTTP
 import { GoalStatus } from "../../types/goal"
+import { fetchGoals, updateGoalStatus } from "../../service/api"
 import { Calendar, ChevronDown, ChevronUp } from "lucide-react"
 export default function GoalItem({ goal: initialGoal, deleteGoal, editGoal }) {
   const [goal, setGoal] = useState(initialGoal)
@@ -11,61 +12,43 @@ export default function GoalItem({ goal: initialGoal, deleteGoal, editGoal }) {
   const [showModal, setShowModal] = useState(false)
 
   const token = localStorage.getItem("token")
-useEffect(() => {
-  const fetchGoal = async () => {
-    try {
-      const res = await axios.get("http://localhost:8000/api/goals", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const updatedGoal = res.data.data.find((g) => g.goalID === initialGoal.goalID);
-      if (updatedGoal && updatedGoal.status !== goal.status) {
-        setGoal(updatedGoal);
+ useEffect(() => {
+    const getGoal = async () => {
+      try {
+        const res = await fetchGoals(token)
+        const updatedGoal = res.data.data.find((g) => g.goalID === initialGoal.goalID)
+        if (updatedGoal && updatedGoal.status !== goal.status) {
+          setGoal(updatedGoal)
+        }
+      } catch (error) {
+        console.error("Failed to fetch goal from API:", error)
       }
-    } catch (error) {
-      console.error("Failed to fetch goal from API:", error);
     }
-  };
-
-  fetchGoal();
-}, [initialGoal.goalID]);
-
-const handleStatusChange = async () => {
-  let newStatus;
-
-  switch (goal.status) {
-    case GoalStatus.NotStarted:
-      newStatus = GoalStatus.InProgress;
-      break;
-    case GoalStatus.InProgress:
-      newStatus = GoalStatus.Completed;
-      break;
-    case GoalStatus.Completed:
-      newStatus = GoalStatus.InProgress; // Nếu muốn quay lại khi bỏ tích
-      break;
-    default:
-      newStatus = GoalStatus.NotStarted;
+    getGoal()
+  }, [initialGoal.goalID])
+  const handleStatusChange = async () => {
+    let newStatus
+    switch (goal.status) {
+      case GoalStatus.NotStarted:
+        newStatus = GoalStatus.InProgress
+        break
+      case GoalStatus.InProgress:
+        newStatus = GoalStatus.Completed
+        break
+      case GoalStatus.Completed:
+        newStatus = GoalStatus.InProgress
+        break
+      default:
+        newStatus = GoalStatus.NotStarted
+    }
+    try {
+      const res = await updateGoalStatus(goal.goalID, { ...goal, status: newStatus }, token)
+      setGoal(res.data.data)
+      console.log("Goal updated successfully:", res.data.data)
+    } catch (error) {
+      console.error("Failed to update goal status:", error)
+    }
   }
-
-  try {
-    const res = await axios.put(
-      `http://localhost:8000/api/goals/${goal.goalID}`,
-      { ...goal, status: newStatus },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    setGoal(res.data.data);
-    console.log("Goal updated successfully:", res.data.data);
-  } catch (error) {
-    console.error("Failed to update goal status:", error);
-  }
-};
-
 
   const handleDelete = () => {
     deleteGoal(goal.id)
@@ -139,11 +122,13 @@ const handleStatusChange = async () => {
 
             <div className="d-flex align-items-center gap-3 text-muted" style={{ fontSize: "0.875rem" }}>
               <span>{goal.semester}</span>
+              <span>{goal.week}</span>
               <span className="d-flex align-items-center gap-1">
                 <Calendar size={14} />
                 {goal.deadline}
               </span>
             </div>
+
           </div>
 
           <button
@@ -164,6 +149,10 @@ const handleStatusChange = async () => {
               </p>
               <p className="mb-1">
                 <strong>Semester:</strong> {goal.semester}
+              </p>
+              
+              <p className="mb-1">
+                <strong>Week:</strong> {goal.week}
               </p>
               <p className="mb-1">
                 <strong>Priority:</strong> {goal.priority === "1" ? "High" : goal.priority === "2" ? "Medium" : "Low"}

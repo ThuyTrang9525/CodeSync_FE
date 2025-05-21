@@ -1,7 +1,8 @@
 "use client"
-import axios from "axios"
+// import axios from "axios"
 import React, { useState } from "react"
-import { GoalStatus } from "../../types/goal"
+// import { GoalStatus } from "../../types/goal"
+import { createGoal } from "../../service/api"
 import { Calendar, BookOpen, Flag, Clock, BarChart2, FileText, Tag, PlusCircle } from "lucide-react"
 
 export default function CreateGoalForm({ addGoal }) {
@@ -28,21 +29,12 @@ export default function CreateGoalForm({ addGoal }) {
 
 const handleSubmit = async (e) => {
   e.preventDefault();
-  console.log('Form data being sent:', formData); // Log form data
+  console.log('Form data being sent:', formData);
   try {
-    const response = await axios.post(
-      "http://localhost:8000/api/goals",
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    
-    console.log('Full Response:', response); // Log the full response
+    const response = await createGoal(formData, token);
 
-    // Check if status is 201 and handle the data properly
+    console.log('Full Response:', response);
+
     if (response.status === 201 && response.data.data) {
       console.log('Goal created:', response.data.data);
       // Call addGoal or other success handling logic here
@@ -51,7 +43,7 @@ const handleSubmit = async (e) => {
     }
   } catch (error) {
     console.error('Create goal failed:', error.response ? error.response.data : error.message);
-    alert('There was an issue creating your goal. Please try again later.'); // Optionally show a user-friendly message
+    alert('There was an issue creating your goal. Please try again later.');
   }
 };
 
@@ -141,9 +133,16 @@ const handleSubmit = async (e) => {
                 value={formData.semester}
                 onChange={handleSelectChange}
               >
-                <option value="Sem 1/2025">Sem 1/2025</option>
-                <option value="Sem 2/2025">Sem 2/2025</option>
-                <option value="Sem 1/2026">Sem 1/2026</option>
+                <option value="Sem 1/2025">2025-1</option>
+                <option value="Sem 2/2025">2025-2</option>
+                <option value="Sem 1/2026">2026-1</option>
+                <option value="Sem 2/2026">2026-2</option>
+                <option value="Sem 1/2027">2027-1</option>
+                <option value="Sem 2/2027">2027-2</option>
+                <option value="Sem 1/2028">2028-1</option>
+                <option value="Sem 2/2028">2028-2</option>
+                <option value="Sem 1/2029">2029-1</option>
+                <option value="Sem 2/2029">2029-2</option>
               </select>
             </div>
           </div>

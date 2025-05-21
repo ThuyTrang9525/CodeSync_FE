@@ -6,7 +6,7 @@ export default function SemesterWeekSelector({
   currentSemester,
   currentWeek,
 }) {
-  const semesters = ["2025-1", "2025-2"]
+  const semesters = ["2025-1", "2025-2", "2026-1", "2026-2", "2027-1", "2027-2"]
   const weeks = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
 
   return (
