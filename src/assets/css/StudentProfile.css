@@ -4,6 +4,7 @@
   background-color: white;
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-top:16px ;
 }
 
 
@@ -91,10 +92,13 @@
 }
 
 
-.section-title {
-  color: #009688; /* Teal color as requested */
+.profile-title {
+  color: #009688;
   font-size: 24px;
   margin-bottom: 20px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
 

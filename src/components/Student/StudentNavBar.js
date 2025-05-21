@@ -41,12 +41,12 @@ const navs = [
   },
 ];
 
-const Navbar = () => {
+const StudentNavBar = () => {
   const location = useLocation();
 
   return (
     <div className="navbar">
-      {navs.map((nav, idx) => {
+      {navs.map((nav) => {
         const isActive = nav.path && location.pathname === nav.path;
         return (
           <div
@@ -59,10 +59,10 @@ const Navbar = () => {
                 {nav.label}
               </Link>
             ) : (
-              <>
+              <div className="nav-link nav-disabled">
                 <div className="nav-icon">{nav.icon}</div>
                 {nav.label}
-              </>
+              </div>
             )}
           </div>
         );
@@ -71,4 +71,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default StudentNavBar;

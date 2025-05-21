@@ -47,7 +47,7 @@ export default function StudentHomeContent() {
               </div>
             </div>
             <p>
-              <em>{item.teacher?.name}</em>
+              <em>{item.teacher?.user?.name}</em>
             </p>
           </div>
         ))}
