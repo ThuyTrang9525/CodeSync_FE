@@ -7,6 +7,7 @@ import '../../assets/css/StudentProfile.css';
 import "../../assets/css/StudentEditProfile.css";
 import "../../assets/css/StudentUploadAchivement.css";
 import Header from "../../components/header"
+import { getUserProfile, updateUserProfile } from '../../service/api';
 export default function Profile() {
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -17,12 +18,7 @@ export default function Profile() {
     const userID = localStorage.getItem('userID');
 
     useEffect(() => {
-        axios.get('http://localhost:8000/api/student/profile', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
-            }
-        })
+      getUserProfile()
             .then(res => {
                 setProfile(res.data);
                 setLoading(false);
@@ -32,15 +28,7 @@ export default function Profile() {
 
     const handleProfileUpdate = async (updatedProfile) => {
         try {
-            const res = await axios.put(
-                `http://localhost:8000/api/student/profile/${userID}`, updatedProfile,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                        'Content-Type': 'application/json'
-                    }
-                }
-            );
+            const res = await updateUserProfile(userID, updatedProfile);
             setProfile(res.data);
             setEditModalOpen(false);
             alert('Cập nhật hồ sơ thành công!');

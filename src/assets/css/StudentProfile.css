@@ -4,7 +4,7 @@
   background-color: white;
   overflow: hidden;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  margin-top:16px ;
+  margin-top: 16px;
 }
 
 
@@ -13,7 +13,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 30px;
-  background-color: #e0f2f1; /* Lighter shade of teal */
+  background-color: #e0f2f1;
+  /* Lighter shade of teal */
   border-bottom: 1px solid #b2dfdb;
 }
 
@@ -57,21 +58,24 @@
 
 .user-name {
   font-size: 22px;
-  color: #009688; /* Teal color as requested */
+  color: #009688;
+  /* Teal color as requested */
   margin-bottom: 5px;
 }
 
 
 .user-email {
   font-size: 16px;
-  color: #009688; /* Teal color as requested */
+  color: #009688;
+  /* Teal color as requested */
   opacity: 0.8;
 }
 
 
 .edit-profile-btn {
   background-color: white;
-  color: #009688; /* Teal color as requested */
+  color: #009688;
+  /* Teal color as requested */
   border: 1px solid #009688;
   border-radius: 20px;
   padding: 8px 20px;
@@ -126,20 +130,23 @@
 
 .trophy-icon {
   font-size: 24px;
-  color: #ffc107; /* Gold color for trophy */
+  color: #ffc107;
+  /* Gold color for trophy */
   margin-right: 10px;
 }
 
 
 .achievements-title h2 {
-  color: #009688; /* Teal color as requested */
+  color: #009688;
+  /* Teal color as requested */
   font-size: 20px;
 }
 
 
 .upload-btn {
   background-color: white;
-  color: #009688; /* Teal color as requested */
+  color: #009688;
+  /* Teal color as requested */
   border: 1px solid #009688;
   border-radius: 20px;
   padding: 6px 15px;
@@ -156,7 +163,8 @@
 
 
 .congrats-text {
-  color: #009688; /* Teal color as requested */
+  color: #009688;
+  /* Teal color as requested */
   font-size: 18px;
   margin-bottom: 20px;
 }
@@ -254,7 +262,7 @@
   width: 90%;
   max-width: 400px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
- 
+
 }
 
 

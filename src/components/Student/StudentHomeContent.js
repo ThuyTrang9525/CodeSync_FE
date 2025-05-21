@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import axios from "axios"
 import { LogOut } from "lucide-react"
 import "../../assets/css/StudentHomepage.css"
+import { getMyClasses } from "../../service/api"
 export default function StudentHomeContent() {
   const [student, setStudent] = useState("")
   const [classes, setClasses] = useState([])
@@ -9,12 +10,7 @@ export default function StudentHomeContent() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    const token = localStorage.getItem("token")
-    axios.get("http://localhost:8000/api/my-classes", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+    getMyClasses()
       .then(res => {
         setStudent(res.data.student)
         setClasses(res.data.classes)
