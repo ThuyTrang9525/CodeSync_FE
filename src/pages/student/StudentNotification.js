@@ -7,10 +7,11 @@ import Footer from "../../components/footer";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
+import { getUserNotifications } from '../../service/api';
 
 export default function NotificationsTable() {
   const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [date, setDate] = useState(new Date());
@@ -18,24 +19,24 @@ export default function NotificationsTable() {
   const [openCalendar, setOpenCalendar] = useState(false);
 
   const receiverID = localStorage.getItem("userID");
- console.log(receiverID);
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      try {
-        const response = await fetch(`http://localhost:8000/api/student/notifications/${receiverID}`);
-        const data = await response.json();
-
-        if (data.status === "success") {
-          setNotifications(data.data); 
-        } else {
-          setError(data.message || "Failed to load notifications.");
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+      setLoading(true);
+      getUserNotifications(receiverID)
+        .then(({data}) => {
+          if (data.status === "success") {
+            setNotifications(data.data);
+          } else {
+            setError(data.message || "Failed to load notifications.");
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching notifications:", err);
+          setError(err.message || "Failed to load notifications.");
+        }).finally(() => {
+          setLoading(false);
+        });
     };
 
     fetchNotifications();
@@ -123,12 +124,12 @@ export default function NotificationsTable() {
                   </td>
                   <td>
                     <div className="d-flex justify-content-center gap-2">
-                        <button className="btn btn-sm btn-outline-secondary btn-icon" title="Xem">
-                            <i className="bi bi-eye"></i>
-                        </button>
-                        <button className="btn btn-sm btn-outline-danger btn-icon" title="Xóa">
-                            <i className="bi bi-trash"></i>
-                        </button>
+                      <button className="btn btn-sm btn-outline-secondary btn-icon" title="Xem">
+                        <i className="bi bi-eye"></i>
+                      </button>
+                      <button className="btn btn-sm btn-outline-danger btn-icon" title="Xóa">
+                        <i className="bi bi-trash"></i>
+                      </button>
                     </div>
                   </td>
                 </tr>
