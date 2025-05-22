@@ -229,7 +229,7 @@ const styles = {
     marginBottom: "8px",
   },
   border: {
-    width: "150%",
+    width: "40%",
     height: "2px",
     backgroundColor: "#009688",
     marginBottom: "20px",
