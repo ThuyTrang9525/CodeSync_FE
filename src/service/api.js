@@ -76,9 +76,17 @@ export const updateUserProfile = (userID, updatedProfile) =>
         }
     )
 export const getUserProfile = () =>
-      axios.get('http://localhost:8000/api/student/profile', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
-            }
-        })
+    axios.get('http://localhost:8000/api/student/profile', {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+        }
+    })
+
+export const getUserNotifications = (receiverID) =>
+    axios.get(`http://localhost:8000/api/student/notifications/${receiverID}`, {
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+        }
+    })
