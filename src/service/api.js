@@ -2,6 +2,8 @@ import axios from "axios"
 
 const API_BASE_URL = "http://localhost:8000/api"
 const INCLASS_PLANS_URL = `${API_BASE_URL}/student/inclass-plans`
+
+const token = localStorage.getItem("token")
 export const createGoal = async (formData, token) => {
     return axios.post(
         `${API_BASE_URL}/goals`,

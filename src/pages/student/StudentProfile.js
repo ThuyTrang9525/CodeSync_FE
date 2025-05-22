@@ -1,12 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import StudentNavBar from '../../components/Student/StudentNavBar';
 import EditProfileModal from '../../components/Student/StudentEditProfileModal';
 import UploadProfileModal from '../../components/Student/StudentUploadAchievementsModal';
 import '../../assets/css/StudentProfile.css';
 import "../../assets/css/StudentEditProfile.css";
 import "../../assets/css/StudentUploadAchivement.css";
+import Header from "../../components/header"
+import { getUserProfile, updateUserProfile } from '../../service/api';
 export default function Profile() {
-    const [editModalOpen, setEditModalOpen] = useState(false)
-    const [uploadModalOpen, setUploadModalOpen] = useState(false)
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [uploadModalOpen, setUploadModalOpen] = useState(false);
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    // Lấy userID từ localStorage (hoặc chỗ bạn lưu userID)
+    const userID = localStorage.getItem('userID');
+
+    useEffect(() => {
+      getUserProfile()
+            .then(res => {
+                setProfile(res.data);
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
+    }, []);
+
+    const handleProfileUpdate = async (updatedProfile) => {
+        try {
+            const res = await updateUserProfile(userID, updatedProfile);
+            setProfile(res.data);
+            setEditModalOpen(false);
+            alert('Cập nhật hồ sơ thành công!');
+        } catch (err) {
+            alert('Cập nhật thất bại: ' + (err.response?.data?.message || 'Lỗi không xác định'));
+        }
+    };
+
     const certificates = [
         {
             id: 1,
@@ -29,78 +59,74 @@ export default function Profile() {
                 'Certificate of completion for the "AWS Cloud Practitioner" certification earned by Nguyen Thi Ha Sang on August 22, 2023, demonstrating comprehensive understanding of AWS cloud infrastructure and services.',
             imageUrl: "https://fagopet.vn/storage/8p/hw/8phwlfug4xt1aa568qdmadttvcz2_gia-meo-anh-long-dai-trang-1.webp",
         },
-    ]
+    ];
 
-
-    const onClickEditProfile = () => {
-        setEditModalOpen(true)
-    }
-
-
-    const onClickUploadProfile = () => {
-        setUploadModalOpen(true)
-    }
+    if (loading) return <div>Đang tải...</div>;
+    if (!profile) return <div>Không tìm thấy hồ sơ.</div>;
 
     return (
-        <div className="profile-container">
-            {/* Header Section */}
-            <div className="profile-header">
-                <div className="user-info">
-                    <div className="avatar">
-                        <div className="avatar-inner">
-                            <div className="avatar-icon">👤</div>
-                        </div>
-                    </div>
-                    <div className="user-details">
-                        <h2 className="user-name">Nguyễn Văn A</h2>
-                        <p className="user-email">Anguyen@gmail.com</p>
-                    </div>
-                </div>
-                <button onClick={onClickEditProfile} className="edit-profile-btn">
-                    Edit Profile
-                </button>
-            </div>
-
-
-            {/* Profile Content */}
-            <div className="profile-content">
-                <h1 className="section-title">My Profile</h1>
-
-
-                <div className="achievements-section">
-                    <div className="achievements-header">
-                        <div className="achievements-title">
-                            <span className="trophy-icon">🏆</span>
-                            <h2>Achievements</h2>
-                        </div>
-                        <button onClick={onClickUploadProfile} className="upload-btn">
-                            Upload achievement
-                        </button>
-                    </div>
-
-
-                    <p className="congrats-text">Congratulations on completing this challenge!</p>
-
-
-                    <div className="certificates-grid">
-                        {certificates.map((cert) => (
-                            <div className="certificate-card" key={cert.id}>
-                                <div className="certificate-image">
-                                    <img src={cert.imageUrl || "/placeholder.svg"} alt={cert.title} className="achievement-img" />
-                                </div>
-                                <div className="certificate-content">
-                                    <h3 className="certificate-title">{cert.title}</h3>
-                                    <p className="certificate-description">{cert.description}</p>
-                                </div>
+        <div>
+            <Header />
+            <div className="profile-container">
+                <div className="profile-header">
+                    <div className="user-info">
+                        <div className="avatar">
+                            <div className="avatar-inner">
+                                <svg className="avatar-icon" viewBox="0 0 100 100" width="70" height="70">
+                                    <circle cx="50" cy="50" r="50" fill="#009688" />
+                                    <circle cx="50" cy="38" r="18" fill="#fff" />
+                                    <ellipse cx="50" cy="72" rx="28" ry="18" fill="#fff" />
+                                </svg>
                             </div>
-                        ))}
+                        </div>
+                        <div className="user-details">
+                            <h2 className="user-name">{profile.name}</h2>
+                            <p className="user-email">{profile.email}</p>
+                        </div>
+                    </div>
+                    <button onClick={() => setEditModalOpen(true)} className="edit-profile-btn">
+                        Edit Profile
+                    </button>
+                </div>
+
+                {/* Profile Content */}
+                <div className="profile-content">
+                    <h1 className="profile-title">My Profile</h1>
+                    <div className="achievements-section">
+                        <div className="achievements-header">
+                            <div className="achievements-title">
+                                <span className="trophy-icon">🏆</span>
+                                <h2>Achievements</h2>
+                            </div>
+                            <button onClick={() => setUploadModalOpen(true)} className="upload-btn">
+                                Upload achievement
+                            </button>
+                        </div>
+                        <p className="congrats-text">Congratulations on completing this challenge!</p>
+                        <div className="certificates-grid">
+                            {certificates.map((cert) => (
+                                <div className="certificate-card" key={cert.id}>
+                                    <div className="certificate-image">
+                                        <img src={cert.imageUrl || "/placeholder.svg"} alt={cert.title} className="achievement-img" />
+                                    </div>
+                                    <div className="certificate-content">
+                                        <h3 className="certificate-title">{cert.title}</h3>
+                                        <p className="certificate-description">{cert.description}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
+
+                <EditProfileModal
+                    isOpen={editModalOpen}
+                    onRequestClose={() => setEditModalOpen(false)}
+                    profile={profile}
+                    onSave={handleProfileUpdate}
+                />
+                <UploadProfileModal isOpen={uploadModalOpen} onRequestClose={() => setUploadModalOpen(false)} />
             </div>
-
-
-            <EditProfileModal isOpen={editModalOpen} onRequestClose={() => setEditModalOpen(false)} />
-            <UploadProfileModal isOpen={uploadModalOpen} onRequestClose={() => setUploadModalOpen(false)} />
         </div>
-    )
+    );
 }
