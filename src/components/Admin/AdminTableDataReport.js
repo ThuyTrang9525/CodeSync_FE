@@ -1,10 +1,8 @@
-"use client"
-
 import { useState, useEffect } from "react"
 
 export default function AdminReport() {
   const [students, setStudents] = useState([])
-  const [goals, setGoals] = useState([])
+  const [goalsByClass, setGoalsByClass] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState(null)
@@ -30,30 +28,66 @@ export default function AdminReport() {
     }
   }
 
-  const fetchGoals = async () => {
-    try {
-      const response = await fetch("http://127.0.0.1:8000/api/admin/goals")
-      if (response.ok) {
-        const data = await response.json()
-        setGoals(data)
-      } else {
-        alert("Không thể lấy dữ liệu goals")
+  const fetchGoalsByStudent = async (userID) => {
+  try {
+    const response = await fetch(`http://127.0.0.1:8000/api/admin/getGoalsbyStudent/${userID}`)
+    if (response.ok) {
+      const data = await response.json()
+
+      if (!data.goals || data.goals.length === 0) {
+        // Không có goal nào
+        setGoalsByClass([]) // để trigger thông báo "Không có goal"
+        setSelectedStudent(data)
+        return
       }
-    } catch (error) {
-      console.error("Lỗi:", error)
-      alert("Đã xảy ra lỗi khi lấy dữ liệu goals")
+
+      // Lọc ra các lớp có goals tương ứng
+      const groupedGoals = data.class_groups
+        .map(group => {
+          const matchedGoals = data.goals.filter(
+            goal => goal.subject === group.className || goal.title === group.className
+          )
+          if (matchedGoals.length > 0) {
+            return {
+              className: group.className,
+              goals: matchedGoals
+            }
+          }
+          return null
+        })
+        .filter(group => group !== null)
+
+      // Xác định goals không thuộc bất kỳ lớp nào
+      const allGroupedGoalIDs = groupedGoals.flatMap(group => group.goals.map(goal => goal.goalID))
+      const unmatchedGoals = data.goals.filter(goal => !allGroupedGoalIDs.includes(goal.goalID))
+
+      if (unmatchedGoals.length > 0) {
+        groupedGoals.push({
+          className: "Other",
+          goals: unmatchedGoals
+        })
+      }
+
+      setGoalsByClass(groupedGoals)
+      setSelectedStudent(data)
+    } else {
+      alert("Không thể lấy dữ liệu goals")
     }
+  } catch (error) {
+    console.error("Lỗi:", error)
+    alert("Đã xảy ra lỗi khi lấy dữ liệu goals")
   }
+}
 
   const handleViewGoals = (student) => {
-    setSelectedStudent(student)
     setShowModal(true)
-    fetchGoals()
+    fetchGoalsByStudent(student.userID)
   }
 
   const closeModal = () => {
     setShowModal(false)
     setSelectedStudent(null)
+    setGoalsByClass([])
   }
 
   if (loading) {
@@ -67,15 +101,14 @@ export default function AdminReport() {
         <div style={styles.border}></div>
       </div>
 
-      {/* Danh sách sinh viên dạng ô */}
       <div style={styles.grid}>
         {students.map((student, index) => (
           <div key={index} style={styles.card}>
             <div>
-                <div style={styles.header}>
-                  <h3 style={styles.name}>{student.name}</h3>
-                  <div style={styles.bordersm}></div>
-                </div>
+              <div style={styles.header}>
+                <h3 style={styles.name}>{student.name}</h3>
+                <div style={styles.bordersm}></div>
+              </div>
               <p><strong>Email:</strong> {student.email}</p>
             </div>
             <button style={styles.button} onClick={() => handleViewGoals(student)}>
@@ -85,8 +118,7 @@ export default function AdminReport() {
         ))}
       </div>
 
-      {/* Modal */}
-      {showModal && (
+      {showModal && selectedStudent && (
         <div style={styles.modalOverlay}>
           <div style={styles.modal}>
             <div style={styles.modalHeader}>
@@ -94,36 +126,39 @@ export default function AdminReport() {
               <button onClick={closeModal} style={styles.closeButton}>×</button>
             </div>
 
-            {selectedStudent && (
-              <div>
-                <h3>{selectedStudent.username}</h3>
-                <p><strong>ID:</strong> {selectedStudent.id}</p>
-                <p><strong>Email:</strong> {selectedStudent.email}</p>
-                <p><strong>Class:</strong> {selectedStudent.class}</p>
+            <div>
+              <h3>{selectedStudent.username || selectedStudent.name}</h3>
+              <p><strong>ID:</strong> {selectedStudent.userID}</p>
+              <p><strong>Email:</strong> {selectedStudent.email}</p>
 
-                <h4 style={styles.goalTitle}>Goals</h4>
-                {goals.length > 0 ? (
-                  <div style={styles.goalGrid}>
-                    {goals.map((goal, index) => (
-                      <div key={index} style={styles.goalCard}>
-                        <h4 style={{ marginBottom: 5 }}>{goal.name}</h4>
-                        <p><strong>Deadline:</strong> {goal.deadline.split("T")[0]}</p>
-                        <p><strong>Status:</strong> {goal.status}</p>
-                      </div>
-                    ))}
+              <h4 style={styles.goalTitle}>Goals by Class</h4>
+              {goalsByClass.length > 0 ? (
+                goalsByClass.map((group, index) => (
+                  <div key={index} style={{ marginBottom: 20 }}>
+                    <h4 style={{ color: "#2c3e50" }}>Class: {group.className}</h4>
+                    {group.goals.length > 0 ? (
+                      group.goals.map((goal, idx) => (
+                        <div key={idx} style={styles.goalCard}>
+                          <h4 style={{ marginBottom: 5 }}>{goal.title}</h4>
+                          <p><strong>Deadline:</strong> {goal.deadline.split("T")[0]}</p>
+                          <p><strong>Status:</strong> {goal.status}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p style={styles.noGoal}>Không có goal cho lớp này</p>
+                    )}
                   </div>
-                ) : (
-                  <p style={styles.noGoal}>Không có goal</p>
-                )}
-              </div>
-            )}
+                ))
+              ) : (
+                <p style={styles.noGoal}>Không có goal</p>
+              )}
+            </div>
           </div>
         </div>
       )}
     </div>
   )
 }
-
 const styles = {
   container: {
     padding: "20px",
