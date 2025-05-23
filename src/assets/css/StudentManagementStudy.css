@@ -245,3 +245,151 @@ tr:hover {
 .table-box tr:hover td {
   background-color: rgba(var(--main-color-light), 0.7);
 }
+
+/* Wrapper phủ fullscreen, căn giữa .comments-section */
+.comments-overlay {
+  position: fixed;
+  inset: 0; /* top:0; right:0; bottom:0; left:0; */
+  background-color: rgba(0,0,0,0.4); /* nền mờ đen */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* đảm bảo nằm trên */
+}
+
+/* Giữ nguyên .comments-section, có thể thêm max-height nếu cần */
+.comments-section {
+  max-width: 600px;
+  width: 90%; /* responsive */
+  max-height: 80vh;
+  overflow-y: auto;
+  margin: 0; /* margin auto không còn cần thiết */
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.comments-section {
+  background: #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
+  max-width: 600px;
+  margin: auto;
+  font-family: sans-serif;
+}
+
+.comments-section h4 {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+
+.comments-section textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.comments-section button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.comments-section button:hover {
+  background-color: #45a049;
+}
+
+.comment-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 16px;
+}
+
+.comment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.comment-content {
+  flex: 1;
+  font-size: 14px;
+  margin-right: 12px;
+  word-break: break-word;
+}
+
+.resolve-button {
+  font-size: 18px;
+  color: green;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+/* Danh sách comment */
+.comments-section ul {
+  list-style: none;
+  margin-top: 25px;
+  padding: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  border-top: 1px solid #eee;
+}
+
+.comments-section ul li {
+  position: relative;
+  background: #f9f9f9;
+  margin-bottom: 12px;
+  padding: 12px 45px 12px 15px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Nút dấu tích xanh */
+.comments-section ul li button {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: #4caf50;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.comments-section ul li button:hover {
+  color: #388e3c;
+}
+
+/* Scrollbar đẹp cho danh sách */
+.comments-section ul::-webkit-scrollbar {
+  width: 6px;
+}
+
+.comments-section ul::-webkit-scrollbar-thumb {
+  background-color: rgba(76, 175, 80, 0.4);
+  border-radius: 3px;
+}
+
+.comments-section ul::-webkit-scrollbar-track {
+  background: transparent;
+}
