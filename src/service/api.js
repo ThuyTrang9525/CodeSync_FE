@@ -106,3 +106,11 @@ export const getUserNotifications = (receiverID) =>
       "Content-Type": "application/json",
     },
   })
+
+  export const getTimeTable = () =>
+  axios.get(`${API_BASE_URL}/events`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  })

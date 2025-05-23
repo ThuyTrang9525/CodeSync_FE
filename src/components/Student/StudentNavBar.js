@@ -24,8 +24,8 @@ const navs = [
   {
     label: "Time table",
     icon: <Menu size={24} />,
-    path: null,
-    isLink: false,
+    path: "/student-timetable",
+    isLink: true,
   },
   {
     label: "Setting",
