@@ -1,226 +1,147 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-// Format ngày giờ dd/mm/yyyy hh:mm
 const formatDateTime = (datetime) => {
   const date = new Date(datetime);
   return `${date.toLocaleDateString('vi-VN')} ${date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
 };
 
-// Style theo loại thông báo, phân biệt teacher và student
-const getStyle = (type, isRead) => {
-  const baseStyle = {
+const styles = {
+  container: {
+    padding: 20,
+    maxWidth: 1200,
+    margin: 'auto',
+  },
+  columns: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '14px 20px',
-    borderRadius: '10px',
-    margin: '10px auto',
-    width: '90%',
-    maxWidth: '100%',
-    minHeight: '100px',
+    gap: 24,
+  },
+  column: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    color: '#333',
+  },
+  cardBase: {
+    padding: '16px 20px',
+    marginBottom: 15,
+    borderRadius: 10,
+    color: '#000', // chữ trắng để tương phản
+    boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+    transition: 'all 0.3s ease',
+  },
+  read: {
+    textDecoration: 'line-through', // thêm gạch ngang
     color: 'white',
-    fontWeight: '600',
-    boxShadow: '0 6px 12px rgba(0,0,0,0.15)',
-    fontSize: '16px',
-    letterSpacing: '0.5px',
-    opacity: isRead ? 0.6 : 1, // làm mờ nếu đã đọc
-    cursor: 'default',
-  };
-
-  const typeStyles = {
-    TEACHER: { backgroundColor: '#009688'}, // xanh dương đậm
-    STUDENT: { backgroundColor: '#3BC50C' }, // vàng cam
-  };
-
-  return { ...baseStyle, ...(typeStyles[type] || typeStyles.STUDENT) };
-};
-
-const checkMarkStyle = (isRead) => ({
-  fontSize: '20px',
-  fontWeight: 'bold',
-  color: isRead ? '#fff' : '#000',
-  userSelect: 'none',
-  cursor: isRead ? 'default' : 'pointer',
-});
-
-// Pagination component
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-  const paginationButtonStyle = (isActive) => ({
-    width: '60px',
-    height: '50px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-    margin: '0 5px',
+  },
+  teacher: {
+    backgroundColor: '#009688',
+  },
+  student: {
+    backgroundColor: '#3BC50C',
+  },  
+  name: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 4,
+  },
+  text: {
+    fontSize: 14,
+    marginBottom: 6,
+  },
+  date: {
+    fontSize: 12,
+    fontStyle: 'italic',
+    opacity: 0.8,
+  },
+  check: {
+    float: 'right',
     cursor: 'pointer',
-    backgroundColor: isActive ? '#00796b' : 'white',
-    color: isActive ? 'white' : '#333',
-    fontWeight: isActive ? 'bold' : 'normal',
-    transition: 'all 0.2s ease',
-  });
-
-  const navButtonStyle = {
-    ...paginationButtonStyle(false),
-    width: '80px',
-  };
-
-  const disabledStyle = {
-    opacity: 0.5,
-    cursor: 'not-allowed',
-  };
-
-  return (
-    <div style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>
-      <div 
-        style={{ 
-          ...navButtonStyle, 
-          ...(currentPage === 1 ? disabledStyle : {}) 
-        }}
-        onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
-      >
-        Prev
-      </div>
-      
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-        <div
-          key={page}
-          style={paginationButtonStyle(page === currentPage)}
-          onClick={() => onPageChange(page)}
-        >
-          {page}
-        </div>
-      ))}
-      
-      <div 
-        style={{ 
-          ...navButtonStyle, 
-          ...(currentPage === totalPages ? disabledStyle : {}) 
-        }}
-        onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
-      >
-        Next
-      </div>
-    </div>
-  );
+    fontSize: 18,
+    marginTop: -5,
+  },
+  noNoti: {
+    textAlign: 'center',
+    padding: 20,
+    fontSize: 16,
+    color: '#777',
+  },
 };
 
 const NotificationsList = () => {
-  const [notifications, setNotifications] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 5; // Số thông báo mỗi trang
-
-  const fetchNotifications = (page) => {
-    // Thêm tham số page vào URL API
-    axios.get(`http://127.0.0.1:8000/api/admin/notifications?page=${page}&limit=${itemsPerPage}`)
-      .then(response => {
-        // Nếu API hỗ trợ phân trang, sử dụng dữ liệu từ API
-        if (response.data.pagination) {
-          setNotifications(response.data.items.map(noti => ({ 
-            ...noti, 
-            type: noti.user.role 
-          })));
-          setTotalPages(response.data.pagination.totalPages);
-        } else {
-          // Nếu API không hỗ trợ phân trang, thực hiện phân trang ở client
-          const filtered = response.data
-            .filter(noti => {
-              const role = noti.user?.role;
-              return role === 'STUDENT' || role === 'TEACHER';
-            })
-            .map(noti => ({ ...noti, type: noti.user.role }));
-          
-          // Tính tổng số trang
-          const total = Math.ceil(filtered.length / itemsPerPage);
-          setTotalPages(total);
-          
-          // Lấy dữ liệu cho trang hiện tại
-          const startIndex = (page - 1) * itemsPerPage;
-          const endIndex = startIndex + itemsPerPage;
-          setNotifications(filtered.slice(startIndex, endIndex));
-        }
-      })
-      .catch(error => {
-        console.error('Lỗi khi lấy thông báo:', error);
-      });
-  };
+  const [studentNotifications, setStudentNotifications] = useState([]);
+  const [teacherNotifications, setTeacherNotifications] = useState([]);
 
   useEffect(() => {
-    fetchNotifications(currentPage);
-  }, [currentPage]);
+    axios
+      .get(`http://127.0.0.1:8000/api/admin/notifications`)
+      .then((res) => {
+        const all = res.data;
 
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    // Cuộn lên đầu danh sách khi chuyển trang
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+        const students = all.filter(n => n.user?.role === 'STUDENT');
+        const teachers = all.filter(n => n.user?.role === 'TEACHER');
 
-  const markAsRead = (notificationID, isAlreadyRead) => {
-    if (isAlreadyRead) return;
+        setStudentNotifications(students);
+        setTeacherNotifications(teachers);
+      })
+      .catch((err) => console.error('Lỗi lấy thông báo:', err));
+  }, []);
 
-    // Cập nhật trạng thái ở client
-    setNotifications(prev =>
-      prev.map(noti =>
-        noti.notificationID === notificationID ? { ...noti, isRead: true } : noti
+  const markAsRead = (id, listSetter) => {
+    listSetter(prev =>
+      prev.map((n) =>
+        n.notificationID === id ? { ...n, isRead: true } : n
       )
     );
 
-    // Gửi request cập nhật backend
-    axios.post(`http://127.0.0.1:8000/api/notifications/${notificationID}/read`)
-      .then(() => {
-        console.log(`Notification ${notificationID} marked as read in backend`);
-      })
-      .catch(error => {
-        console.error('Lỗi khi cập nhật trạng thái đã đọc:', error);
-        // Có thể rollback lại state nếu muốn
-      });
+    axios
+      .post(`http://127.0.0.1:8000/api/notifications/${id}/read`)
+      .then(() => console.log(`Đã đánh dấu ${id} là đã đọc`))
+      .catch((err) => console.error('Lỗi khi cập nhật:', err));
+  };
+
+  const renderNotifications = (list, type, listSetter) => {
+    if (list.length === 0) {
+      return <div style={styles.noNoti}>Không có thông báo nào</div>;
+    }
+
+    return list.map((noti) => (
+      <div
+        key={noti.notificationID}
+        style={{
+          ...styles.cardBase,
+          ...(type === 'STUDENT' ? styles.student : styles.teacher),
+          ...(noti.isRead ? styles.read : {}),
+        }}
+      >
+        <div style={styles.check} onClick={() => markAsRead(noti.notificationID, listSetter)}>
+          <i className="fa-regular fa-circle-check" title="Đánh dấu đã đọc"></i>
+        </div>
+        <div style={styles.name}>{noti.user?.name || 'Không rõ'}</div>
+        <div style={styles.text}>{noti.content}</div>
+        <div style={styles.date}>{formatDateTime(noti.createdAt)}</div>
+      </div>
+    ));
   };
 
   return (
-    <div>
-        <>
-          {notifications.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '20px' }}>Không có thông báo nào</div>
-          ) : (
-            notifications.map(noti => (
-              <div
-                key={noti.notificationID}
-                style={getStyle(noti.type, noti.isRead)}
-              >
-                <div>
-                  <div style={{ fontSize: '18px', fontWeight: 'bold' }}>
-                    {noti.user?.name || 'Không rõ'}
-                  </div>
-                  <div style={{ fontSize: '14px', fontWeight: 'normal', margin: '4px 0' }}>
-                    {noti.content}
-                  </div>
-                  <div style={{ fontSize: '12px', fontStyle: 'italic' }}>
-                    {formatDateTime(noti.createdAt)}
-                  </div>
-                </div>
-
-                <div
-                  style={checkMarkStyle(noti.isRead)}
-                  onClick={() => markAsRead(noti.notificationID, noti.isRead)}
-                  title={noti.isRead ? 'Đã đọc' : 'Đánh dấu là đã đọc'}
-                >
-                  <i className="fa-regular fa-circle-check"></i>
-                </div>
-              </div>
-            ))
-          )}
-          
-          {totalPages > 1 && (
-            <Pagination 
-              currentPage={currentPage} 
-              totalPages={totalPages} 
-              onPageChange={handlePageChange} 
-            />
-          )}
-        </>
+    <div style={styles.container}>
+      <div style={styles.columns}>
+        <div style={styles.column}>
+          <div style={styles.title}>Student</div>
+          {renderNotifications(studentNotifications, 'STUDENT', setStudentNotifications)}
+        </div>
+        <div style={styles.column}>
+          <div style={styles.title}>Teacher</div>
+          {renderNotifications(teacherNotifications, 'TEACHER', setTeacherNotifications)}
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,0 +1,117 @@
+/* Overlay background */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+/* Modal content */
+.modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 360px;
+  padding: 20px;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+/* Modal title */
+.modal-title {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #009688;
+  margin-bottom: 8px;
+}
+
+/* Icon wrapper */
+.modal-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+/* Profile icon */
+.profile-icon {
+  font-size: 42px;
+  color: #009688;
+}
+
+/* Divider line */
+.modal-divider {
+  margin: 8px 0 16px;
+  border: none;
+  border-top: 1px solid #ddd;
+}
+
+/* Form container */
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Input fields */
+.modal-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+/* Input focus */
+.modal-input:focus {
+  outline: none;
+  border-color: #009688;
+  box-shadow: 0 0 4px rgba(0, 150, 136, 0.4);
+}
+
+/* Button group */
+.modal-button-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+/* Buttons */
+.modal-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Cancel button */
+.modal-button-cancel {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.modal-button-cancel:hover {
+  background-color: #e0e0e0;
+}
+
+/* Save button */
+.modal-button-save {
+  background-color: #009688;
+  color: white;
+}
+
+.modal-button-save:hover {
+  background-color: #00796b;
+}

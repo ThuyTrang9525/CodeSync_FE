@@ -4,6 +4,7 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminUser from './pages/Admin/AdminUser';
 import AdminClass from './pages/Admin/AdminClass';
 import AdminNotification from './pages/Admin/AdminNotification';
+import AdminReport from './pages/Admin/AdminReport';
 import StudentGoal from './pages/Student/StudentGoal';
 import StudentManagementStudy from './pages/Student/StudentManagementStudy';
 import ClassesGrid from './pages/Teacher/TeacherHomepage';
@@ -15,7 +16,7 @@ import Login from './pages/Login/Login';
 import LandingPage from "./pages/HomePage";
 import NotificationsTableStudent from "./pages/Student/StudentNotification"; // Thêm dòng này
 import NotFound from "./pages/404NotFound";
-
+import StudentDetailView from './pages/Teacher/TeacherTrackStudent';
 const routes = [
     {
         path: "/Login",
@@ -26,6 +27,11 @@ const routes = [
         path: "/admin-dashboard",
         element: <AdminDashboard />,
         name: "Admin Dashboard",
+    },
+     {
+        path: "/students/:studentId",
+        element: <StudentDetailView />,
+        name: "Student deatail",
     },
     {
         path: "/admin-user",
@@ -41,6 +47,11 @@ const routes = [
         path: "/admin-notification",
         element: <AdminNotification />,
         name: "Admin Notification",
+    },
+    {
+        path: "/admin-report",
+        element: <AdminReport />,
+        name: "Admin Report",
     },
     {
         path: "/student-goal",
