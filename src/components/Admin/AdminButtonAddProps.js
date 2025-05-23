@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { addUser } from "../../service/api"; // Thay đổi đường dẫn nếu cần
 
 const AdminButtonAddProps = () => {
   const [showModal, setShowModal] = useState(false);
@@ -6,7 +7,7 @@ const AdminButtonAddProps = () => {
     name: "",
     email: "",
     password: "",
-    role: "STUDENT" 
+    role: "", // Không mặc định, bắt buộc chọn
   });
 
   const handleOpen = () => setShowModal(true);
@@ -21,21 +22,10 @@ const AdminButtonAddProps = () => {
     e.preventDefault();
 
     try {
-      console.log("Form Data on Submit: ", formData); // Kiểm tra dữ liệu trước khi gửi
+      console.log("Form Data on Submit: ", formData);
 
-      const response = await fetch("http://127.0.0.1:8000/api/admin/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-      });
+            const data = await addUser(formData);
 
-      if (!response.ok) {
-        throw new Error("Failed to add user");
-      }
-
-      const data = await response.json();
       console.log("User added successfully:", data);
       alert("User added successfully!");
 
@@ -43,7 +33,7 @@ const AdminButtonAddProps = () => {
         name: "",
         email: "",
         password: "",
-        role: "STUDENT" // Reset lại giá trị role
+        role: "", // Reset lại role về trống
       });
       handleClose();
     } catch (error) {
@@ -60,7 +50,6 @@ const AdminButtonAddProps = () => {
           Add User
         </button>
       </div>
-
 
       {showModal && (
         <div style={styles.modalOverlay}>
@@ -99,7 +88,11 @@ const AdminButtonAddProps = () => {
                 value={formData.role}
                 onChange={handleChange}
                 style={styles.input}
+                required
               >
+                <option value="" disabled>
+                  -- Select role --
+                </option>
                 <option value="STUDENT">Student</option>
                 <option value="TEACHER">Teacher</option>
               </select>

@@ -106,6 +106,131 @@ export const getUserNotifications = (receiverID) =>
       "Content-Type": "application/json",
     },
   })
+/// Teacher
+export const TeacherClasses = async () => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/teacher/classes`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = res.data;
+
+    if (data.classes) {
+      return data.classes;
+    } else {
+      console.error("No classes field in response", data);
+      return [];
+    }
+  } catch (err) {
+    console.error("Failed to fetch classes:", err);
+    return [];
+  }
+};
+
+
+export const StudentById = async (studentId) => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/teacher/students/${studentId}`);
+    return res.data;
+  } catch (err) {
+    console.error("Error loading student data", err);
+    throw err; 
+  }
+};
+
+export const StudentsByClassId = async (classId) => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/classes/${classId}/students`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = res.data;
+
+    if (Array.isArray(data.students)) {
+      return data.students;
+    } else if (Array.isArray(data)) {
+      return data;
+    } else {
+      console.error("Unexpected data format from API", data);
+      return [];
+    }
+  } catch (err) {
+    console.error("Failed to fetch students by class ID:", err);
+    return [];
+  }
+};
+
+
+export const NotificationsByReceiver = async (receiverID) => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/notifications/${receiverID}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = res.data;
+
+    if (data.status === "success") {
+      return data.data; // danh sách thông báo
+    } else {
+      console.error("API returned error status:", data);
+      return [];
+    }
+  } catch (err) {
+    console.error("Failed to fetch notifications:", err);
+    return [];
+  }
+};
+
+export const addUser = (userData) =>
+  axios.post(`${API_BASE_URL}/admin/users`, userData, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  export const getAllNotifications = () =>
+  axios.get(`${API_BASE_URL}/admin/notifications`);
+
+export const markNotificationAsRead = (id) =>
+  axios.post(`${API_BASE_URL}/admin/notifications/${id}/read`);
+
+
+export const fetchClasses = () =>
+  axios.get(`${API_BASE_URL}/admin/classes`);
+
+export const updateClass = (classID, data) =>
+  axios.put(`${API_BASE_URL}/admin/classes/${classID}`, data);
+
+export const deleteClass = (classID) =>
+  axios.delete(`${API_BASE_URL}/admin/classes/${classID}`);
+
+export const fetchStudents = () =>
+  axios.get(`${API_BASE_URL}/admin/reports`);
+
+export const fetchGoalsByStudent = (userID) =>
+  axios.get(`${API_BASE_URL}/admin/getGoalsbyStudent/${userID}`);
+
+export const fetchUsers = () =>
+  axios.get(`${API_BASE_URL}/admin/users`);
+
+export const updateUser = (userID, data) =>
+  axios.put(`${API_BASE_URL}/admin/users/${userID}`, data);
+
+export const deleteUser = (userID) =>
+  axios.delete(`${API_BASE_URL}/admin/users/${userID}`);
+
+export const fetchAdminGoals = () =>
+  axios.get(`${API_BASE_URL}/admin/goals`);
 
   export const getTimeTable = () =>
   axios.get(`${API_BASE_URL}/events`, {
