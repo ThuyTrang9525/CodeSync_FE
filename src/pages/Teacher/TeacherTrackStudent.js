@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo, useRef } from "react"
 import { useParams,useNavigate } from "react-router-dom"
 import GoalItem from "../../components/Student/StudentGoalItem"
-import ChatBox from "../../components/Teacher/TeacherChatBox"
+import ChatWidget from "../../components/Teacher/TeacherChatBox"
 import axios from "axios"
 
 
@@ -275,27 +275,7 @@ export default function StudentDetailView() {
       {renderStudyPlans()}
       <hr />
       {renderSelfStudyPlans()}
-      <button
-        onClick={() => setChatOpen((open) => !open)}
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          left: "20px",
-          backgroundColor: "#007bff",
-          color: "#fff",
-          border: "none",
-          borderRadius: "50%",
-          width: "40px",
-          height: "40px",
-          fontSize: "24px",
-          boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-          zIndex: 1000,
-        }}
-        title="Chat"
-      >
-        💬
-      </button>
-      {chatOpen && <ChatBox userId={student.studentID} userName={student.name} onClose={() => setChatOpen(false)} />}
+      <ChatWidget />
     </div>
   )
 
