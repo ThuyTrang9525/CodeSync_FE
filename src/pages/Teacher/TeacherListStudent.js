@@ -9,6 +9,7 @@ import Footer from "../../components/footer"
 
 export default function StudentTable() {
   const { classId } = useParams()
+  localStorage.setItem("classID", classId);
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
