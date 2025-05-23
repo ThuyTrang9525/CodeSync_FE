@@ -4,6 +4,7 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminUser from './pages/Admin/AdminUser';
 import AdminClass from './pages/Admin/AdminClass';
 import AdminNotification from './pages/Admin/AdminNotification';
+import AdminReport from './pages/Admin/AdminReport';
 import StudentGoal from './pages/Student/StudentGoal';
 import StudentManagementStudy from './pages/Student/StudentManagementStudy';
 import ClassesGrid from './pages/Teacher/TeacherHomepage';
@@ -46,6 +47,11 @@ const routes = [
         path: "/admin-notification",
         element: <AdminNotification />,
         name: "Admin Notification",
+    },
+    {
+        path: "/admin-report",
+        element: <AdminReport />,
+        name: "Admin Report",
     },
     {
         path: "/student-goal",

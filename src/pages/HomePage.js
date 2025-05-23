@@ -55,7 +55,7 @@ export default function LandingPage() {
           <div className="text-center mb-5">
             <h2 className="section-title fw-bold mb-2">The Secret Behind Success</h2>
             <div className="title-underline mb-5"></div>
-            <Row className="g-4">
+            <Row className="g-3">
               <Col md={4}>
                 <div className="feature-card">
                   <div className="icon-circle">

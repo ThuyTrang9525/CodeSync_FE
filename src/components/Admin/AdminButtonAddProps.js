@@ -6,7 +6,7 @@ const AdminButtonAddProps = () => {
     name: "",
     email: "",
     password: "",
-    role: "STUDENT" // Đảm bảo có giá trị mặc định cho role
+    role: "STUDENT" 
   });
 
   const handleOpen = () => setShowModal(true);
@@ -23,7 +23,7 @@ const AdminButtonAddProps = () => {
     try {
       console.log("Form Data on Submit: ", formData); // Kiểm tra dữ liệu trước khi gửi
 
-      const response = await fetch("http://127.0.0.1:8000/api/users", {
+      const response = await fetch("http://127.0.0.1:8000/api/admin/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

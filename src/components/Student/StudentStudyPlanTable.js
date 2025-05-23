@@ -337,7 +337,7 @@ const StudyPlanTable = () => {
                 placeholder="Lesson"
                 rows={2}
                 value={newEntry.lessonSummary}
-                onChange={(e) => handleNewEntryChange("lesson", e.target.value)}
+                onChange={(e) => handleNewEntryChange("lessonSummary", e.target.value)}
               />
             </td>
             <td>
@@ -356,7 +356,7 @@ const StudyPlanTable = () => {
                 placeholder="Difficulty"
                 rows={2}
                 value={newEntry.difficulties}
-                onChange={(e) => handleNewEntryChange("difficulty", e.target.value)}
+                onChange={(e) => handleNewEntryChange("difficulties", e.target.value)}
               />
             </td>
             <td>
@@ -365,7 +365,7 @@ const StudyPlanTable = () => {
                 placeholder="Plan"
                 rows={2}
                 value={newEntry.planToImprove}
-                onChange={(e) => handleNewEntryChange("plan", e.target.value)}
+                onChange={(e) => handleNewEntryChange("planToImprove", e.target.value)}
               />
             </td>
             <td>

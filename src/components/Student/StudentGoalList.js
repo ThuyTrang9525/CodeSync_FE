@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import GoalItem from "./StudentGoalItem";
+import { updateGoalStatus } from "../../service/api"
 
 export default function GoalList({ goals, updateGoalStatus, deleteGoal, editGoal }) {
   const [activeTab, setActiveTab] = useState("all");
@@ -24,24 +25,21 @@ export default function GoalList({ goals, updateGoalStatus, deleteGoal, editGoal
   };
 
   // Hàm cập nhật trạng thái goal
-  const handleChangeStatus = (goalId, newStatus) => {
+   const handleChangeStatus = (goalId, newStatus) => {
     if (!goalId) {
-      console.error('Goal ID is missing');
-      return;
+      console.error('Goal ID is missing')
+      return
     }
-
-    // Gửi yêu cầu PUT đến API với goalId
-    axios.put(`http://localhost:8000/api/goals/${goalId}`, {
-      status: newStatus,
-    })
-    .then(response => {
-      console.log('Goal updated successfully:', response.data.data);
-      // Cập nhật UI nếu cần
-    })
-    .catch(error => {
-      console.error('Failed to update goal:', error);
-    });
-  };
+    const token = localStorage.getItem("token")
+    updateGoalStatus(goalId, newStatus, token)
+      .then(response => {
+        console.log('Goal updated successfully:', response.data.data)
+        // Cập nhật UI nếu cần
+      })
+      .catch(error => {
+        console.error('Failed to update goal:', error)
+      })
+  }
 
   return (
     <div className="card">
