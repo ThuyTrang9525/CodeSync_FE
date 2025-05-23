@@ -16,11 +16,29 @@ export default function NotificationsTable() {
   const [date, setDate] = useState(new Date());
   const [selectedClass, setSelectedClass] = useState("All");
   const [openCalendar, setOpenCalendar] = useState(false);
+  const notificationsPerPage = 10;
+  const indexOfLastNotification = currentPage * notificationsPerPage;
+  const indexOfFirstNotification = indexOfLastNotification - notificationsPerPage;
+  const filteredNotifications = notifications.filter((n) => {
+  const matchesClass =
+  selectedClass === "All" || n.className === selectedClass;
+
+  const matchesDate = new Date(n.createdAt).toDateString() === date.toDateString();
+
+  return matchesClass && matchesDate;
+  });
+ const currentNotifications = filteredNotifications.slice(indexOfFirstNotification, indexOfLastNotification);
+  const totalPages = Math.ceil(filteredNotifications.length / notificationsPerPage);
+  const pageNumbers = [];
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
 
  const receiverID = localStorage.getItem("userID");
  console.log(receiverID);
 
   useEffect(() => {
+    setCurrentPage(1)
     const fetchNotifications = async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/notifications/${receiverID}`);
@@ -39,7 +57,7 @@ export default function NotificationsTable() {
     };
 
     fetchNotifications();
-  }, []);
+  }, [selectedClass, date]);
 
   const toggleCalendar = () => {
     setOpenCalendar(!openCalendar);
@@ -55,10 +73,6 @@ export default function NotificationsTable() {
   };
 
   const formattedDate = date.toLocaleDateString();
-
-  const filteredNotifications = notifications.filter((n) =>
-    selectedClass === "All" || n.class_name === selectedClass
-  );
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-white">
@@ -122,7 +136,7 @@ export default function NotificationsTable() {
                   <td colSpan="5" className="text-center py-3">No notifications found.</td>
                 </tr>
               )}
-              {!loading && !error && filteredNotifications.map((notification) => (
+              {!loading && !error && currentNotifications.map((notification) => (
                 <tr key={notification.id}>
                   <td>{notification.name || "N/A"}</td>
                   <td className="text-danger fw-medium text-center">{notification.className || "N/A"}</td>
@@ -147,12 +161,17 @@ export default function NotificationsTable() {
             </tbody>
           </table>
         </div>
-
         <div className="d-flex align-items-center justify-content-between mt-3">
           <div className="d-flex align-items-center gap-1">
-            <button className="btn btn-primary btn-sm px-3">1</button>
-            <button className="btn btn-outline-secondary btn-sm px-3">2</button>
-            <button className="btn btn-outline-secondary btn-sm">Next</button>
+            {pageNumbers.map((pageNumber) => (
+              <button
+                key={pageNumber}
+                className={`btn btn-sm px-3 ${currentPage === pageNumber ? "btn-primary" : "btn-outline-secondary"}`}
+                onClick={() => setCurrentPage(pageNumber)}
+              >
+                {pageNumber}
+              </button>
+            ))}
           </div>
         </div>
       </div>

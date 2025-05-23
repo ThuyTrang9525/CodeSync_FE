@@ -1,8 +1,10 @@
 "use client"
 import { useState, useEffect, useMemo, useRef } from "react"
 import { useParams,useNavigate } from "react-router-dom"
+import { Plus, MessageSquare } from "lucide-react"; 
 import GoalItem from "../../components/Student/StudentGoalItem"
 import ChatWidget from "../../components/Teacher/TeacherChatBox"
+import CommentsSection from "../../components/Student/StudentCommentsSection"; 
 import axios from "axios"
 
 
@@ -10,9 +12,26 @@ export default function StudentDetailView() {
   const { studentId } = useParams()
   const [activeTab, setActiveTab] = useState("profile")
   const [student, setStudent] = useState(null)
-  const [chatOpen, setChatOpen] = useState(false)
-  const navigate = useNavigate()
-
+  const [showCommentsFor, setShowCommentsFor] = useState(null);
+  const commentButtonRefs = useRef({});
+  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
+  const [commentCounts, setCommentCounts] = useState({});
+  const navigate = useNavigate();
+   const toggleComments = (planID) => {
+    if (showCommentsFor === planID) {
+      setShowCommentsFor(null);
+    } else {
+      const btn = commentButtonRefs.current[planID];
+      if (btn) {
+        const rect = btn.getBoundingClientRect();
+        setPopupPosition({
+          top: rect.bottom + window.scrollY + 5, 
+          left: rect.left + window.scrollX,
+        });
+      }
+      setShowCommentsFor(planID);
+    }
+  };
   useEffect(() => {
     if (studentId) {
       axios
@@ -140,6 +159,7 @@ export default function StudentDetailView() {
           </div>
         </div>
       </div>
+      <ChatWidget />
     </div>
   );
 };
@@ -180,17 +200,18 @@ export default function StudentDetailView() {
           )}
         </div>
       </div>
+      <ChatWidget />
     </div>
+    
   )
 
- const renderStudyPlans = () => (
+const renderStudyPlans = () => (
   <div>
     <h4 className="mb-2 font-semibold text-lg">Study Plans</h4>
     {student.study_plans?.length ? (
       <table className="w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
-            {/* Vì planID, type, semester, week bạn không yêu cầu, chỉ giữ các cột theo mẫu */}
             <th className="border border-gray-300 p-2">Date</th>
             <th className="border border-gray-300 p-2">Skill/ Module</th>
             <th className="border border-gray-300 p-2">My Lesson</th>
@@ -198,6 +219,7 @@ export default function StudentDetailView() {
             <th className="border border-gray-300 p-2">My difficult</th>
             <th className="border border-gray-300 p-2">My plan</th>
             <th className="border border-gray-300 p-2">Problem solved</th>
+            <th className="border border-gray-300 p-2">Comment</th>
           </tr>
         </thead>
         <tbody>
@@ -216,16 +238,55 @@ export default function StudentDetailView() {
                   {plan[field]}
                 </td>
               ))}
+              <td className="p-2 border text-center">
+                <button
+                  ref={(el) => (commentButtonRefs.current[plan.planID] = el)}
+                  onClick={() => toggleComments(plan.planID)}
+                  className="flex items-center justify-center gap-1 text-blue-600 hover:text-blue-800"
+                  title="Toggle comments"
+                >
+                  <MessageSquare size={18} />
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
+         {showCommentsFor && (
+            <div
+              style={{
+                position: "fixed", 
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)", 
+                zIndex: 2000,
+                wplanIDth: 600,
+                maxHeight: 600,
+                overflowY: "auto",
+                backgroundColor: "white",
+                border: "1px solplanID #ccc",
+                borderRadius: 8,
+                boxShadow:
+                  "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)",
+                padding: 12,
+              }}
+            >
+              <CommentsSection planID={showCommentsFor} planType="in_class" />
+              <div className="text-right mt-2">
+                <button
+                  className="text-gray-600 hover:text-gray-900 text-xs"
+                  onClick={() => setShowCommentsFor(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
       </table>
     ) : (
       <p>No study plans available</p>
     )}
   </div>
 )
-
 
  const renderSelfStudyPlans = () => (
   <div>
@@ -244,6 +305,7 @@ export default function StudentDetailView() {
               <th className="p-2 border">Evaluation</th>
               <th className="p-2 border">Notes</th>
               <th className="p-2 border">Time Allocation</th>
+              <th className="p-2 border">Comment</th>
             </tr>
           </thead>
           <tbody>
@@ -258,9 +320,49 @@ export default function StudentDetailView() {
                 <td className="p-2 border">{plan.evaluation}</td>
                 <td className="p-2 border">{plan.notes ?? "N/A"}</td>
                 <td className="p-2 border">{plan.time_allocation}</td>
+                <td className="p-2 border text-center">
+                  <button
+                  ref={(el) => (commentButtonRefs.current[plan.planID] = el)}
+                    onClick={() => toggleComments(plan.planID)}
+                    className="flex items-center justify-center gap-1 text-blue-600 hover:text-blue-800"
+                    title="Toggle comments"
+                  >
+                    <MessageSquare size={18} />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
+            {showCommentsFor && (
+            <div
+              style={{
+                position: "fixed", 
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)", 
+                zIndex: 2000,
+                wplanIDth: 600,
+                maxHeight: 600,
+                overflowY: "auto",
+                backgroundColor: "white",
+                border: "1px solplanID #ccc",
+                borderRadius: 8,
+                boxShadow:
+                  "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)",
+                padding: 12,
+              }}
+            >
+              <CommentsSection planID={showCommentsFor} planType="in_class" />
+              <div className="text-right mt-2">
+                <button
+                  className="text-gray-600 hover:text-gray-900 text-xs"
+                  onClick={() => setShowCommentsFor(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
         </table>
       </div>
     ) : (
@@ -281,6 +383,8 @@ export default function StudentDetailView() {
 
   const renderContent = () => {
     switch (activeTab) {
+      case "← Back":
+        return navigate(-1)
       case "goals":
         return renderGoals()
       case "learning_journal":
@@ -298,7 +402,7 @@ export default function StudentDetailView() {
         </button> */}
       <div className="">
         <ul className="nav nav-tabs card-header">
-          {["profile", "goals", "learning_journal"].map((tab) => (
+          {["← Back","profile", "goals", "learning_journal"].map((tab) => (
             <li className="nav-item" key={tab}>
               <button className={`nav-link ${activeTab === tab ? "active" : ""}`} onClick={() => setActiveTab(tab)}>
                 {tab

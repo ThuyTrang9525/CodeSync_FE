@@ -13,6 +13,7 @@ export default function StudentTable() {
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [searchTerm, setSearchTerm] = useState("")
 
   const [selectedWeek, setSelectedWeek] = useState("Choose Week")
   const [missingOption, setMissingOption] = useState("Missing Status")
@@ -31,6 +32,7 @@ export default function StudentTable() {
 
 
   useEffect(() => {
+    setSearchTerm("")
     const fetchStudents = async () => {
       setLoading(true)
       setError(null)
@@ -65,7 +67,9 @@ export default function StudentTable() {
       fetchStudents()
     }
   }, [classId])
-
+  const filteredStudents = students.filter((student) =>
+    student.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  )
   return (
     <div className="d-flex flex-column min-vh-100 bg-white">
       <Header />
@@ -86,7 +90,13 @@ export default function StudentTable() {
               <span className="input-group-text bg-white">
                 <i className="bi bi-search"></i>
               </span>
-              <input type="text" className="form-control" placeholder="Search..." />
+              <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
             </div>
 
             {/* Week Dropdown */}
@@ -163,7 +173,7 @@ export default function StudentTable() {
               </thead>
               <tbody>
                 {students.length > 0 ? (
-                  students.map((student, index) => (
+                  filteredStudents.map((student, index) => (
                     <tr key={student.userID || index}>
                       <td className="text-center">{index + 1}</td>
                       <td className="text-center">{student.name || "No name"}</td>
