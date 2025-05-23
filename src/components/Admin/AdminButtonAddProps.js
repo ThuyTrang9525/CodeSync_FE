@@ -6,7 +6,7 @@ const AdminButtonAddProps = () => {
     name: "",
     email: "",
     password: "",
-    role: "STUDENT" 
+    role: "", // Không mặc định, bắt buộc chọn
   });
 
   const handleOpen = () => setShowModal(true);
@@ -21,7 +21,7 @@ const AdminButtonAddProps = () => {
     e.preventDefault();
 
     try {
-      console.log("Form Data on Submit: ", formData); // Kiểm tra dữ liệu trước khi gửi
+      console.log("Form Data on Submit: ", formData);
 
       const response = await fetch("http://127.0.0.1:8000/api/admin/users", {
         method: "POST",
@@ -43,7 +43,7 @@ const AdminButtonAddProps = () => {
         name: "",
         email: "",
         password: "",
-        role: "STUDENT" // Reset lại giá trị role
+        role: "", // Reset lại role về trống
       });
       handleClose();
     } catch (error) {
@@ -60,7 +60,6 @@ const AdminButtonAddProps = () => {
           Add User
         </button>
       </div>
-
 
       {showModal && (
         <div style={styles.modalOverlay}>
@@ -99,7 +98,11 @@ const AdminButtonAddProps = () => {
                 value={formData.role}
                 onChange={handleChange}
                 style={styles.input}
+                required
               >
+                <option value="" disabled>
+                  -- Select role --
+                </option>
                 <option value="STUDENT">Student</option>
                 <option value="TEACHER">Teacher</option>
               </select>
