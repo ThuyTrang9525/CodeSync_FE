@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import NavBar from '../../components/Teacher/TeacherNavBar'
 import Header from "../../components/header"
 import Footer from "../../components/footer"
@@ -21,6 +22,12 @@ export default function StudentTable() {
   const missingOptions = ["Show All", "Show Missing"]
 
   const formattedClassId = classId ? classId.toUpperCase().replace(/-/g, " ") : "PNV26B"
+  const navigate = useNavigate()
+
+  const handleViewProfile = (studentId) => {
+    navigate(`/students/${studentId}`)
+  }
+
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -177,7 +184,10 @@ export default function StudentTable() {
                       </td>
                       <td>
                         <div className="d-flex justify-content-center gap-2">
-                          <button className="btn btn-sm btn-outline-secondary btn-icon">
+                          <button
+                            className="btn btn-sm btn-outline-secondary btn-icon"
+                            onClick={() => handleViewProfile(student.userID)}
+                          >
                             <i className="bi bi-eye"></i>
                           </button>
                         </div>
