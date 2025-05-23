@@ -6,12 +6,15 @@ import { useNavigate } from "react-router-dom"
 import NavBar from '../../components/Teacher/TeacherNavBar'
 import Header from "../../components/header"
 import Footer from "../../components/footer"
+import { StudentsByClassId } from "../../service/api"
 
 export default function StudentTable() {
   const { classId } = useParams()
+  localStorage.setItem("classID", classId);
   const [students, setStudents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [searchTerm, setSearchTerm] = useState("")
 
   const [selectedWeek, setSelectedWeek] = useState("Choose Week")
   const [missingOption, setMissingOption] = useState("Missing Status")
@@ -28,43 +31,31 @@ export default function StudentTable() {
     navigate(`/students/${studentId}`)
   }
 
-
   useEffect(() => {
-    const fetchStudents = async () => {
-      setLoading(true)
-      setError(null)
+    setSearchTerm("");
+
+    const loadStudents = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const response = await fetch(`http://localhost:8000/api/classes/${classId}/students`)
-        if (!response.ok) throw new Error("Failed to fetch students")
-
-        const data = await response.json()
-        console.log("Fetched data:", data)
-        
-
-        // Nếu API trả về { students: [...] }
-        if (Array.isArray(data.students)) {
-          setStudents(data.students)
-        }
-        // Nếu API trả về trực tiếp mảng
-        else if (Array.isArray(data)) {
-          setStudents(data)
-        } else {
-          setStudents([])
-          setError("Unexpected data format from API")
-        }
-      } catch (error) {
-        setError(error.message)
-        setStudents([])
+        const data = await StudentsByClassId(classId);
+        setStudents(data);
+      } catch (err) {
+        setError(err.message);
+        setStudents([]);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
     if (classId) {
-      fetchStudents()
+      loadStudents();
     }
-  }, [classId])
-
+  }, [classId]);
+  const filteredStudents = students.filter((student) =>
+    student.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  )
   return (
     <div className="d-flex flex-column min-vh-100 bg-white">
       <Header />
@@ -85,7 +76,13 @@ export default function StudentTable() {
               <span className="input-group-text bg-white">
                 <i className="bi bi-search"></i>
               </span>
-              <input type="text" className="form-control" placeholder="Search..." />
+              <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
             </div>
 
             {/* Week Dropdown */}
@@ -162,7 +159,7 @@ export default function StudentTable() {
               </thead>
               <tbody>
                 {students.length > 0 ? (
-                  students.map((student, index) => (
+                  filteredStudents.map((student, index) => (
                     <tr key={student.userID || index}>
                       <td className="text-center">{index + 1}</td>
                       <td className="text-center">{student.name || "No name"}</td>

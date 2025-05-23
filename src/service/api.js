@@ -106,6 +106,89 @@ export const getUserNotifications = (receiverID) =>
       "Content-Type": "application/json",
     },
   })
+/// Teacher
+export const TeacherClasses = async () => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/teacher/classes`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = res.data;
+
+    if (data.classes) {
+      return data.classes;
+    } else {
+      console.error("No classes field in response", data);
+      return [];
+    }
+  } catch (err) {
+    console.error("Failed to fetch classes:", err);
+    return [];
+  }
+};
+
+
+export const StudentById = async (studentId) => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/teacher/students/${studentId}`);
+    return res.data;
+  } catch (err) {
+    console.error("Error loading student data", err);
+    throw err; 
+  }
+};
+
+export const StudentsByClassId = async (classId) => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/classes/${classId}/students`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = res.data;
+
+    if (Array.isArray(data.students)) {
+      return data.students;
+    } else if (Array.isArray(data)) {
+      return data;
+    } else {
+      console.error("Unexpected data format from API", data);
+      return [];
+    }
+  } catch (err) {
+    console.error("Failed to fetch students by class ID:", err);
+    return [];
+  }
+};
+
+
+export const NotificationsByReceiver = async (receiverID) => {
+  try {
+    const res = await axios.get(`${API_BASE_URL}/notifications/${receiverID}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = res.data;
+
+    if (data.status === "success") {
+      return data.data; // danh sách thông báo
+    } else {
+      console.error("API returned error status:", data);
+      return [];
+    }
+  } catch (err) {
+    console.error("Failed to fetch notifications:", err);
+    return [];
+  }
+};
 
 export const addUser = (userData) =>
   axios.post(`${API_BASE_URL}/admin/users`, userData, {

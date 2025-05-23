@@ -5,33 +5,21 @@ import { useNavigate } from 'react-router-dom'
 import NavBar from '../../components/Teacher/TeacherNavBar'
 import Header from "../../components/header"
 import Footer from "../../components/footer"
+import { TeacherClasses } from "../../service/api"
 
 function ClassesGrid() {
   const navigate = useNavigate()
   const [classes, setClasses] = useState([])
 
+ 
   useEffect(() => {
-    const fetchClasses = async () => {
-      try {
-        const res = await fetch("http://localhost:8000/api/teacher/classes", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+    const loadClasses = async () => {
+      const result = await TeacherClasses();
+      setClasses(result);
+    };
 
-        const data = await res.json()
-        if (data.classes) {
-          setClasses(data.classes)
-        } else {
-          console.error("No classes field in response", data)
-        }
-      } catch (err) {
-        console.error("Failed to fetch classes:", err)
-      }
-    }
-
-    fetchClasses()
-  }, [])
+    loadClasses();
+  }, []);
 
   const handleClassClick = (classId) => {
     navigate(`/teachers/${classId}`)

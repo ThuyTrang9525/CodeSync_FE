@@ -1,261 +1,52 @@
 "use client"
 import { useState, useEffect, useMemo, useRef } from "react"
 import { useParams,useNavigate } from "react-router-dom"
+import { Plus, MessageSquare } from "lucide-react"; 
 import GoalItem from "../../components/Student/StudentGoalItem"
+import ChatWidget from "../../components/Teacher/TeacherChatBox"
+import CommentsSection from "../../components/Student/StudentCommentsSection";
+import { StudentById } from "../../service/api"
 import axios from "axios"
 
-function ChatBox({ userName, onClose }) {
-  const { studentId } = useParams();
-  const currentUserId = localStorage.getItem("user");
-  const userId = studentId; 
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const messagesEndRef = useRef(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!userId) return;
-
-    setIsLoading(true);
-    setError(null);
-
-    axios
-      .get(`http://localhost:8000/api/comments/history/${userId}`)
-      .then((res) => {
-        setMessages(res.data);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error("Lỗi tải lịch sử chat:", err);
-        setError("Failed to load chat history. Please try again.");
-        setIsLoading(false);
-      });
-  }, [userId]);
-
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
-
-  const sendMessage = () => {
-    if (!input.trim()) return;
-
-    setIsLoading(true);
-    setError(null);
-
-    const tempMessage = {
-      tempId: Date.now(),
-      content: input,
-      createdAt: new Date().toISOString(),
-      senderID: currentUserId,
-    };
-
-    const messageContent = input;
-
-    setMessages((prev) => [...prev, tempMessage]);
-    setInput("");
-
-    axios
-      .post("http://localhost:8000/api/comments/send", {
-        receiverID: userId,
-        content: messageContent,
-        // planID, planType có thể truyền nếu có
-      })
-      .then((res) => {
-        setMessages((prev) =>
-          prev.filter((msg) => msg.tempId !== tempMessage.tempId).concat(res.data)
-        );
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error("Send message error:", err.response?.data || err);
-        setError("Failed to send message. Please try again.");
-        setIsLoading(false);
-        setMessages((prev) => prev.filter((msg) => msg.tempId !== tempMessage.tempId));
-        setInput(messageContent);
-      });
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
-  return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: "90px",
-        left: "20px",
-        width: "320px",
-        height: "400px",
-        backgroundColor: "#fff",
-        borderRadius: 8,
-        boxShadow: "0 0 10px rgba(0,0,0,0.2)",
-        display: "flex",
-        flexDirection: "column",
-        zIndex: 10000,
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          padding: "10px 15px",
-          borderBottom: "1px solid #ddd",
-          fontWeight: "bold",
-          fontSize: 16,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          backgroundColor: "#0d6efd",
-          color: "#fff",
-          borderTopLeftRadius: 8,
-          borderTopRightRadius: 8,
-        }}
-      >
-        Chat with {userName}
-        <button
-          onClick={onClose}
-          style={{
-            cursor: "pointer",
-            border: "none",
-            background: "transparent",
-            fontSize: 24,
-            color: "#fff",
-            lineHeight: 1,
-          }}
-          aria-label="Close chat"
-        >
-          &times;
-        </button>
-      </div>
-
-      {/* Messages */}
-      <div
-        style={{
-          flexGrow: 1,
-          overflowY: "auto",
-          padding: 10,
-          backgroundColor: "#f8f9fa",
-        }}
-      >
-        {error && (
-          <div style={{ color: "red", textAlign: "center", margin: "10px 0" }}>
-            {error}
-          </div>
-        )}
-
-        {isLoading && messages.length === 0 ? (
-          <p style={{ textAlign: "center", color: "#888" }}>Loading messages...</p>
-        ) : messages.length === 0 ? (
-          <p style={{ textAlign: "center", color: "#888" }}>No messages yet</p>
-        ) : null}
-
-        {messages.map((msg) => {
-          const isSentByCurrentUser = msg.senderID === currentUserId;
-          return (
-            <div
-              key={msg.commentID || msg.tempId}
-              style={{
-                marginBottom: 8,
-                textAlign: isSentByCurrentUser ? "right" : "left",
-              }}
-            >
-              <div
-                style={{
-                  display: "inline-block",
-                  padding: "8px 12px",
-                  borderRadius: 20,
-                  backgroundColor: isSentByCurrentUser ? "#e2e3e5" : "#0d6efd",
-                  color: isSentByCurrentUser ? "#000" : "#fff",
-                  maxWidth: "80%",
-                  whiteSpace: "pre-wrap",
-                  wordWrap: "break-word",
-                  opacity: msg.tempId ? 0.7 : 1,
-                }}
-              >
-                {msg.content}
-                <div
-                  style={{
-                    fontSize: 10,
-                    marginTop: 4,
-                    opacity: 0.7,
-                    textAlign: "right",
-                  }}
-                >
-                  {msg.tempId
-                    ? "Sending..."
-                    : new Date(msg.createdAt).toLocaleTimeString()}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input */}
-      <div style={{ padding: 10, borderTop: "1px solid #ddd" }}>
-        <textarea
-          rows={2}
-          style={{
-            width: "100%",
-            resize: "none",
-            padding: 8,
-            borderRadius: 6,
-            border: "1px solid #ccc",
-          }}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyPress}
-          placeholder="Type a message..."
-        />
-        <button
-          onClick={sendMessage}
-          disabled={isLoading || !input.trim()}
-          style={{
-            marginTop: 6,
-            width: "100%",
-            backgroundColor: isLoading || !input.trim() ? "#6c757d" : "#0d6efd",
-            color: "white",
-            padding: 10,
-            border: "none",
-            borderRadius: 6,
-            cursor: isLoading || !input.trim() ? "not-allowed" : "pointer",
-            fontWeight: "bold",
-          }}
-        >
-          {isLoading ? "Sending..." : "Send"}
-        </button>
-      </div>
-    </div>
-  );
-}
 
 export default function StudentDetailView() {
   const { studentId } = useParams()
   const [activeTab, setActiveTab] = useState("profile")
   const [student, setStudent] = useState(null)
-  const [chatOpen, setChatOpen] = useState(false)
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    if (studentId) {
-      axios
-        .get(`http://localhost:8000/api/teacher/students/${studentId}`)
-        .then((res) => {
-          setStudent(res.data)
-          console.log("API data:", res.data)
-        })
-        .catch((err) => {
-          console.error("Error loading student data", err)
-        })
+  const [showCommentsFor, setShowCommentsFor] = useState(null);
+  const commentButtonRefs = useRef({});
+  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
+  const [commentCounts, setCommentCounts] = useState({});
+  const navigate = useNavigate();
+   const toggleComments = (planID) => {
+    if (showCommentsFor === planID) {
+      setShowCommentsFor(null);
+    } else {
+      const btn = commentButtonRefs.current[planID];
+      if (btn) {
+        const rect = btn.getBoundingClientRect();
+        setPopupPosition({
+          top: rect.bottom + window.scrollY + 5, 
+          left: rect.left + window.scrollX,
+        });
+      }
+      setShowCommentsFor(planID);
     }
-  }, [studentId])
+  };
+   useEffect(() => {
+    const loadStudent = async () => {
+      if (studentId) {
+        try {
+          const data = await StudentById(studentId);
+          setStudent(data);
+          console.log("API data:", data);
+        } catch (err) {
+        }
+      }
+    };
+
+    loadStudent();
+  }, [studentId]);
 
   const completedGoals = useMemo(() => {
     return student?.goals?.filter((g) => g.status === "completed") || []
@@ -282,26 +73,29 @@ export default function StudentDetailView() {
     }
   }
 
-  const certificates = [
-    {
-      id: 1,
-      title: "Laravel Mastery",
-      description: "Completed advanced Laravel course",
-      imageUrl: "/cert1.png",
-    },
-    {
-      id: 2,
-      title: "React Basics",
-      description: "Finished React fundamentals module",
-      imageUrl: "/cert2.png",
-    },
-    {
-      id: 3,
-      title: "Team Collaboration",
-      description: "Worked on a group project successfully",
-      imageUrl: "/cert3.png",
-    },
-  ]
+   const certificates = [
+        {
+            id: 1,
+            title: "Certificate Google AI Essentials",
+            description:
+                'Certificate of completion for the "Google AI Essentials" course awarded to Nguyen Thi Ha Sang on April 15, 2023 through Coursera, verifying foundational knowledge in Artificial Intelligence.',
+            imageUrl: "https://fagopet.vn/storage/8p/hw/8phwlfug4xt1aa568qdmadttvcz2_gia-meo-anh-long-dai-trang-1.webp",
+        },
+        {
+            id: 2,
+            title: "Microsoft Azure Fundamentals",
+            description:
+                'Certificate of completion for the "Microsoft Azure Fundamentals" course awarded to Nguyen Thi Ha Sang on June 10, 2023, validating essential skills in cloud computing and Microsoft Azure services.',
+            imageUrl: "https://fagopet.vn/storage/8p/hw/8phwlfug4xt1aa568qdmadttvcz2_gia-meo-anh-long-dai-trang-1.webp",
+        },
+        {
+            id: 3,
+            title: "AWS Cloud Practitioner",
+            description:
+                'Certificate of completion for the "AWS Cloud Practitioner" certification earned by Nguyen Thi Ha Sang on August 22, 2023, demonstrating comprehensive understanding of AWS cloud infrastructure and services.',
+            imageUrl: "https://fagopet.vn/storage/8p/hw/8phwlfug4xt1aa568qdmadttvcz2_gia-meo-anh-long-dai-trang-1.webp",
+        },
+    ];
 
   if (!student) return <p>Loading...</p>
 
@@ -367,6 +161,7 @@ export default function StudentDetailView() {
           </div>
         </div>
       </div>
+      <ChatWidget />
     </div>
   );
 };
@@ -407,17 +202,18 @@ export default function StudentDetailView() {
           )}
         </div>
       </div>
+      <ChatWidget />
     </div>
+    
   )
 
- const renderStudyPlans = () => (
+const renderStudyPlans = () => (
   <div>
     <h4 className="mb-2 font-semibold text-lg">Study Plans</h4>
     {student.study_plans?.length ? (
       <table className="w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
-            {/* Vì planID, type, semester, week bạn không yêu cầu, chỉ giữ các cột theo mẫu */}
             <th className="border border-gray-300 p-2">Date</th>
             <th className="border border-gray-300 p-2">Skill/ Module</th>
             <th className="border border-gray-300 p-2">My Lesson</th>
@@ -425,6 +221,7 @@ export default function StudentDetailView() {
             <th className="border border-gray-300 p-2">My difficult</th>
             <th className="border border-gray-300 p-2">My plan</th>
             <th className="border border-gray-300 p-2">Problem solved</th>
+            <th className="border border-gray-300 p-2">Comment</th>
           </tr>
         </thead>
         <tbody>
@@ -443,16 +240,55 @@ export default function StudentDetailView() {
                   {plan[field]}
                 </td>
               ))}
+              <td className="p-2 border text-center">
+                <button
+                  ref={(el) => (commentButtonRefs.current[plan.planID] = el)}
+                  onClick={() => toggleComments(plan.planID)}
+                  className="flex items-center justify-center gap-1 text-blue-600 hover:text-blue-800"
+                  title="Toggle comments"
+                >
+                  <MessageSquare size={18} />
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
+         {showCommentsFor && (
+            <div
+              style={{
+                position: "fixed", 
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)", 
+                zIndex: 2000,
+                wplanIDth: 600,
+                maxHeight: 600,
+                overflowY: "auto",
+                backgroundColor: "white",
+                border: "1px solplanID #ccc",
+                borderRadius: 8,
+                boxShadow:
+                  "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)",
+                padding: 12,
+              }}
+            >
+              <CommentsSection planID={showCommentsFor} planType="in_class" />
+              <div className="text-right mt-2">
+                <button
+                  className="text-gray-600 hover:text-gray-900 text-xs"
+                  onClick={() => setShowCommentsFor(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
       </table>
     ) : (
       <p>No study plans available</p>
     )}
   </div>
 )
-
 
  const renderSelfStudyPlans = () => (
   <div>
@@ -471,6 +307,7 @@ export default function StudentDetailView() {
               <th className="p-2 border">Evaluation</th>
               <th className="p-2 border">Notes</th>
               <th className="p-2 border">Time Allocation</th>
+              <th className="p-2 border">Comment</th>
             </tr>
           </thead>
           <tbody>
@@ -485,9 +322,49 @@ export default function StudentDetailView() {
                 <td className="p-2 border">{plan.evaluation}</td>
                 <td className="p-2 border">{plan.notes ?? "N/A"}</td>
                 <td className="p-2 border">{plan.time_allocation}</td>
+                <td className="p-2 border text-center">
+                  <button
+                  ref={(el) => (commentButtonRefs.current[plan.planID] = el)}
+                    onClick={() => toggleComments(plan.planID)}
+                    className="flex items-center justify-center gap-1 text-blue-600 hover:text-blue-800"
+                    title="Toggle comments"
+                  >
+                    <MessageSquare size={18} />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
+            {showCommentsFor && (
+            <div
+              style={{
+                position: "fixed", 
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)", 
+                zIndex: 2000,
+                wplanIDth: 600,
+                maxHeight: 600,
+                overflowY: "auto",
+                backgroundColor: "white",
+                border: "1px solplanID #ccc",
+                borderRadius: 8,
+                boxShadow:
+                  "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)",
+                padding: 12,
+              }}
+            >
+              <CommentsSection planID={showCommentsFor} planType="in_class" />
+              <div className="text-right mt-2">
+                <button
+                  className="text-gray-600 hover:text-gray-900 text-xs"
+                  onClick={() => setShowCommentsFor(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
         </table>
       </div>
     ) : (
@@ -502,32 +379,14 @@ export default function StudentDetailView() {
       {renderStudyPlans()}
       <hr />
       {renderSelfStudyPlans()}
-      <button
-        onClick={() => setChatOpen((open) => !open)}
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          left: "20px",
-          backgroundColor: "#007bff",
-          color: "#fff",
-          border: "none",
-          borderRadius: "50%",
-          width: "40px",
-          height: "40px",
-          fontSize: "24px",
-          boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-          zIndex: 1000,
-        }}
-        title="Chat"
-      >
-        💬
-      </button>
-      {chatOpen && <ChatBox userId={student.studentID} userName={student.name} onClose={() => setChatOpen(false)} />}
+      <ChatWidget />
     </div>
   )
 
   const renderContent = () => {
     switch (activeTab) {
+      case "← Back":
+        return navigate(-1)
       case "goals":
         return renderGoals()
       case "learning_journal":
@@ -545,7 +404,7 @@ export default function StudentDetailView() {
         </button> */}
       <div className="">
         <ul className="nav nav-tabs card-header">
-          {["profile", "goals", "learning_journal"].map((tab) => (
+          {["← Back","profile", "goals", "learning_journal"].map((tab) => (
             <li className="nav-item" key={tab}>
               <button className={`nav-link ${activeTab === tab ? "active" : ""}`} onClick={() => setActiveTab(tab)}>
                 {tab
