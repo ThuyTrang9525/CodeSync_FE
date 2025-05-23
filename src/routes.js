@@ -15,7 +15,7 @@ import Login from './pages/Login/Login';
 import LandingPage from "./pages/HomePage";
 import NotificationsTableStudent from "./pages/Student/StudentNotification"; // Thêm dòng này
 import NotFound from "./pages/404NotFound";
-
+import StudentDetailView from './pages/Teacher/TeacherTrackStudent';
 const routes = [
     {
         path: "/Login",
@@ -26,6 +26,11 @@ const routes = [
         path: "/admin-dashboard",
         element: <AdminDashboard />,
         name: "Admin Dashboard",
+    },
+     {
+        path: "/students/:studentId",
+        element: <StudentDetailView />,
+        name: "Student deatail",
     },
     {
         path: "/admin-user",
