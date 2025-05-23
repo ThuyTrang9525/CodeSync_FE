@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-
-const API_URL = "http://127.0.0.1:8000/api/admin/classes";
+import { fetchClasses, updateClass, deleteClass } from "../../service/api";
 
 const ClassTable = () => {
   const [classes, setClasses] = useState([]);
@@ -17,12 +16,12 @@ const ClassTable = () => {
   });
 
   useEffect(() => {
-    fetchClasses();
+    loadClasses();
   }, []);
 
-  const fetchClasses = async () => {
+  const loadClasses = async () => {
     try {
-      const res = await axios.get(API_URL);
+      const res = await fetchClasses();
       setClasses(res.data);
     } catch (err) {
       console.error("Error fetching classes:", err);
@@ -42,8 +41,8 @@ const ClassTable = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc chắn muốn xoá lớp học này?")) return;
     try {
-      await axios.delete(`${API_URL}/${id}`);
-      fetchClasses();
+      await deleteClass(id);
+      loadClasses();
     } catch (err) {
       console.error("Error deleting class:", err);
     }
@@ -64,14 +63,15 @@ const ClassTable = () => {
         quantity: formData.quantity === "" ? null : Number(formData.quantity),
       };
 
-      await axios.put(`${API_URL}/${editingClass.classID}`, payload);
+      await updateClass(editingClass.classID, payload);
       setShowModal(false);
-      fetchClasses();
+      loadClasses();
     } catch (err) {
       console.error("Error updating class:", err.response?.data || err.message);
     }
   };
 
+  // ...phần còn lại giữ nguyên...
   // Pagination logic
   const indexOfLast = currentPage * classesPerPage;
   const indexOfFirst = indexOfLast - classesPerPage;

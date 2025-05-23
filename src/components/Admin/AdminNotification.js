@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
+import { getAllNotifications, markNotificationAsRead } from '../../service/api';
 const formatDateTime = (datetime) => {
   const date = new Date(datetime);
   return `${date.toLocaleDateString('vi-VN')} ${date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
@@ -32,20 +32,20 @@ const styles = {
     padding: '16px 20px',
     marginBottom: 15,
     borderRadius: 10,
-    color: '#000', // chữ trắng để tương phản
+    color: '#000',
     boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
     transition: 'all 0.3s ease',
   },
   read: {
-    textDecoration: 'line-through', // thêm gạch ngang
-    color: 'white',
+    textDecoration: 'line-through',
+    opacity: 0.5,
   },
   teacher: {
     backgroundColor: '#009688',
   },
   student: {
     backgroundColor: '#3BC50C',
-  },  
+  },
   name: {
     fontWeight: 'bold',
     fontSize: 16,
@@ -79,8 +79,7 @@ const NotificationsList = () => {
   const [teacherNotifications, setTeacherNotifications] = useState([]);
 
   useEffect(() => {
-    axios
-      .get(`http://127.0.0.1:8000/api/admin/notifications`)
+    getAllNotifications()
       .then((res) => {
         const all = res.data;
 
@@ -94,14 +93,15 @@ const NotificationsList = () => {
   }, []);
 
   const markAsRead = (id, listSetter) => {
+    // Cập nhật UI trước
     listSetter(prev =>
       prev.map((n) =>
         n.notificationID === id ? { ...n, isRead: true } : n
       )
     );
 
-    axios
-      .post(`http://127.0.0.1:8000/api/notifications/${id}/read`)
+    // Gửi request tới API
+    markNotificationAsRead(id)
       .then(() => console.log(`Đã đánh dấu ${id} là đã đọc`))
       .catch((err) => console.error('Lỗi khi cập nhật:', err));
   };

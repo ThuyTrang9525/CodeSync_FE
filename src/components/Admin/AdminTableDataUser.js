@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import RoleFilter from "./AdminRoleFilter"; // Import component lọc
-
-const API_URL = "http://127.0.0.1:8000/api/admin/users";
-
+import { fetchUsers, updateUser, deleteUser } from "../../service/api";
 const UserTable = () => {
   const [users, setUsers] = useState([]);
   const [filteredRole, setFilteredRole] = useState("all");
@@ -20,12 +18,12 @@ const UserTable = () => {
   });
 
   useEffect(() => {
-    fetchUsers();
+    loadUsers();
   }, []);
 
-  const fetchUsers = async () => {
+  const loadUsers = async () => {
     try {
-      const response = await axios.get(API_URL);
+      const response = await fetchUsers();
       setUsers(response.data);
     } catch (error) {
       console.error("Lỗi khi lấy user:", error);
@@ -48,8 +46,8 @@ const UserTable = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`${API_URL}/${userID}`);
-      fetchUsers();
+      await deleteUser(userID);
+      loadUsers();
     } catch (error) {
       console.error("Lỗi khi xoá user:", error);
     }
@@ -76,13 +74,15 @@ const UserTable = () => {
         ...(formData.password && { password: formData.password }),
       };
 
-      await axios.put(`${API_URL}/${editingUser.userID}`, payload);
+      await updateUser(editingUser.userID, payload);
       setShowModal(false);
-      fetchUsers();
+      loadUsers();
     } catch (error) {
       console.error("Lỗi khi cập nhật user:", error.response?.data || error.message);
     }
   };
+
+  // ...phần còn lại giữ nguyên...
 
   const closeModal = () => setShowModal(false);
 
