@@ -1,94 +1,85 @@
 import { useState, useEffect } from "react"
+import { fetchStudents, fetchGoalsByStudent } from "../../service/api";
+
 
 export default function AdminReport() {
-  const [students, setStudents] = useState([])
-  const [goalsByClass, setGoalsByClass] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [showModal, setShowModal] = useState(false)
-  const [selectedStudent, setSelectedStudent] = useState(null)
+  const [students, setStudents] = useState([]);
+  const [goalsByClass, setGoalsByClass] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
 
   useEffect(() => {
-    fetchStudents()
-  }, [])
+    loadStudents();
+  }, []);
 
-  const fetchStudents = async () => {
+  const loadStudents = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/admin/reports")
-      if (response.ok) {
-        const data = await response.json()
-        setStudents(data)
-      } else {
-        alert("Không thể lấy dữ liệu sinh viên")
-      }
+      const response = await fetchStudents();
+      setStudents(response.data);
     } catch (error) {
-      console.error("Lỗi:", error)
-      alert("Đã xảy ra lỗi khi lấy dữ liệu")
+      console.error("Lỗi:", error);
+      alert("Đã xảy ra lỗi khi lấy dữ liệu");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const fetchGoalsByStudent = async (userID) => {
-  try {
-    const response = await fetch(`http://127.0.0.1:8000/api/admin/getGoalsbyStudent/${userID}`)
-    if (response.ok) {
-      const data = await response.json()
+  const handleFetchGoalsByStudent = async (userID) => {
+    try {
+      const response = await fetchGoalsByStudent(userID);
+      const data = response.data;
 
       if (!data.goals || data.goals.length === 0) {
-        // Không có goal nào
-        setGoalsByClass([]) // để trigger thông báo "Không có goal"
-        setSelectedStudent(data)
-        return
+        setGoalsByClass([]);
+        setSelectedStudent(data);
+        return;
       }
 
-      // Lọc ra các lớp có goals tương ứng
       const groupedGoals = data.class_groups
         .map(group => {
           const matchedGoals = data.goals.filter(
             goal => goal.subject === group.className || goal.title === group.className
-          )
+          );
           if (matchedGoals.length > 0) {
             return {
               className: group.className,
               goals: matchedGoals
-            }
+            };
           }
-          return null
+          return null;
         })
-        .filter(group => group !== null)
+        .filter(group => group !== null);
 
-      // Xác định goals không thuộc bất kỳ lớp nào
-      const allGroupedGoalIDs = groupedGoals.flatMap(group => group.goals.map(goal => goal.goalID))
-      const unmatchedGoals = data.goals.filter(goal => !allGroupedGoalIDs.includes(goal.goalID))
+      const allGroupedGoalIDs = groupedGoals.flatMap(group => group.goals.map(goal => goal.goalID));
+      const unmatchedGoals = data.goals.filter(goal => !allGroupedGoalIDs.includes(goal.goalID));
 
       if (unmatchedGoals.length > 0) {
         groupedGoals.push({
           className: "Other",
           goals: unmatchedGoals
-        })
+        });
       }
 
-      setGoalsByClass(groupedGoals)
-      setSelectedStudent(data)
-    } else {
-      alert("Không thể lấy dữ liệu goals")
+      setGoalsByClass(groupedGoals);
+      setSelectedStudent(data);
+    } catch (error) {
+      console.error("Lỗi:", error);
+      alert("Đã xảy ra lỗi khi lấy dữ liệu goals");
     }
-  } catch (error) {
-    console.error("Lỗi:", error)
-    alert("Đã xảy ra lỗi khi lấy dữ liệu goals")
-  }
-}
+  };
 
   const handleViewGoals = (student) => {
-    setShowModal(true)
-    fetchGoalsByStudent(student.userID)
-  }
+    setShowModal(true);
+    handleFetchGoalsByStudent(student.userID);
+  };
 
   const closeModal = () => {
-    setShowModal(false)
-    setSelectedStudent(null)
-    setGoalsByClass([])
-  }
+    setShowModal(false);
+    setSelectedStudent(null);
+    setGoalsByClass([]);
+  };
+
 
   if (loading) {
     return <div style={styles.loading}>Đang tải...</div>

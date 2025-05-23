@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Chart } from 'chart.js/auto';
 import axios from 'axios';
-
+import { fetchAdminGoals } from '../../service/api';
 const TopProgressChart = () => {
   const chartRef = useRef(null);
   const chartInstanceRef = useRef(null);
@@ -10,7 +10,7 @@ const TopProgressChart = () => {
   useEffect(() => {
     const fetchAndRender = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/admin/goals');
+        const response = await fetchAdminGoals();
         const goals = response.data;
 
         // Đếm số lượng theo trạng thái
@@ -58,7 +58,6 @@ const TopProgressChart = () => {
               'rgba(255, 99, 132, 0.7)',
               'rgba(219, 248, 0, 0.7)',
               'rgba(0, 241, 48, 0.92)',
-
             ],
             borderColor: [
               'rgba(255, 99, 132, 0.7)',
@@ -69,7 +68,7 @@ const TopProgressChart = () => {
           }]
         },
         options: {
-          indexAxis: 'x', // Biểu đồ dọc
+          indexAxis: 'x',
           scales: {
             x: {
               title: {
@@ -78,10 +77,10 @@ const TopProgressChart = () => {
               }
             },
             y: {
-              beginAtZero: true, // Bắt đầu từ 0
-              stepSize: 1, // Chỉ hiển thị các giá trị nguyên (1, 2, 3, ...)
+              beginAtZero: true,
+              stepSize: 1,
               ticks: {
-                precision: 0 // Không hiển thị số thập phân
+                precision: 0
               }
             }
           },

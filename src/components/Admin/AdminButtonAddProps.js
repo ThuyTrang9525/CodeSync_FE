@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { addUser } from "../../service/api"; // Thay đổi đường dẫn nếu cần
 
 const AdminButtonAddProps = () => {
   const [showModal, setShowModal] = useState(false);
@@ -23,19 +24,8 @@ const AdminButtonAddProps = () => {
     try {
       console.log("Form Data on Submit: ", formData);
 
-      const response = await fetch("http://127.0.0.1:8000/api/admin/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-      });
+            const data = await addUser(formData);
 
-      if (!response.ok) {
-        throw new Error("Failed to add user");
-      }
-
-      const data = await response.json();
       console.log("User added successfully:", data);
       alert("User added successfully!");
 

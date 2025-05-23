@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
+import { getAllNotifications, markNotificationAsRead } from '../../service/api';
 const formatDateTime = (datetime) => {
   const date = new Date(datetime);
   return `${date.toLocaleDateString('vi-VN')} ${date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}`;
@@ -79,8 +79,7 @@ const NotificationsList = () => {
   const [teacherNotifications, setTeacherNotifications] = useState([]);
 
   useEffect(() => {
-    axios
-      .get('http://127.0.0.1:8000/api/admin/notifications')
+    getAllNotifications()
       .then((res) => {
         const all = res.data;
 
@@ -102,8 +101,7 @@ const NotificationsList = () => {
     );
 
     // Gửi request tới API
-    axios
-      .post(`http://127.0.0.1:8000/api/admin/notifications/${id}/read`)
+    markNotificationAsRead(id)
       .then(() => console.log(`Đã đánh dấu ${id} là đã đọc`))
       .catch((err) => console.error('Lỗi khi cập nhật:', err));
   };

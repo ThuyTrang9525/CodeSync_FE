@@ -106,3 +106,45 @@ export const getUserNotifications = (receiverID) =>
       "Content-Type": "application/json",
     },
   })
+
+export const addUser = (userData) =>
+  axios.post(`${API_BASE_URL}/admin/users`, userData, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  export const getAllNotifications = () =>
+  axios.get(`${API_BASE_URL}/admin/notifications`);
+
+export const markNotificationAsRead = (id) =>
+  axios.post(`${API_BASE_URL}/admin/notifications/${id}/read`);
+
+
+export const fetchClasses = () =>
+  axios.get(`${API_BASE_URL}/admin/classes`);
+
+export const updateClass = (classID, data) =>
+  axios.put(`${API_BASE_URL}/admin/classes/${classID}`, data);
+
+export const deleteClass = (classID) =>
+  axios.delete(`${API_BASE_URL}/admin/classes/${classID}`);
+
+export const fetchStudents = () =>
+  axios.get(`${API_BASE_URL}/admin/reports`);
+
+export const fetchGoalsByStudent = (userID) =>
+  axios.get(`${API_BASE_URL}/admin/getGoalsbyStudent/${userID}`);
+
+export const fetchUsers = () =>
+  axios.get(`${API_BASE_URL}/admin/users`);
+
+export const updateUser = (userID, data) =>
+  axios.put(`${API_BASE_URL}/admin/users/${userID}`, data);
+
+export const deleteUser = (userID) =>
+  axios.delete(`${API_BASE_URL}/admin/users/${userID}`);
+
+export const fetchAdminGoals = () =>
+  axios.get(`${API_BASE_URL}/admin/goals`);
