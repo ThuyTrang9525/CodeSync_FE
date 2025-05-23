@@ -109,13 +109,14 @@ export const getUserNotifications = (receiverID) =>
 /// Teacher
 export const TeacherClasses = async () => {
   try {
-    const res = await fetch("http://localhost:8000/api/teacher/classes", {
+    const res = await axios.get(`${API_BASE_URL}/teacher/classes`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
       },
     });
 
-    const data = await res.json();
+    const data = res.data;
 
     if (data.classes) {
       return data.classes;
@@ -129,9 +130,10 @@ export const TeacherClasses = async () => {
   }
 };
 
+
 export const StudentById = async (studentId) => {
   try {
-    const res = await axios.get(`http://localhost:8000/api/teacher/students/${studentId}`);
+    const res = await axios.get(`${API_BASE_URL}/teacher/students/${studentId}`);
     return res.data;
   } catch (err) {
     console.error("Error loading student data", err);
@@ -141,11 +143,14 @@ export const StudentById = async (studentId) => {
 
 export const StudentsByClassId = async (classId) => {
   try {
-    const response = await fetch(`http://localhost:8000/api/classes/${classId}/students`);
+    const res = await axios.get(`${API_BASE_URL}/classes/${classId}/students`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+    });
 
-    if (!response.ok) throw new Error("Failed to fetch students");
-
-    const data = await response.json();
+    const data = res.data;
 
     if (Array.isArray(data.students)) {
       return data.students;
@@ -155,24 +160,32 @@ export const StudentsByClassId = async (classId) => {
       console.error("Unexpected data format from API", data);
       return [];
     }
-  } catch (error) {
-    console.error("Error fetching students:", error);
-    throw error;
+  } catch (err) {
+    console.error("Failed to fetch students by class ID:", err);
+    return [];
   }
 };
 
+
 export const NotificationsByReceiver = async (receiverID) => {
   try {
-    const response = await fetch(`http://localhost:8000/api/notifications/${receiverID}`);
-    const data = await response.json();
+    const res = await axios.get(`${API_BASE_URL}/notifications/${receiverID}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = res.data;
 
     if (data.status === "success") {
       return data.data; // danh sách thông báo
     } else {
-      throw new Error(data.message || "Failed to load notifications.");
+      console.error("API returned error status:", data);
+      return [];
     }
   } catch (err) {
-    console.error("Error fetching notifications:", err);
-    throw err;
+    console.error("Failed to fetch notifications:", err);
+    return [];
   }
 };
