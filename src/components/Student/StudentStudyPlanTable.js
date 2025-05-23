@@ -1,16 +1,26 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import axios from "axios"
-import { Plus } from "lucide-react"
+import { Plus, MessageSquare } from "lucide-react"
+import CommentsSection from "./StudentCommentsSection"
+import {
+  fetchStudyPlans,
+  createStudyPlan,
+  updateStudyPlan,
+  deleteStudyPlan,
+} from "../../service/api"
 
-const DEFAULT_SEMESTER = "2025-1"
-const DEFAULT_WEEK = 1
+const USER_ID = localStorage.getItem("userId")
 
-const StudyPlanTable = () => {
+const StudyPlanTable = ({ semester, week }) => {
   const [studyPlans, setStudyPlans] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  const [showCommentsFor, setShowCommentsFor] = useState(null)
+  const commentButtonRefs = useRef({})
+  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 })
 
   const [editingCell, setEditingCell] = useState({ id: null, field: null })
   const [editValue, setEditValue] = useState("")
@@ -22,378 +32,285 @@ const StudyPlanTable = () => {
     difficulties: "",
     planToImprove: "",
     problemSolved: "Yes",
-    semester: DEFAULT_SEMESTER,
-    week: DEFAULT_WEEK,
   })
 
-  // Lấy token từ localStorage (chỉ chạy client-side)
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
-
   useEffect(() => {
-    if (!token) {
-      setError("Chưa đăng nhập")
-      setLoading(false)
-      return
-    }
-
-    const fetchStudyPlans = async () => {
-      setLoading(true)
+    const fetchData = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8000/api/student/study-plans/semester/${DEFAULT_SEMESTER}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              Accept: "application/json",
-            },
-          }
-        )
-
-        const data = Array.isArray(response.data) ? response.data : response.data.data
-        const filteredData = data.filter((item) => item.week === DEFAULT_WEEK)
-        setStudyPlans(filteredData)
-        setError(null)
-      } catch (err) {
-        setError("Lỗi khi lấy dữ liệu từ server")
-        console.error(err)
+        const token = localStorage.getItem("token")
+        const response = await fetchStudyPlans(semester, week, token)
+        setStudyPlans(response.data)
+      } catch (error) {
+        console.error("❌ Failed to fetch data", error)
+        setError("Không thể tải dữ liệu.")
       } finally {
         setLoading(false)
       }
     }
 
-    fetchStudyPlans()
-  }, [token])
+    fetchData()
+  }, [semester, week])
+  useEffect(() => {
+    if (showCommentsFor) {
+      console.log("Showing comments for planID:", showCommentsFor)
+      const btn = commentButtonRefs.current[showCommentsFor];
+      if (btn) {
+        const rect = btn.getBoundingClientRect();
+        console.log("Button rect:", rect)
+        setPopupPosition({
+          top: rect.bottom + window.scrollY + 5,
+          left: rect.left + window.scrollX,
+        });
+      } else {
+        console.log("Button reference not found for planID:", showCommentsFor)
+      }
+    }
+  }, [showCommentsFor]);
+  const toggleComments = (planID) => {
+    console.log("Toggle comments clicked for planID:", planID)
+    setShowCommentsFor(prev => (prev === planID ? null : planID));
+  };
+  const handleNewEntryChange = (field, value) => {
+    setNewEntry({ ...newEntry, [field]: value });
+  };
 
-  const handleEdit = (id, field, value) => {
-    setEditingCell({ id, field })
-    setEditValue(value || "")
-  }
-
-  const handleSave = async (id, field) => {
-    const updatedItem = studyPlans.find((item) => item.id === id)
-    if (!updatedItem) return
-
-    if (editValue === updatedItem[field]) {
-      // Không có thay đổi, chỉ đóng chế độ chỉnh sửa
-      setEditingCell({ id: null, field: null })
+  const handleAddEntry = () => {
+    if (!newEntry.date || !newEntry.skill) {
+      console.warn("Missing required fields: date or skill")
       return
     }
 
-    const updated = { ...updatedItem, [field]: editValue }
-
-    try {
-      await axios.put(
-        `http://localhost:8000/api/student/study-plans/${id}`,
-        updated,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        }
-      )
-      setStudyPlans((prev) =>
-        prev.map((item) => (item.id === id ? updated : item))
-      )
-      setError(null)
-    } catch (err) {
-      setError("Lỗi khi cập nhật")
-      console.error(err)
-    }
-
-    setEditingCell({ id: null, field: null })
-    setEditValue("")
-  }
-
-  const handleNewEntryChange = (field, value) => {
-    setNewEntry((prev) => ({ ...prev, [field]: value }))
-  }
-
-  const validateEntry = (entry) => {
-    const errors = [];
-
-    if (!entry.date) {
-      errors.push("date is missing");
-    } else if (isNaN(Date.parse(entry.date))) {
-      errors.push("date is invalid");
-    }
-
-    if (!entry.skill || entry.skill.trim() === "") {
-      errors.push("skill is missing or empty");
-    }
-
-    if (!entry.lessonSummary|| entry.lessonSummary.trim() === "") {
-      errors.push("lesson is missing or empty");
-    }
-
-    if (
-      entry.selfAssessment=== "" ||
-      isNaN(parseInt(entry.selfAssessment)) ||
-      parseInt(entry.selfAssessment) < 1 ||
-      parseInt(entry.selfAssessment) > 5
-    ) {
-      errors.push("selfAssessment must be a number from 1 to 5");
-    }
-
-    if (!entry.difficulties || entry.difficulty.trim() === "") {
-      errors.push("difficulty is missing or empty");
-    }
-
-    if (!entry.planToImprove || entry.plan.trim() === "") {
-      errors.push("plan is missing or empty");
-    }
-
-    if (entry.problemSolved !== "Yes" && entry.problemSolved !== "No") {
-      errors.push("problemSolved must be 'Yes' or 'No'");
-    }
-
-    return errors;
-  };
-
-  const handleAddEntry = async (e) => {
-    e.preventDefault();
-
-    const validationErrors = validateEntry(newEntry);
-    if (validationErrors.length > 0) {
-      console.error("❌ Invalid input:", validationErrors);
-      setError("Dữ liệu không hợp lệ: " + validationErrors.join(", "));
-      return;
-    }
-
-    const payload = {
+    const token = localStorage.getItem("token")
+    const dataToSend = {
+      userID: USER_ID,
+      semester,
+      week,
       date: newEntry.date,
-  semester: DEFAULT_SEMESTER,
-  week: DEFAULT_WEEK,
-  skill: newEntry.skill,
-  lessonSummary: newEntry.lessonSummary,
-  selfAssessment: parseInt(newEntry.selfAssessment),
-  difficulties: newEntry.difficulties,
-  planToImprove: newEntry.planToImprove,
-  problemSolved: newEntry.problemSolved === "Yes",
-    };
+      skill: newEntry.skill,
+      lessonSummary: newEntry.lessonSummary,
+      selfAssessment: newEntry.selfAssessment,
+      difficulties: newEntry.difficulties,
+      planToImprove: newEntry.planToImprove,
+      problemSolved: newEntry.problemSolved,
+    }
 
-    console.log("🔍 Data sent to server:", payload);
+    createStudyPlan(dataToSend, token)
+      .then((response) => {
+        setStudyPlans([...studyPlans, response.data])
+        setNewEntry({
+          date: "",
+          skill: "",
+          lessonSummary: "",
+          selfAssessment: "",
+          difficulties: "",
+          planToImprove: "",
+          problemSolved: "Yes",
+        })
+      })
+      .catch((error) => {
+        console.error("Error adding entry:", error)
+        setError("Không thể thêm mục mới.")
+      })
+  }
+
+  const handleEdit = (planID, field, value) => {
+    setEditingCell({ planID, field })
+    setEditValue(value)
+  }
+
+  const handleSave = async (planID, field) => {
+    const updatedItem = studyPlans.find((item) => item.planID === planID)
+    if (!updatedItem) return
+
+    const token = localStorage.getItem("token")
+    const updatedValue = {
+      ...updatedItem,
+      [field]: editValue,
+    }
 
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/student/study-plans",
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        }
-      );
-
-      setStudyPlans((prev) => [...prev, response.data]);
-
-      setNewEntry({
-        date: "",
-        skill: "",
-        lessonSummary: "",
-        selfAssessment: "",
-        difficulties: "",
-        planToImprove: "",
-        problemSolved: "Yes",
-      });
-
-      setError(null);
-    } catch (err) {
-      if (err.response && err.response.data) {
-        console.error("💥 Server responded with validation errors:", err.response.data);
-        setError("Lỗi từ server: " + JSON.stringify(err.response.data));
-      } else {
-        console.error("❌ Unknown error:", err);
-        setError("Lỗi không xác định");
-      }
+      const response = await updateStudyPlan(planID, updatedValue, token)
+      setStudyPlans(
+        studyPlans.map((item) => (item.planID === planID ? response.data : item))
+      )
+      setEditingCell({ planID: null, field: null })
+    } catch (error) {
+      console.error("Error updating entry:", error)
+      setError("Không thể cập nhật.")
     }
-  };
+  }
+
+  const handleDelete = (planID) => {
+    const token = localStorage.getItem("token")
+    deleteStudyPlan(planID, token)
+      .then(() => {
+        setStudyPlans(studyPlans.filter((item) => item.planID !== planID))
+      })
+      .catch((error) => {
+        console.error("Error deleting entry:", error)
+        setError("Không thể xóa.")
+      })
+  }
+
+  const renderCell = (item, field) => {
+    const value = item[field]
+    if (editingCell.planID === item.planID && editingCell.field === field) {
+      return (
+        <input
+          value={editValue}
+          onChange={(e) => setEditValue(e.target.value)}
+          onBlur={() => handleSave(item.planID, field)}
+          autoFocus
+          className="w-full text-xs"
+        />
+      )
+    }
+    return (
+      <div onClick={() => handleEdit(item.planID, field, value)} className="cursor-pointer">
+        {value}
+      </div>
+    )
+  }
 
   if (loading) return <p>Đang tải dữ liệu...</p>
   if (error) return <p className="text-red-600">{error}</p>
 
   return (
-    <div>
-      <table className="w-full border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border border-gray-300 p-2">Date</th>
-            <th className="border border-gray-300 p-2">Skill/ Module</th>
-            <th className="border border-gray-300 p-2">My Lesson</th>
-            <th className="border border-gray-300 p-2">Self - assessment (1-3)</th>
-            <th className="border border-gray-300 p-2">My difficult</th>
-            <th className="border border-gray-300 p-2">My plan</th>
-            <th className="border border-gray-300 p-2">Problem solved</th>
-          </tr>
-        </thead>
-        <tbody>
-          {studyPlans.map((item) => (
-<tr key={item.id} className="hover:bg-gray-50">
-  {[
-    "date",
-    "skill",
-    "lessonSummary",
-    "selfAssessment",
-    "difficulties",
-    "planToImprove",
-    "problemSolved",
-  ].map((field) => (
-    <td
-      key={`${item.id}-${field}`} // ✅ Đây là chỗ cần sửa
-      className={`border border-gray-300 p-2 ${
-        editingCell.id === item.id && editingCell.field === field
-          ? ""
-          : "cursor-pointer"
-      }`}
-      onClick={() => handleEdit(item.id, field, item[field])}
-    >
-      {editingCell.id === item.id && editingCell.field === field ? (
-        ["lessonSummary", "difficulties", "planToImprove"].includes(field) ? (
-          <textarea
-            className="w-full p-1 border border-teal-400 rounded"
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-            onBlur={() => handleSave(item.id, field)}
-            rows={3}
-            autoFocus
-            onKeyDown={(e) => {
-              if (e.key === "Escape") {
-                setEditingCell({ id: null, field: null })
-              }
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault()
-                handleSave(item.id, field)
-              }
-            }}
-          />
-        ) : field === "problemSolved" ? (
-          <select
-            className="w-full p-1 border border-teal-400 rounded"
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-            onBlur={() => handleSave(item.id, field)}
-            autoFocus
-            onKeyDown={(e) => {
-              if (e.key === "Escape") {
-                setEditingCell({ id: null, field: null })
-              }
-              if (e.key === "Enter") {
-                handleSave(item.id, field)
-              }
-            }}
-          >
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-            <option value="Partially">Partially</option>
-          </select>
-        ) : (
-          <input
-            className="w-full p-1 border border-teal-400 rounded"
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-            onBlur={() => handleSave(item.id, field)}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") {
-                setEditingCell({ id: null, field: null })
-              }
-              if (e.key === "Enter") {
-                handleSave(item.id, field)
-              }
-            }}
-            autoFocus
-          />
-        )
-      ) : (
-        item[field]
-      )}
-    </td>
-  ))}
-</tr>
-
-          ))}
-
-          {/* New row for adding data */}
-          <tr className="bg-[#e0f2f1]">
-            <td>
-              <input
-                className="w-full p-2 border border-[#009688] rounded"
-                placeholder="Date"
-                value={newEntry.date}
-                onChange={(e) => handleNewEntryChange("date", e.target.value)}
-              />
+  <div>
+    <table className="w-full border-collapse border border-gray-300 text-sm">
+      <thead className="bg-gray-100">
+        <tr>
+          <th className="border p-2">Date</th>
+          <th className="border p-2">Skill</th>
+          <th className="border p-2">Lesson</th>
+          <th className="border p-2">Self-assessment</th>
+          <th className="border p-2">Difficulties</th>
+          <th className="border p-2">Plan</th>
+          <th className="border p-2">Solved?</th>
+          <th className="border p-2 text-center">💬</th>
+          <th className="border p-2 text-center">🗑️</th>
+        </tr>
+      </thead>
+      <tbody>
+        {studyPlans.map((item) => (
+          <tr key={item.planID}>
+            {["date", "skill", "lessonSummary", "selfAssessment", "difficulties", "planToImprove", "problemSolved"].map((field) => (
+              <td key={field} className="border p-1">
+                {renderCell(item, field)}
+              </td>
+            ))}
+            <td className="border text-center">
+              <button
+                  ref={(el) => (commentButtonRefs.current[item.planID] = el)}
+                  onClick={() => toggleComments(item.planID)}
+                  className="flex items-center justify-center gap-1 text-blue-600 hover:text-blue-800"
+                  title="Toggle comments"
+                >
+                <MessageSquare size={18} />
+                <span className="text-xs"></span>
+              </button>
             </td>
-            <td>
-              <input
-                className="w-full p-2 border border-[#009688] rounded"
-                placeholder="Skill/Module"
-                value={newEntry.skill}
-                onChange={(e) => handleNewEntryChange("skill", e.target.value)}
-              />
-            </td>
-            <td>
-              <textarea
-                className="w-full p-2 border border-[#009688] rounded"
-                placeholder="Lesson"
-                rows={2}
-                value={newEntry.lessonSummary}
-                onChange={(e) => handleNewEntryChange("lessonSummary", e.target.value)}
-              />
-            </td>
-            <td>
-              <input
-                className="w-full p-2 border border-[#009688] rounded"
-                placeholder="1-3"
-                value={newEntry.selfAssessment}
-                onChange={(e) =>
-                  handleNewEntryChange("selfAssessment", e.target.value)
-                }
-              />
-            </td>
-            <td>
-              <textarea
-                className="w-full p-2 border border-[#009688] rounded"
-                placeholder="Difficulty"
-                rows={2}
-                value={newEntry.difficulties}
-                onChange={(e) => handleNewEntryChange("difficulties", e.target.value)}
-              />
-            </td>
-            <td>
-              <textarea
-                className="w-full p-2 border border-[#009688] rounded"
-                placeholder="Plan"
-                rows={2}
-                value={newEntry.planToImprove}
-                onChange={(e) => handleNewEntryChange("planToImprove", e.target.value)}
-              />
-            </td>
-            <td>
-              <select
-                className="w-full p-2 border border-[#009688] rounded"
-                value={newEntry.problemSolved}
-                onChange={(e) =>
-                  handleNewEntryChange("problemSolved", e.target.value)
-                }
+            <td className="p-2 border text-center">
+              <button
+                onClick={() => handleDelete(item.planID)}
+                className="text-red-500 hover:underline text-xs"
               >
-                <option value="Yes">Yes</option>
-                <option value="No">No</option>
-                <option value="Partially">Partially</option>
-              </select>
+                Delete
+              </button>
             </td>
           </tr>
-        </tbody>
-      </table>
+        ))}
 
-      <button
-        onClick={handleAddEntry}
-        className="mt-4 px-4 py-2 bg-teal-600 text-white rounded flex items-center gap-2 hover:bg-teal-700 transition"
-      >
-        <Plus size={16} />
-        Add Entry
-      </button>
+        <tr className="bg-[#e0f2f1]">
+          <td>
+            <input
+              className="w-full p-2 border border-[#009688] rounded"
+              placeholder="Date"
+              value={newEntry.date}
+              onChange={(e) => handleNewEntryChange("date", e.target.value)}
+            />
+          </td>
+          <td>
+            <input
+              className="w-full p-2 border border-[#009688] rounded"
+              placeholder="Skill/Module"
+              value={newEntry.skill}
+              onChange={(e) => handleNewEntryChange("skill", e.target.value)}
+            />
+          </td>
+          <td>
+            <textarea
+              className="w-full p-2 border border-[#009688] rounded"
+              placeholder="Lesson"
+              rows={2}
+              value={newEntry.lessonSummary}
+              onChange={(e) => handleNewEntryChange("lessonSummary", e.target.value)}
+            />
+          </td>
+          <td>
+            <input
+              className="w-full p-2 border border-[#009688] rounded"
+              placeholder="1-3"
+              value={newEntry.selfAssessment}
+              onChange={(e) => handleNewEntryChange("selfAssessment", e.target.value)}
+            />
+          </td>
+          <td>
+            <textarea
+              className="w-full p-2 border border-[#009688] rounded"
+              placeholder="Difficulty"
+              rows={2}
+              value={newEntry.difficulties}
+              onChange={(e) => handleNewEntryChange("difficulties", e.target.value)}
+            />
+          </td>
+          <td>
+            <textarea
+              className="w-full p-2 border border-[#009688] rounded"
+              placeholder="Plan"
+              rows={2}
+              value={newEntry.planToImprove}
+              onChange={(e) => handleNewEntryChange("planToImprove", e.target.value)}
+            />
+          </td>
+          <td>
+            <select
+              className="w-full p-2 border border-[#009688] rounded"
+              value={newEntry.problemSolved}
+              onChange={(e) => handleNewEntryChange("problemSolved", e.target.value)}
+            >
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+              <option value="Partially">Partially</option>
+            </select>
+          </td>
+          <td></td> 
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+
+    {showCommentsFor && (
+  <div
+    style={{
+      position: "fixed",
+      top: popupPosition.top,
+      left: popupPosition.left,
+      zIndex: 3000,
+      backgroundColor: "white",
+      border: "1px solid #ccc",
+      padding: "1rem",
+      borderRadius: "8px",
+      maxWidth: "400px",
+    }}
+  >
+    <CommentsSection planID={showCommentsFor} planType="study" />
+    <div className="text-right mt-2">
+      <button onClick={() => setShowCommentsFor(null)}>Close</button>
     </div>
-  )
-}
+  </div>
+)}
 
-export default StudyPlanTable
+  </div>
+)}
+export default StudyPlanTable;

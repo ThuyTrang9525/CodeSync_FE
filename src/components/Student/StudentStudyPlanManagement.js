@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Menu } from "lucide-react"
 import SkillsTable from "./StudentSkillsTable"
 import StudyPlanTable from "./StudentStudyPlanTable"
@@ -22,7 +22,7 @@ export default function StudyPlanManagement() {
   }
 
   return (
-    <div className="flex-col">
+    <div className="flex-col w-full h-full p-4 bg-gray-100">
       <div className="flex justify-between items-center mb-4">
         <div className="bg-blue-200 p-2 border border-blue-300 rounded">
           <h1 className="text-2xl font-bold text-center">Study Plan Management</h1>
