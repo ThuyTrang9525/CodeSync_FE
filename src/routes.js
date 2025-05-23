@@ -9,6 +9,7 @@ import StudentGoal from './pages/Student/StudentGoal';
 import StudentManagementStudy from './pages/Student/StudentManagementStudy';
 import ClassesGrid from './pages/Teacher/TeacherHomepage';
 import NotificationsTable from './pages/Teacher/TeacherNotification';
+import StudentCalendarView from './pages/Student/StudentCalendarView';
 import StudentTable from './pages/Teacher/TeacherListStudent';
 import Homepage from "./pages/Student/StudentHomepage";
 import Profile from "./pages/Student/StudentProfile";
@@ -102,6 +103,11 @@ const routes = [
         path: "*",
         element: <NotFound />,
         name: "404",
+    },
+    {
+        path: "student-timetable",
+        element: <StudentCalendarView />,
+        name: "student-timetable",
     },
 ];
 

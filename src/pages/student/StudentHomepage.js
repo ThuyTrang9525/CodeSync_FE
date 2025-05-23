@@ -6,7 +6,7 @@ import "../../assets/css/StudentHomepage.css"
 
 export default function StudentHomepage() {
     return(
-    <div className="student-homepage">
+    <div className="student-homepage ">
       <Header />
       <Navbar />
       <StudentHomeContent />

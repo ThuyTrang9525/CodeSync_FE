@@ -67,7 +67,7 @@ export default function Profile() {
     return (
         <div>
             <Header />
-            <div className="profile-container">
+            <div className="profile-container ">
                 <div className="profile-header">
                     <div className="user-info">
                         <div className="avatar">

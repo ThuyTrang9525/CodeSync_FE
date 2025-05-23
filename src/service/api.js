@@ -231,3 +231,11 @@ export const deleteUser = (userID) =>
 
 export const fetchAdminGoals = () =>
   axios.get(`${API_BASE_URL}/admin/goals`);
+
+  export const getTimeTable = () =>
+  axios.get(`${API_BASE_URL}/events`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  })
