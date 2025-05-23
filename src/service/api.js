@@ -106,3 +106,73 @@ export const getUserNotifications = (receiverID) =>
       "Content-Type": "application/json",
     },
   })
+/// Teacher
+export const TeacherClasses = async () => {
+  try {
+    const res = await fetch("http://localhost:8000/api/teacher/classes", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (data.classes) {
+      return data.classes;
+    } else {
+      console.error("No classes field in response", data);
+      return [];
+    }
+  } catch (err) {
+    console.error("Failed to fetch classes:", err);
+    return [];
+  }
+};
+
+export const StudentById = async (studentId) => {
+  try {
+    const res = await axios.get(`http://localhost:8000/api/teacher/students/${studentId}`);
+    return res.data;
+  } catch (err) {
+    console.error("Error loading student data", err);
+    throw err; 
+  }
+};
+
+export const StudentsByClassId = async (classId) => {
+  try {
+    const response = await fetch(`http://localhost:8000/api/classes/${classId}/students`);
+
+    if (!response.ok) throw new Error("Failed to fetch students");
+
+    const data = await response.json();
+
+    if (Array.isArray(data.students)) {
+      return data.students;
+    } else if (Array.isArray(data)) {
+      return data;
+    } else {
+      console.error("Unexpected data format from API", data);
+      return [];
+    }
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    throw error;
+  }
+};
+
+export const NotificationsByReceiver = async (receiverID) => {
+  try {
+    const response = await fetch(`http://localhost:8000/api/notifications/${receiverID}`);
+    const data = await response.json();
+
+    if (data.status === "success") {
+      return data.data; // danh sách thông báo
+    } else {
+      throw new Error(data.message || "Failed to load notifications.");
+    }
+  } catch (err) {
+    console.error("Error fetching notifications:", err);
+    throw err;
+  }
+};

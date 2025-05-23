@@ -4,7 +4,8 @@ import { useParams,useNavigate } from "react-router-dom"
 import { Plus, MessageSquare } from "lucide-react"; 
 import GoalItem from "../../components/Student/StudentGoalItem"
 import ChatWidget from "../../components/Teacher/TeacherChatBox"
-import CommentsSection from "../../components/Student/StudentCommentsSection"; 
+import CommentsSection from "../../components/Student/StudentCommentsSection";
+import { StudentById } from "../../service/api"
 import axios from "axios"
 
 
@@ -32,19 +33,20 @@ export default function StudentDetailView() {
       setShowCommentsFor(planID);
     }
   };
-  useEffect(() => {
-    if (studentId) {
-      axios
-        .get(`http://localhost:8000/api/teacher/students/${studentId}`)
-        .then((res) => {
-          setStudent(res.data)
-          console.log("API data:", res.data)
-        })
-        .catch((err) => {
-          console.error("Error loading student data", err)
-        })
-    }
-  }, [studentId])
+   useEffect(() => {
+    const loadStudent = async () => {
+      if (studentId) {
+        try {
+          const data = await StudentById(studentId);
+          setStudent(data);
+          console.log("API data:", data);
+        } catch (err) {
+        }
+      }
+    };
+
+    loadStudent();
+  }, [studentId]);
 
   const completedGoals = useMemo(() => {
     return student?.goals?.filter((g) => g.status === "completed") || []

@@ -7,6 +7,7 @@ import Footer from "../../components/footer";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt } from "react-icons/fa";
+import { NotificationsByReceiver } from "../../service/api"
 
 export default function NotificationsTable() {
   const [notifications, setNotifications] = useState([]);
@@ -37,18 +38,13 @@ export default function NotificationsTable() {
  const receiverID = localStorage.getItem("userID");
  console.log(receiverID);
 
-  useEffect(() => {
-    setCurrentPage(1)
-    const fetchNotifications = async () => {
-      try {
-        const response = await fetch(`http://localhost:8000/api/notifications/${receiverID}`);
-        const data = await response.json();
+   useEffect(() => {
+    setCurrentPage(1);
 
-        if (data.status === "success") {
-          setNotifications(data.data); 
-        } else {
-          setError(data.message || "Failed to load notifications.");
-        }
+    const loadNotifications = async () => {
+      try {
+        const data = await NotificationsByReceiver(receiverID);
+        setNotifications(data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -56,7 +52,7 @@ export default function NotificationsTable() {
       }
     };
 
-    fetchNotifications();
+    loadNotifications();
   }, [selectedClass, date]);
 
   const toggleCalendar = () => {
