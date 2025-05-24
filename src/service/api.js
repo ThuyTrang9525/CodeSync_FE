@@ -214,8 +214,28 @@ export const updateClass = (classID, data) =>
 export const deleteClass = (classID) =>
   axios.delete(`${API_BASE_URL}/admin/classes/${classID}`);
 
+
+export const createClass = (data) =>
+  axios.post(`${API_BASE_URL}/admin/classes`, data, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
 export const fetchStudents = () =>
   axios.get(`${API_BASE_URL}/admin/reports`);
+
+export const fetchTeachers = () => axios.get(`${API_BASE_URL}/admin/teachers`);
+
+export const assignTeacherToClass = (data) =>
+  axios.post(`${API_BASE_URL}/admin/assign-teacher`, data, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
 
 export const fetchGoalsByStudent = (userID) =>
   axios.get(`${API_BASE_URL}/admin/getGoalsbyStudent/${userID}`);
