@@ -10,14 +10,13 @@ export default class AdminDashboard extends Component {
     teachers: 0,
     students: 0,
     classes: 0,
-    visits: 0
   };
 
   componentDidMount() {
     axios.get('http://localhost:8000/api/stats')
       .then(response => {
-        const { teachers, students, classes, visits } = response.data;
-        this.setState({ teachers, students, classes, visits });
+        const { teachers, students, classes} = response.data;
+        this.setState({ teachers, students, classes});
       })
       .catch(error => {
         console.error('Error fetching dashboard data:', error);
@@ -25,7 +24,7 @@ export default class AdminDashboard extends Component {
   }
 
   render() {
-    const { teachers, students, classes, visits } = this.state;
+    const { teachers, students, classes } = this.state;
 
     return (
       <div className="container">
@@ -43,10 +42,6 @@ export default class AdminDashboard extends Component {
           <div className="stat-card">
             <h3 className="stat-title">Total Classes</h3>
             <p className="stat-value">{classes}</p>
-          </div>
-          <div className="stat-card">
-            <h3 className="stat-title">Weekly Visits</h3>
-            <p className="stat-value">{visits}</p>
           </div>
         </div>
 

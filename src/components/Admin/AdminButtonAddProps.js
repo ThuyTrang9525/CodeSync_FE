@@ -118,13 +118,14 @@ const styles = {
 
   addBtn: {
     marginTop: "20px",
-    backgroundColor: "#009688",
+    backgroundColor: "#00796b",
     color: "#fff",
     padding: "10px 20px",
     fontSize: "16px",
     border: "none",
     borderRadius: "4px",
     cursor: "pointer",
+    fontWeight: "600",
   },
 
   modalOverlay: {
