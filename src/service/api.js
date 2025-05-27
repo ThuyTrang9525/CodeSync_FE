@@ -14,14 +14,26 @@ export const login = (email, password, role) =>
 // Goals APIs
 export const createGoal = async (formData, token) =>
   axios.post(`${API_BASE_URL}/goals`, formData, {
-    headers: { Authorization: `Bearer ${token}` },
+   headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
   })
 
-export const fetchGoals = (token) =>
-  axios.get(`${API_BASE_URL}/goals`, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+export const fetchGoals = (token, semester = null, week = null) => {
+  let url = `${API_BASE_URL}/goals`;
 
+  if (semester && week) {
+    url = `${API_BASE_URL}/goals/semesters/${semester}?week=${week}`;
+  }
+
+  return axios.get(url, {
+   headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+};
 export const updateGoalStatus = (goalID, data, token) =>
   axios.put(`${API_BASE_URL}/goals/${goalID}`, data, {
     headers: {
@@ -32,18 +44,28 @@ export const updateGoalStatus = (goalID, data, token) =>
 
 export const deleteGoal = (id, token) =>
   axios.delete(`${API_BASE_URL}/goals/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    
+   headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
   })
 
-export const editGoal = (updatedGoal, token) =>
-  axios.put(`${API_BASE_URL}/goals/${updatedGoal.goalID || updatedGoal.id}`, updatedGoal, {
-    headers: { Authorization: `Bearer ${token}` },
-  })
+export const editGoal = (goal, token) =>
+  axios.put(`${API_BASE_URL}/goals/${goal.goalID}`, goal, {
+   headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
 
 // Study Plan APIs
 export const createStudyPlan = (data, token) =>
   axios.post(STUDY_PLAN_URL, data, {
-    headers: { Authorization: `Bearer ${token}` },
+   headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
   })
 
 export const updateStudyPlan = (id, data, token) =>
