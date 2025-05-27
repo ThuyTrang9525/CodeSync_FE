@@ -88,7 +88,7 @@ export default function GoalList({ goals, updateGoalStatus, deleteGoal, editGoal
                 goal={goal}
                 updateGoalStatus={handleChangeStatus}  // Truyền đúng hàm handleChangeStatus
                 deleteGoal={deleteGoal}
-                editGoal={editGoal}
+                 editGoal={editGoal}
               />
             ))
           ) : (

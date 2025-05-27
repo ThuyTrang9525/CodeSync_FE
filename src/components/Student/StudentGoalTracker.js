@@ -10,7 +10,7 @@ import {
   createGoal,
   updateGoalStatus,
   deleteGoal as apiDeleteGoal,
-  editGoal as apiEditGoal,
+  editGoal as editGoal,
 } from "../../service/api"
 
 export default function GoalTracker() {
@@ -66,15 +66,16 @@ export default function GoalTracker() {
   }
 
 
-  const editGoal = async (updatedGoal) => {
-      try {
-      const token = localStorage.getItem("token")
-      const res = await apiEditGoal(updatedGoal, token)
-      setGoals(goals.map((goal) => (goal.goalID === updatedGoal.goalID ? res.data.data : goal)))
-    } catch (err) {
-      console.error("Failed to edit goal:", err)
-    }
+ const editGoal = async (updatedGoal,token) => {
+  try {
+    const token = localStorage.getItem("token");
+    const res = await editGoal(updatedGoal, token);
+    setGoals(goals.map((goal) => (goal.goalID === updatedGoal.goalID ? res.data.data : goal)));
+  } catch (err) {
+    console.error("Failed to edit goal:", err);
+    throw err; // Để component con bắt được lỗi
   }
+};
 
   // Statistics
   const semesterGoals = goals.filter((goal) => goal.semester === "2025-1")

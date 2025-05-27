@@ -1,257 +1,164 @@
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, Plus } from "lucide-react";
+import { fetchGoals, createGoal, updateGoalStatus, deleteGoal } from "../../service/api";
 
-export default function SkillsTable() {
-    const [skills, setSkills] = useState([
-      {
-        id: 1,
-        description: "Can complete complete sentence structures and identify vocabulary",
-        completed: {
-          toeic: true,
-          itEnglish: true,
-          speakEnglish: true,
-        },
-      },
-      {
-        id: 2,
-        description: "Can complete complete sentence structures and identify vocabulary",
-        completed: {
-          toeic: true,
-          itEnglish: true,
-          speakEnglish: true,
-        },
-      },
-    ])
-  
-    const [editingCell, setEditingCell] = useState({ skillId: null, field: null })
-    const [editValue, setEditValue] = useState("")
-  
-    // New state for adding a new skill
-    const [newSkill, setNewSkill] = useState({
-      description: "",
-      completed: {
-        toeic: false,
-        itEnglish: false,
-        speakEnglish: false,
-      },
-    })
-  
-    const handleEdit = (skillId, field, value) => {
-      setEditingCell({ skillId, field })
-      setEditValue(value)
+export default function GoalsTable({ token, semester, week }) {
+  const [goals, setGoals] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [newGoalDescription, setNewGoalDescription] = useState("");
+  const [newGoalSubject, setNewGoalSubject] = useState("");
+  const [newGoalDeadline, setNewGoalDeadline] = useState("");
+  const [newGoalCompleted, setNewGoalCompleted] = useState(false);
+const handleAddGoal = async (newGoal) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    // Bạn cần nhập thêm 'title' và 'deadline' khi tạo mục tiêu
+    // Giả sử tạm thời title giống description, deadline là ngày hiện tại hoặc user nhập
+    const goalData = {
+      title: newGoal.description,      // hoặc bạn có thể thêm input riêng để nhập title
+      description: newGoal.description,
+      semester,
+      week,
+      deadline: newGoal.deadline || new Date().toISOString().split("T")[0], // ngày hiện tại, định dạng "YYYY-MM-DD"
+      subject: newGoal.subject || null,
+    };
+
+    const res = await createGoal(goalData, token);
+
+    setGoals((prevGoals) => [...prevGoals, res.data.data]);
+    setNewGoalDescription("");
+  } catch (error) {
+    if (error.response) {
+      console.error("Failed to add goal:", error.response.data);
+    } else {
+      console.error("Failed to add goal:", error.message);
     }
-  
-    const handleSave = (skillId, field) => {
-      setSkills(
-        skills.map((skill) => {
-          if (skill.id === skillId) {
-            return {
-              ...skill,
-              description: field === "description" ? editValue : skill.description,
-            }
-          }
-          return skill
-        }),
-      )
-      setEditingCell({ skillId: null, field: null })
+  }
+};
+  // Các hàm handleAddGoal, toggleCompleted, handleDeleteGoal giữ nguyên hoặc sửa nếu cần
+const toggleCompleted = (goalId) => {
+  // TODO: Gọi API để cập nhật trạng thái hoàn thành của goal
+  console.log("Toggled goal:", goalId);
+};
+useEffect(() => {
+
+  const loadGoals = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token"); // Lấy token ngay trong useEffect
+      const res = await fetchGoals(token, semester, week);
+      setGoals(res.data.data);
+    } catch (error) {
+      console.error("Failed to fetch goals:", error);
+    } finally {
+      setLoading(false);
     }
-  
-    const toggleCheckbox = (skillId, field) => {
-      setSkills(
-        skills.map((skill) => {
-          if (skill.id === skillId) {
-            return {
-              ...skill,
-              completed: {
-                ...skill.completed,
-                [field]: !skill.completed[field],
-              },
-            }
-          }
-          return skill
-        }),
-      )
-    }
-  
-    // Toggle checkbox for new skill
-    const toggleNewSkillCheckbox = (field) => {
-      setNewSkill({
-        ...newSkill,
-        completed: {
-          ...newSkill.completed,
-          [field]: !newSkill.completed[field],
-        },
-      })
-    }
-  
-    // Add new skill
-    const handleAddSkill = () => {
-      if (newSkill.description.trim() === "") return
-  
-      const newId = skills.length > 0 ? Math.max(...skills.map((skill) => skill.id)) + 1 : 1
-  
-      setSkills([
-        ...skills,
-        {
-          id: newId,
-          description: newSkill.description,
-          completed: newSkill.completed,
-        },
-      ])
-  
-      // Reset new skill form
-      setNewSkill({
-        description: "",
-        completed: {
-          toeic: false,
-          itEnglish: false,
-          speakEnglish: false,
-        },
-      })
-    }
-  
-    return (
-      <div className="overflow-x-auto">
-        <table className="w-full">
+  };
+
+  loadGoals();
+}, [token, semester, week]);
+
+const handleDeleteGoal = (goalId) => {
+  // TODO: Gọi API để xóa goal
+  console.log("Deleted goal:", goalId);
+};
+
+
+  return (
+    <div>
+      {loading ? (
+        <p>Loading goals...</p>
+      ) : (
+        <table className="w-full border-collapse border border-gray-300">
           <thead>
             <tr>
-              <th>Toeic</th>
-              <th>IT English</th>
-              <th>Speak English</th>
+              <th className="border border-gray-300 p-2">Description</th>
+              <th className="border border-gray-300 p-2">Subject</th>
+              <th className="border border-gray-300 p-2">Deadline</th>
+              <th className="border border-gray-300 p-2">Completed</th>
+              <th className="border border-gray-300 p-2">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {skills.map((skill) => (
-              <tr key={skill.id}>
-                <td>
-                  <div className="flex items-start">
-                    <div
-                      className={`flex-1 ${editingCell.skillId === skill.id && editingCell.field === "description" ? "" : "editable-cell"}`}
-                      onClick={() => handleEdit(skill.id, "description", skill.description)}
-                    >
-                      {editingCell.skillId === skill.id && editingCell.field === "description" ? (
-                        <input
-                          className="editable-input"
-                          value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
-                          onBlur={() => handleSave(skill.id, "description")}
-                          onKeyDown={(e) => e.key === "Enter" && handleSave(skill.id, "description")}
-                          autoFocus
-                        />
-                      ) : (
-                        skill.description
-                      )}
-                    </div>
-                    <div className="checkbox-container cursor-pointer" onClick={() => toggleCheckbox(skill.id, "toeic")}>
-                      {skill.completed.toeic && <Check className="h-4 w-4" />}
-                    </div>
-                  </div>
+            {goals.map((goal) => (
+              <tr key={goal.id} className="border border-gray-300">
+                <td className="p-2">{goal.description}</td>
+                <td className="p-2">{goal.subject || "-"}</td>
+                <td className="p-2">{goal.deadline ? new Date(goal.deadline).toLocaleDateString() : "-"}</td>
+                <td
+                  className="p-2 text-center cursor-pointer"
+                  onClick={() => toggleCompleted(goal.id, goal.completed)}
+                >
+                  {goal.completed ? (
+                    <Check className="inline-block w-5 h-5 text-green-600" />
+                  ) : (
+                    <input type="checkbox" readOnly />
+                  )}
                 </td>
-                <td>
-                  <div className="flex items-start">
-                    <div
-                      className={`flex-1 ${editingCell.skillId === skill.id && editingCell.field === "description" ? "" : "editable-cell"}`}
-                      onClick={() => handleEdit(skill.id, "description", skill.description)}
-                    >
-                      {editingCell.skillId === skill.id && editingCell.field === "description" ? (
-                        <input
-                          className="editable-input"
-                          value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
-                          onBlur={() => handleSave(skill.id, "description")}
-                          onKeyDown={(e) => e.key === "Enter" && handleSave(skill.id, "description")}
-                          autoFocus
-                        />
-                      ) : (
-                        skill.description
-                      )}
-                    </div>
-                    <div
-                      className="checkbox-container cursor-pointer"
-                      onClick={() => toggleCheckbox(skill.id, "itEnglish")}
-                    >
-                      {skill.completed.itEnglish && <Check className="h-4 w-4" />}
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div className="flex items-start">
-                    <div
-                      className={`flex-1 ${editingCell.skillId === skill.id && editingCell.field === "description" ? "" : "editable-cell"}`}
-                      onClick={() => handleEdit(skill.id, "description", skill.description)}
-                    >
-                      {editingCell.skillId === skill.id && editingCell.field === "description" ? (
-                        <input
-                          className="editable-input"
-                          value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
-                          onBlur={() => handleSave(skill.id, "description")}
-                          onKeyDown={(e) => e.key === "Enter" && handleSave(skill.id, "description")}
-                          autoFocus
-                        />
-                      ) : (
-                        skill.description
-                      )}
-                    </div>
-                    <div
-                      className="checkbox-container cursor-pointer"
-                      onClick={() => toggleCheckbox(skill.id, "speakEnglish")}
-                    >
-                      {skill.completed.speakEnglish && <Check className="h-4 w-4" />}
-                    </div>
-                  </div>
+                <td className="p-2 text-center">
+                  <button
+                    onClick={() => handleDeleteGoal(goal.id)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
-            {/* New row for adding data */}
-            <tr className="bg-[#e0f2f1]">
-              <td>
-                <div className="flex items-start">
-                  <input
-                    className="flex-1 p-2 border border-[#009688] rounded"
-                    placeholder="Enter new skill description"
-                    value={newSkill.description}
-                    onChange={(e) => setNewSkill({ ...newSkill, description: e.target.value })}
-                  />
-                  <div
-                    className="checkbox-container cursor-pointer ml-2 bg-white"
-                    onClick={() => toggleNewSkillCheckbox("toeic")}
-                  >
-                    {newSkill.completed.toeic && <Check className="h-4 w-4" />}
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div className="flex items-start">
-                  <div className="flex-1 text-center text-gray-500">Same as first column</div>
-                  <div
-                    className="checkbox-container cursor-pointer ml-2 bg-white"
-                    onClick={() => toggleNewSkillCheckbox("itEnglish")}
-                  >
-                    {newSkill.completed.itEnglish && <Check className="h-4 w-4" />}
-                  </div>
-                </div>
-              </td>
-              <td>
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 text-center text-gray-500">Same as first column</div>
-                  <div
-                    className="checkbox-container cursor-pointer ml-2 bg-white"
-                    onClick={() => toggleNewSkillCheckbox("speakEnglish")}
-                  >
-                    {newSkill.completed.speakEnglish && <Check className="h-4 w-4" />}
-                  </div>
-                  <button className="ml-2 bg-[#009688] hover:bg-[#00796b]" size="sm" onClick={handleAddSkill}>
-                    <Plus className="h-4 w-4 mr-1" /> Add
-                  </button>
-                </div>
-              </td>
-            </tr>
+
+            {/* Row thêm goal */}
+            <tr>
+              <td className="p-2">
+    <input
+      type="text"
+      value={newGoalDescription}
+      onChange={(e) => setNewGoalDescription(e.target.value)}
+      placeholder="New goal description"
+      className="w-full border border-gray-400 rounded p-1"
+    />
+  </td>
+  <td className="p-2">
+    <input
+      type="text"
+      value={newGoalSubject}
+      onChange={(e) => setNewGoalSubject(e.target.value)}
+      placeholder="Subject"
+      className="w-full border border-gray-400 rounded p-1"
+    />
+  </td>
+  <td className="p-2">
+    <input
+      type="date"
+      value={newGoalDeadline}
+      onChange={(e) => setNewGoalDeadline(e.target.value)}
+      className="w-full border border-gray-400 rounded p-1"
+    />
+  </td>
+  <td className="p-2 text-center">
+    <input
+      type="checkbox"
+      checked={newGoalCompleted}
+      onChange={(e) => setNewGoalCompleted(e.target.checked)}
+    />
+  </td>
+  <td className="p-2 text-center">
+    <button
+      onClick={() => handleAddGoal({
+        description: newGoalDescription,
+        subject: newGoalSubject,
+        deadline: newGoalDeadline,
+        completed: newGoalCompleted,
+      })}
+      className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+    >
+      <Plus className="inline-block w-4 h-4 mr-1" /> Add
+    </button>
+  </td>
+</tr>
           </tbody>
         </table>
-      </div>
-    )
-  }
-  
+      )}
+    </div>
+  );
+}
