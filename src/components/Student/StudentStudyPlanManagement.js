@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Menu } from "lucide-react"
-import SkillsTable from "./StudentSkillsTable"
+import GoalsTable from "./StudentSkillsTable"
 import StudyPlanTable from "./StudentStudyPlanTable"
 import SelfStudyTable from "./StudentSeftStudyTable"
 import SemesterWeekSelector from "./StudentWeekSelector"
@@ -120,7 +120,7 @@ export default function StudyPlanManagement() {
 
       <div >
         <h2 style={styles.sectionTitle}>Week {week}'s Goals</h2>
-        <SkillsTable semester={semester} week={week} />
+        <GoalsTable semester={semester} week={week} />
       </div>
 
       <div style={styles.tabButtons}>

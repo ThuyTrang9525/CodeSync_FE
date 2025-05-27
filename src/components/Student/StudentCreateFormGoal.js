@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 // import { GoalStatus } from "../../types/goal"
 import { createGoal } from "../../service/api"
+import "../../assets/css/StudentFormGoal.css"
 import { Calendar, BookOpen, Flag, Clock, BarChart2, FileText, Tag, PlusCircle } from "lucide-react"
 
 export default function CreateGoalForm({ addGoal }) {
