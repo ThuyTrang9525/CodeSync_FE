@@ -5,7 +5,12 @@ const SELF_PLAN_URL = `${API_BASE_URL}/student/self-study-plans`
 const STUDY_PLAN_URL = `${API_BASE_URL}/student/study-plans`
 
 const token = localStorage.getItem("token")
-
+export const login = (email, password, role) =>
+  axios.post(`${API_BASE_URL}/login`, { email, password, role }, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    }
+  });
 // Goals APIs
 export const createGoal = async (formData, token) =>
   axios.post(`${API_BASE_URL}/goals`, formData, {

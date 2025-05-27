@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import '../../assets/css/Login.css';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { login } from "../../service/api";
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,54 +17,32 @@ function LoginPage() {
     setError("");
 
     try {
-  const response = await axios.post(
-  "http://localhost:8000/api/login", 
-  { email, password, role }, // Dữ liệu yêu cầu
-  {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('token')}`, // Token
+      const response = await login(email, password, role); // <-- dùng service
+      const userRole = response.data.user.role;
+      const token = response.data.access_token;
+      const user = response.data.user.userID;
+      localStorage.setItem('token', token);
+      localStorage.setItem("userID", user);
+
+      if (userRole === "TEACHER") {
+        navigate(`/teacher-home`);
+      } else if (userRole === "STUDENT") {
+        navigate(`/student-home`);
+      } else if (userRole === "ADMIN") {
+        navigate(`/admin-dashboard`);
+      }
+    } catch (err) {
+      if (err.response) {
+        setError(err.response.data.message || "Login failed. Please try again.");
+      } else if (err.request) {
+        setError("No response from server. Please try again later.");
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     }
-  }
-);
-
-;
-    const userRole = response.data.user.role; 
-    const token = response.data.access_token;
-    const user = response.data.user.userID;
-    console.log("API Response:", response.data);
-    console.log("User Role:", userRole);
-    // Lưu token để dùng các request sau
-    localStorage.setItem('token', token);
-    localStorage.setItem("userID", user);
-     console.log('Token:', token);
-
-    // Điều hướng theo role
-    if (userRole === "TEACHER") {
-      navigate(`/teacher-home`);
-    } else if (userRole === "STUDENT") {
-      navigate(`/student-home`);
-    } else if (userRole === "ADMIN") {
-      navigate(`/admin-dashboard`);
-    }
-    
+  };
 
 
-  } catch (err) {
-    console.error("Error during login:", err);
-
-    if (err.response) {
-      // Lỗi từ server (status code 4xx hoặc 5xx)
-      setError(err.response.data.message || "Login failed. Please try again.");
-    } else if (err.request) {
-      // Không nhận được phản hồi từ server
-      setError("No response from server. Please try again later.");
-    } else {
-      // Lỗi khác
-      setError("An unexpected error occurred. Please try again.");
-    }
-  }
-
-}
 
   return (
     <div className="login-container">
