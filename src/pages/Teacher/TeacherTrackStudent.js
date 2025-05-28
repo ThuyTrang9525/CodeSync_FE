@@ -6,7 +6,8 @@ import GoalItem from "../../components/Student/StudentGoalItem"
 import ChatWidget from "../../components/Teacher/TeacherChatBox"
 import CommentsSection from "../../components/Student/StudentCommentsSection";
 import { StudentById } from "../../service/api"
-import axios from "axios"
+import { handleSetDeadline } from "../../service/api"
+import SemesterWeekSelector from "../../components/Student/StudentWeekSelector"
 
 
 export default function StudentDetailView() {
@@ -17,6 +18,9 @@ export default function StudentDetailView() {
   const commentButtonRefs = useRef({});
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 });
   const [commentCounts, setCommentCounts] = useState({});
+  const [semester, setSemester] = useState("2025-1")
+  const [week, setWeek] = useState("1")
+  const currentUserEmail = localStorage.getItem("email");
   const navigate = useNavigate();
    const toggleComments = (planID) => {
     if (showCommentsFor === planID) {
@@ -166,7 +170,7 @@ export default function StudentDetailView() {
   );
 };
 
-
+  
   const renderGoals = () => (
     <div className="card">
       <div className="card-header">
@@ -174,24 +178,6 @@ export default function StudentDetailView() {
       </div>
 
       <div className="card-body p-0">
-        {/* <ul className="nav nav-tabs nav-fill px-3 pt-3">
-          {[
-            { id: "all", label: "All" },
-            { id: "completed", label: `Completed (${completedGoals.length})` },
-            { id: "in-progress", label: `In Progress (${inProgressGoals.length})` },
-            { id: "not-started", label: `Not Started (${notStartedGoals.length})` },
-          ].map((tab) => (
-            <li className="nav-item" key={tab.id}>
-              <button
-                className={`nav-link ${activeTab === tab.id ? "active" : ""}`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.label}
-              </button>
-            </li>
-          ))}
-        </ul> */}
-
         <div className="p-4">
           {getFilteredGoals().length > 0 ? (
             getFilteredGoals().map((goal) => <GoalItem key={goal.goalID} goal={goal} />)
@@ -206,10 +192,66 @@ export default function StudentDetailView() {
     </div>
     
   )
+const renderWeekGoals = () => (
+  <div>
+    <h4 className="text-base font-semibold mb-2">Weekly Goals</h4>
+    {student.goals?.length ? (
+      <div className="overflow-x-auto">
+        <table className="min-w-full border border-gray-300 text-sm">
+          <thead>
+            <tr className="bg-gray-100 text-xs text-left">
+              <th className="p-2 border">Week</th>
+              <th className="p-2 border">Subject</th>
+              <th className="p-2 border">Title</th>
+              <th className="p-2 border">Description</th>
+              <th className="p-2 border">Deadline</th>
+              <th className="p-2 border">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {student.goals.map((goal, idx) => (
+              <tr key={goal.goalID || idx} className="border-t hover:bg-gray-50">
+                <td className="p-2 border text-center">{goal.week}</td>
+                <td className="p-2 border">{goal.subject}</td>
+                <td className="p-2 border">{goal.title}</td>
+                <td className="p-2 border">{goal.description}</td>
+                <td className="p-2 border">
+                  <input
+                    type="date"
+                    defaultValue={goal.deadline ? goal.deadline.slice(0, 10) : ""}
+                    onChange={(e) =>
+                      handleSetDeadline(goal.goalID, e.target.value, student.classID)
+                    }
+                    className="border rounded px-1 py-0.5 text-sm"
+                  />
+                </td>
+                <td className="p-2 border">
+                  <span
+                    className={`px-2 py-1 rounded text-xs ${
+                      goal.status === "completed"
+                        ? "bg-green-600"
+                        : goal.status === "in-progress"
+                        ? "bg-yellow-500"
+                        : "bg-gray-500"
+                    }`}
+                  >
+                    {goal.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    ) : (
+      <p>No goals available</p>
+    )}
+  </div>
+);
 
 const renderStudyPlans = () => (
   <div>
-    <h4 className="mb-2 font-semibold text-lg">Study Plans</h4>
+    <h4 className="mb-2 font-semibold text-lg">Self-Study Plan</h4>
     {student.study_plans?.length ? (
       <table className="w-full border-collapse border border-gray-300">
         <thead>
@@ -277,6 +319,7 @@ const renderStudyPlans = () => (
                 <button
                   className="text-gray-600 hover:text-gray-900 text-xs"
                   onClick={() => setShowCommentsFor(null)}
+                   currentUserEmail={currentUserEmail}
                 >
                   Close
                 </button>
@@ -292,7 +335,7 @@ const renderStudyPlans = () => (
 
  const renderSelfStudyPlans = () => (
   <div>
-    <h4 className="text-base font-semibold mb-2">Self Study Plans</h4>
+    <h4 className="text-base font-semibold mb-2">In-Class</h4>
     {student.self_study_plans?.length ? (
       <div className="overflow-x-auto">
         <table className="min-w-full border border-gray-300 text-sm">
@@ -359,6 +402,7 @@ const renderStudyPlans = () => (
                 <button
                   className="text-gray-600 hover:text-gray-900 text-xs"
                   onClick={() => setShowCommentsFor(null)}
+                   currentUserEmail={currentUserEmail}
                 >
                   Close
                 </button>
@@ -376,6 +420,14 @@ const renderStudyPlans = () => (
 
   const renderLearningJournal = () => (
     <div>
+       <SemesterWeekSelector
+        currentSemester={semester}
+        currentWeek={week}
+        onSemesterChange={setSemester}
+        onWeekChange={setWeek}
+      />
+      {renderWeekGoals()}
+      <hr />
       {renderStudyPlans()}
       <hr />
       {renderSelfStudyPlans()}
@@ -399,9 +451,6 @@ const renderStudyPlans = () => (
 
   return (
     <div className="card mt-3 d-flex justify-content-center">
-       {/* <button className="btn btn-outline-secondary btn-sm" onClick={() => navigate(-1)}>
-          ← Back
-        </button> */}
       <div className="">
         <ul className="nav nav-tabs card-header">
           {["← Back","profile", "goals", "learning_journal"].map((tab) => (

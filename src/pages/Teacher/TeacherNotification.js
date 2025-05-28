@@ -38,22 +38,23 @@ export default function NotificationsTable() {
  const receiverID = localStorage.getItem("userID");
  console.log(receiverID);
 
-   useEffect(() => {
-    setCurrentPage(1);
+  useEffect(() => {
+  if (!receiverID) return;
 
-    const loadNotifications = async () => {
-      try {
-        const data = await NotificationsByReceiver(receiverID);
-        setNotifications(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadNotifications = async () => {
+    try {
+      const data = await NotificationsByReceiver(receiverID);
+      setNotifications(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    loadNotifications();
-  }, [selectedClass, date]);
+  loadNotifications();
+}, [selectedClass, date]);
+
 
   const toggleCalendar = () => {
     setOpenCalendar(!openCalendar);

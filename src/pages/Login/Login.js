@@ -23,6 +23,7 @@ function LoginPage() {
       const user = response.data.user.userID;
       localStorage.setItem('token', token);
       localStorage.setItem("userID", user);
+      localStorage.setItem("email",email);
 
       if (userRole === "TEACHER") {
         navigate(`/teacher-home`);

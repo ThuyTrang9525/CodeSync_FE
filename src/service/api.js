@@ -206,7 +206,7 @@ export const NotificationsByReceiver = async (receiverID) => {
     const data = res.data;
 
     if (data.status === "success") {
-      return data.data; // danh sách thông báo
+      return data.data;
     } else {
       console.error("API returned error status:", data);
       return [];
@@ -286,3 +286,16 @@ export const fetchAdminGoals = () =>
       "Content-Type": "application/json",
     },
   })
+
+export const handleSetDeadline = async (goalID, newDeadline, classID = null) => {
+  try {
+    await axios.put(
+      `${API_BASE_URL}/teacher/goals/${goalID}/set-deadline`,
+      { deadline: newDeadline, classID }
+    );
+    console.success("Deadline updated and student notified!");
+  } catch (error) {
+    console.error("Failed to update deadline", error);
+    console.error("Failed to update deadline");
+  }
+};
