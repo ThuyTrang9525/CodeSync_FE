@@ -1,73 +1,59 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
+import {
+  fetchComments,
+  addComment,
+  resolveComment,
+} from "../../service/api";
 const CommentsSection = ({ planID, planType }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
-
   const USER_ID = localStorage.getItem("userID");
   const TOKEN = localStorage.getItem("token");
-const [showComments, setShowComments] = useState(false);
-  const [selectedPlanID, setSelectedPlanID] = useState(null);
-  const [selectedPlanType, setSelectedPlanType] = useState(null);
 
-  const handleToggleComments = (planID, planType) => {
-    setSelectedPlanID(planID);
-    setSelectedPlanType(planType);
-    setShowComments(prev => !prev);
+  useEffect(() => {
+    if (!planID || !planType) return;
+    fetchComments(planID, planType, TOKEN)
+      .then(res => {
+        setComments(res.data);
+      })
+      .catch(err => {
+        console.error("Fetch error:", err);
+      });
+  }, [planID, planType, TOKEN]);
+
+  const handleResolveComment = (commentID) => {
+    resolveComment(commentID, TOKEN)
+      .then(() => {
+        setComments(comments.filter(c => c.commentID !== commentID));
+      })
+      .catch(err => {
+        console.error("Error resolving comment:", err);
+      });
   };
 
-   useEffect(() => {
-     console.log("Fetching comments for:", planID, planType);
-     if (!planID || !planType) return;
-
-     axios.get(`http://localhost:8000/api/comments`, {
-       params: {
-         planID,
-         planType,
-       },
-       headers: { Authorization: `Bearer ${TOKEN}` }
-     })
-     .then(res => {
-       console.log("Fetched comments:", res.data);
-       setComments(res.data);
-     })
-     .catch(err => console.error("Fetch error:", err));
-   }, [planID, planType]);
-   
-const handleResolveComment = (commentID) => {
-  axios.put(`http://localhost:8000/api/comments/${commentID}/resolve`, {}, {
-    headers: { Authorization: `Bearer ${TOKEN}` }
-  })
-  .then(() => {
-    setComments(comments.filter(c => c.commentID !== commentID));
-  })
-  .catch(err => {
-    console.error("Error resolving comment:", err);
-  });
-};
   const handleAddComment = () => {
     if (!newComment.trim()) return;
-
-    axios.post("http://localhost:8000/api/comments", {
-      planID,
-      planType,
-      senderID: USER_ID,
-      content: newComment,
-    }, {
-      headers: { Authorization: `Bearer ${TOKEN}` },
-    })
-    .then(res => {
-      setComments([res.data, ...comments]);
-      setNewComment("");
-    })
-    .catch(err => {
-      if (err.response) {
-        console.error("Error response:", err.response.data);
-      } else {
-        console.error("Error:", err.message);
-      }
-    });
+    addComment(
+      {
+        planID,
+        planType,
+        senderID: USER_ID,
+        content: newComment,
+      },
+      TOKEN
+    )
+      .then(res => {
+        setComments([res.data, ...comments]);
+        setNewComment("");
+      })
+      .catch(err => {
+        if (err.response) {
+          console.error("Error response:", err.response.data);
+        } else {
+          console.error("Error:", err.message);
+        }
+      });
   };
 
      return (

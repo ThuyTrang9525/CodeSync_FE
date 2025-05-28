@@ -8,7 +8,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-
+import "../../assets/css/StudentCalendar.css"; 
 const Calendar = () => {
   const [events, setEvents] = useState([]);
   const [selectedRange, setSelectedRange] = useState(null);
