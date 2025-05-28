@@ -1,0 +1,122 @@
+/* Calendar Wrapper */
+.calendar-wrapper.container {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.calendar-sidebar {
+  width: 220px;
+  background-color: #fff;
+  padding: 0.3rem;
+  border-right: 1px solid #ddd;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Mini calendar header */
+.mini-calendar .fc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+
+.mini-calendar .fc-toolbar-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Navigation buttons */
+.mini-calendar .fc-button {
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  color: #444;
+  padding: 0 4px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.mini-calendar .fc-button:hover {
+  background-color: #f1f3f4;
+  border-radius: 4px;
+}
+
+/* Calendar grid */
+.mini-calendar .fc {
+  font-size: 0.65rem;
+}
+
+.mini-calendar .fc-daygrid-day {
+  height: 1.5rem;
+  padding: 0;
+}
+
+.mini-calendar .fc-daygrid-day-number {
+  line-height: 1.5rem;
+  font-weight: 400;
+  color: #202124;
+}
+
+.mini-calendar .fc-day-today {
+  background-color: #e8f0fe !important;
+  border-radius: 50%;
+  color: #1967d2;
+  font-weight: bold;
+}
+
+/* Main calendar area */
+.calendar-main {
+  flex: 1;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Weekly calendar tweaks */
+.weekly-calendar .fc-timegrid-slot-label {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.weekly-calendar .fc-event {
+  background-color: #4f9ceb;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  padding: 2px 4px;
+}
+
+.weekly-calendar .fc-event-title {
+  white-space: normal;
+}
+
+/* Common calendar styles */
+.fc-toolbar-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.fc-button {
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  padding: 0.3rem 0.6rem;
+  color: #fff;
+  font-size: 0.85rem;
+  transition: background-color 0.2s ease;
+}
+
+.fc-button:hover {
+  background-color: #0056b3;
+}
+
+.fc-day-today {
+  background-color: #e6f0ff !important;
+}

@@ -1,9 +1,8 @@
-"use client"
-
 import { useState, useEffect, useRef } from "react"
-import axios from "axios"
-import { Plus, MessageSquare } from "lucide-react"
+import { MessageSquare } from "lucide-react"
+
 import CommentsSection from "./StudentCommentsSection"
+
 import {
   fetchStudyPlans,
   createStudyPlan,
@@ -17,13 +16,13 @@ const StudyPlanTable = ({ semester, week }) => {
   const [studyPlans, setStudyPlans] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
-  const [showCommentsFor, setShowCommentsFor] = useState(null)
+ const [showCommentsFor, setShowCommentsFor] = useState(null);
   const commentButtonRefs = useRef({})
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 })
 
-  const [editingCell, setEditingCell] = useState({ id: null, field: null })
+  const [editingCell, setEditingCell] = useState({ planID: null, field: null })
   const [editValue, setEditValue] = useState("")
+
   const [newEntry, setNewEntry] = useState({
     date: "",
     skill: "",
@@ -31,15 +30,17 @@ const StudyPlanTable = ({ semester, week }) => {
     selfAssessment: "",
     difficulties: "",
     planToImprove: "",
-    problemSolved: "Yes",
+    problemSolved: true,
   })
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true)
       try {
         const token = localStorage.getItem("token")
         const response = await fetchStudyPlans(semester, week, token)
         setStudyPlans(response.data)
+        setError(null)
       } catch (error) {
         console.error("❌ Failed to fetch data", error)
         setError("Không thể tải dữ liệu.")
@@ -47,39 +48,35 @@ const StudyPlanTable = ({ semester, week }) => {
         setLoading(false)
       }
     }
-
     fetchData()
   }, [semester, week])
-  useEffect(() => {
-    if (showCommentsFor) {
-      console.log("Showing comments for planID:", showCommentsFor)
-      const btn = commentButtonRefs.current[showCommentsFor];
+
+
+  const toggleComments = (planID) => {
+    if (showCommentsFor === planID) {
+      setShowCommentsFor(null);
+    } else {
+      const btn = commentButtonRefs.current[planID];
       if (btn) {
         const rect = btn.getBoundingClientRect();
-        console.log("Button rect:", rect)
         setPopupPosition({
-          top: rect.bottom + window.scrollY + 5,
+          top: rect.bottom + window.scrollY + 5, // 5px cách nút
           left: rect.left + window.scrollX,
         });
-      } else {
-        console.log("Button reference not found for planID:", showCommentsFor)
       }
+      setShowCommentsFor(planID);
     }
-  }, [showCommentsFor]);
-  const toggleComments = (planID) => {
-    console.log("Toggle comments clicked for planID:", planID)
-    setShowCommentsFor(prev => (prev === planID ? null : planID));
   };
+
   const handleNewEntryChange = (field, value) => {
-    setNewEntry({ ...newEntry, [field]: value });
-  };
+    setNewEntry({ ...newEntry, [field]: value })
+  }
 
   const handleAddEntry = () => {
     if (!newEntry.date || !newEntry.skill) {
       console.warn("Missing required fields: date or skill")
       return
     }
-
     const token = localStorage.getItem("token")
     const dataToSend = {
       userID: USER_ID,
@@ -93,7 +90,6 @@ const StudyPlanTable = ({ semester, week }) => {
       planToImprove: newEntry.planToImprove,
       problemSolved: newEntry.problemSolved,
     }
-
     createStudyPlan(dataToSend, token)
       .then((response) => {
         setStudyPlans([...studyPlans, response.data])
@@ -104,12 +100,16 @@ const StudyPlanTable = ({ semester, week }) => {
           selfAssessment: "",
           difficulties: "",
           planToImprove: "",
-          problemSolved: "Yes",
+          problemSolved: true,
         })
       })
       .catch((error) => {
-        console.error("Error adding entry:", error)
-        setError("Không thể thêm mục mới.")
+        if (error.response) {
+          console.error("Server responded with:", error.response.status, error.response.data);
+        } else {
+          console.error("Error adding entry:", error.message);
+        }
+        setError("Không thể thêm mục mới.");
       })
   }
 
@@ -166,7 +166,10 @@ const StudyPlanTable = ({ semester, week }) => {
       )
     }
     return (
-      <div onClick={() => handleEdit(item.planID, field, value)} className="cursor-pointer">
+      <div
+        onClick={() => handleEdit(item.planID, field, value)}
+        className="cursor-pointer"
+      >
         {value}
       </div>
     )
@@ -176,141 +179,177 @@ const StudyPlanTable = ({ semester, week }) => {
   if (error) return <p className="text-red-600">{error}</p>
 
   return (
-  <div>
-    <table className="w-full border-collapse border border-gray-300 text-sm">
-      <thead className="bg-gray-100">
-        <tr>
-          <th className="border p-2">Date</th>
-          <th className="border p-2">Skill</th>
-          <th className="border p-2">Lesson</th>
-          <th className="border p-2">Self-assessment</th>
-          <th className="border p-2">Difficulties</th>
-          <th className="border p-2">Plan</th>
-          <th className="border p-2">Solved?</th>
-          <th className="border p-2 text-center">💬</th>
-          <th className="border p-2 text-center">🗑️</th>
-        </tr>
-      </thead>
-      <tbody>
-        {studyPlans.map((item) => (
-          <tr key={item.planID}>
-            {["date", "skill", "lessonSummary", "selfAssessment", "difficulties", "planToImprove", "problemSolved"].map((field) => (
-              <td key={field} className="border p-1">
-                {renderCell(item, field)}
-              </td>
-            ))}
-            <td className="border text-center">
-              <button
+    <div>
+      <table className="w-full border-collapse border border-gray-300 text-sm">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="border p-2">Date</th>
+            <th className="border p-2">Skill</th>
+            <th className="border p-2">Lesson</th>
+            <th className="border p-2">Self-assessment</th>
+            <th className="border p-2">Difficulties</th>
+            <th className="border p-2">Plan</th>
+            <th className="border p-2">Solved?</th>
+            <th className="border p-2 text-center">💬</th>
+            <th className="border p-2 text-center">🗑️</th>
+          </tr>
+        </thead>
+        <tbody>
+          {studyPlans.map((item) => (
+            <tr key={item.planID}>
+              {[
+                "date",
+                "skill",
+                "lessonSummary",
+                "selfAssessment",
+                "difficulties",
+                "planToImprove",
+                "problemSolved",
+              ].map((field) => (
+                <td key={field} className="border p-1">
+                  {renderCell(item, field)}
+                </td>
+              ))}
+              <td className="border text-center">
+                <button
                   ref={(el) => (commentButtonRefs.current[item.planID] = el)}
                   onClick={() => toggleComments(item.planID)}
                   className="flex items-center justify-center gap-1 text-blue-600 hover:text-blue-800"
                   title="Toggle comments"
                 >
-                <MessageSquare size={18} />
-                <span className="text-xs"></span>
-              </button>
+                  <MessageSquare size={18} />
+                  <span className="text-xs"></span>
+                </button>
+              </td>
+              <td className="p-2 border text-center">
+                <button
+                  onClick={() => handleDelete(item.planID)}
+                  className="text-red-500 hover:underline text-xs"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+
+          <tr className="bg-[#e0f2f1]">
+            <td>
+              <input
+                type="date"
+                className="w-full p-2 border border-[#009688] rounded"
+                placeholder="Date"
+                value={newEntry.date}
+                onChange={(e) => handleNewEntryChange("date", e.target.value)}
+              />
             </td>
-            <td className="p-2 border text-center">
-              <button
-                onClick={() => handleDelete(item.planID)}
-                className="text-red-500 hover:underline text-xs"
+            <td>
+              <input
+                className="w-full p-2 border border-[#009688] rounded"
+                placeholder="Skill/Module"
+                value={newEntry.skill}
+                onChange={(e) => handleNewEntryChange("skill", e.target.value)}
+              />
+            </td>
+            <td>
+              <textarea
+                className="w-full p-2 border border-[#009688] rounded"
+                placeholder="Lesson"
+                rows={2}
+                value={newEntry.lessonSummary}
+                onChange={(e) =>
+                  handleNewEntryChange("lessonSummary", e.target.value)
+                }
+              />
+            </td>
+            <td>
+              <input
+                className="w-full p-2 border border-[#009688] rounded"
+                placeholder="1-3"
+                value={newEntry.selfAssessment}
+                onChange={(e) =>
+                  handleNewEntryChange("selfAssessment", e.target.value)
+                }
+              />
+            </td>
+            <td>
+              <textarea
+                className="w-full p-2 border border-[#009688] rounded"
+                placeholder="Difficulty"
+                rows={2}
+                value={newEntry.difficulties}
+                onChange={(e) =>
+                  handleNewEntryChange("difficulties", e.target.value)
+                }
+              />
+            </td>
+            <td>
+              <textarea
+                className="w-full p-2 border border-[#009688] rounded"
+                placeholder="Plan"
+                rows={2}
+                value={newEntry.planToImprove}
+                onChange={(e) =>
+                  handleNewEntryChange("planToImprove", e.target.value)
+                }
+              />
+            </td>
+            <td>
+              <select
+                className="w-full p-2 border border-[#009688] rounded"
+                value={newEntry.problemSolved}
+                onChange={(e) =>
+                  handleNewEntryChange("problemSolved", e.target.value)
+                }
               >
-                Delete
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+                <option value="Partially">Partially</option>
+              </select>
+            </td>
+            <td colSpan={2} className="text-center">
+              <button
+                onClick={handleAddEntry}
+                className="text-green-600 hover:underline text-xs"
+              >
+                Add
               </button>
             </td>
           </tr>
-        ))}
+        </tbody>
+      </table>
 
-        <tr className="bg-[#e0f2f1]">
-          <td>
-            <input
-              className="w-full p-2 border border-[#009688] rounded"
-              placeholder="Date"
-              value={newEntry.date}
-              onChange={(e) => handleNewEntryChange("date", e.target.value)}
-            />
-          </td>
-          <td>
-            <input
-              className="w-full p-2 border border-[#009688] rounded"
-              placeholder="Skill/Module"
-              value={newEntry.skill}
-              onChange={(e) => handleNewEntryChange("skill", e.target.value)}
-            />
-          </td>
-          <td>
-            <textarea
-              className="w-full p-2 border border-[#009688] rounded"
-              placeholder="Lesson"
-              rows={2}
-              value={newEntry.lessonSummary}
-              onChange={(e) => handleNewEntryChange("lessonSummary", e.target.value)}
-            />
-          </td>
-          <td>
-            <input
-              className="w-full p-2 border border-[#009688] rounded"
-              placeholder="1-3"
-              value={newEntry.selfAssessment}
-              onChange={(e) => handleNewEntryChange("selfAssessment", e.target.value)}
-            />
-          </td>
-          <td>
-            <textarea
-              className="w-full p-2 border border-[#009688] rounded"
-              placeholder="Difficulty"
-              rows={2}
-              value={newEntry.difficulties}
-              onChange={(e) => handleNewEntryChange("difficulties", e.target.value)}
-            />
-          </td>
-          <td>
-            <textarea
-              className="w-full p-2 border border-[#009688] rounded"
-              placeholder="Plan"
-              rows={2}
-              value={newEntry.planToImprove}
-              onChange={(e) => handleNewEntryChange("planToImprove", e.target.value)}
-            />
-          </td>
-          <td>
-            <select
-              className="w-full p-2 border border-[#009688] rounded"
-              value={newEntry.problemSolved}
-              onChange={(e) => handleNewEntryChange("problemSolved", e.target.value)}
-            >
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-              <option value="Partially">Partially</option>
-            </select>
-          </td>
-          <td></td> 
-          <td></td>
-        </tr>
-      </tbody>
-    </table>
-
-    {showCommentsFor && (
+      {showCommentsFor && (
   <div
     style={{
-      position: "fixed",
-      top: popupPosition.top,
-      left: popupPosition.left,
-      zIndex: 3000,
+      position: "fixed", // dùng fixed để popup không phụ thuộc vào scroll
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)", // căn giữa hoàn hảo
+      zIndex: 2000,
+      wplanIDth: 600,
+      maxHeight: 600,
+      overflowY: "auto",
       backgroundColor: "white",
-      border: "1px solid #ccc",
-      padding: "1rem",
-      borderRadius: "8px",
-      maxWidth: "400px",
+      border: "1px solplanID #ccc",
+      borderRadius: 8,
+      boxShadow:
+        "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)",
+      padding: 12,
     }}
   >
-    <CommentsSection planID={showCommentsFor} planType="study" />
+    <CommentsSection planID={showCommentsFor} planType="in_class" />
     <div className="text-right mt-2">
-      <button onClick={() => setShowCommentsFor(null)}>Close</button>
+      <button
+        className="text-gray-600 hover:text-gray-900 text-xs"
+        onClick={() => setShowCommentsFor(null)}
+      >
+        Close
+      </button>
     </div>
   </div>
 )}
+    </div>
+  )
+}
 
-  </div>
-)}
-export default StudyPlanTable;
+export default StudyPlanTable

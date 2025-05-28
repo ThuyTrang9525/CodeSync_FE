@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const API_BASE_URL = "http://localhost:8000/api"
+const API_BASE_URL = "https://codesyncbe-production.up.railway.app/api"
 const SELF_PLAN_URL = `${API_BASE_URL}/student/self-study-plans`
 const STUDY_PLAN_URL = `${API_BASE_URL}/student/study-plans`
 
@@ -286,3 +286,19 @@ export const fetchAdminGoals = () =>
       "Content-Type": "application/json",
     },
   })
+
+  export const fetchComments = (planID, planType, token) =>
+  axios.get(`${API_BASE_URL}/comments`, {
+    params: { planID, planType },
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const addComment = (data, token) =>
+  axios.post(`${API_BASE_URL}/comments`, data, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const resolveComment = (commentID, token) =>
+  axios.put(`${API_BASE_URL}/comments/${commentID}/resolve`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
