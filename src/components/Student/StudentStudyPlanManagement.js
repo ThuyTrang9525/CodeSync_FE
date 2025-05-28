@@ -142,7 +142,7 @@ export default function StudyPlanManagement() {
         <div style={styles.section}>
           <h2 style={styles.sectionTitle}>In Class</h2>
 <div style={styles.scrollContainer}>
-            <SelfStudyTable semester={semester} week={week} />
+            <StudyPlanTable semester={semester} week={week} />
           </div>        </div>
       )}
 
