@@ -7,7 +7,6 @@ const STUDY_PLAN_URL = `${API_BASE_URL}/student/study-plans`
 const token = localStorage.getItem("token");
 const EVENT_URL = `${API_BASE_URL}/events`
 const DASHBOARD_URL = `${API_BASE_URL}/stats`;
-const token = localStorage.getItem("token")
 export const login = (email, password, role) =>
   axios.post(`${API_BASE_URL}/login`, { email, password, role }, {
     headers: {
