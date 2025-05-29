@@ -5,7 +5,7 @@ import Footer from '../../components/footer';
 import Navbar from '../../components/Student/StudentNavBar';
 import studyImg from '../../assets/image/study.png';
 import '../../assets/css/StudentRequestSupport.css';
-import { sendSupportRequest } from '../../service/api';
+import { getAllSubject, sendSupportRequest } from '../../service/api';
 
 const SupportRequestForm = () => {
   const [title, setTitle] = useState('');
@@ -19,7 +19,7 @@ const SupportRequestForm = () => {
   useEffect(() => {
     const fetchClassesWithTeachers = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/teacher/subjects');
+        const response = await getAllSubject();
         setClassList(response.data);
         if (response.data.length > 0) {
           setClassID(response.data[0].classID);

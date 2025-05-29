@@ -293,7 +293,7 @@ export const getTimeTable = () =>
     },
   })
 
-  export const fetchComments = (planID, planType, token) =>
+export const fetchComments = (planID, planType, token) =>
   axios.get(`${API_BASE_URL}/comments`, {
     params: { planID, planType },
     headers: { Authorization: `Bearer ${token}` },
@@ -306,5 +306,10 @@ export const addComment = (data, token) =>
 
 export const resolveComment = (commentID, token) =>
   axios.put(`${API_BASE_URL}/comments/${commentID}/resolve`, {}, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+export const getAllSubject = () =>
+  axios.get(`${API_BASE_URL}/teacher/subjects`, {}, {
     headers: { Authorization: `Bearer ${token}` },
   });
