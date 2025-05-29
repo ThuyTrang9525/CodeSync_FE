@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
 import EditProfileModal from '../../components/Student/StudentEditProfileModal';
 import UploadProfileModal from '../../components/Student/StudentUploadAchievementsModal';
-import {updateUserProfile } from '../../service/api';
 import axios from 'axios';
+import {
+   fetchCertificates,
+  fetchUserProfile,
+  updateUserProfile,
+} from '../../service/api';
 export default function Profile() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
@@ -13,49 +17,38 @@ export default function Profile() {
 
   const userID = localStorage.getItem('userID');
 
+ useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const certData = await fetchCertificates();
+        setCertificates(certData);
+      } catch (err) {
+        console.error('Error fetching certificates:', err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const certRes = await axios.get('http://127.0.0.1:8000/api/student/certificates', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setCertificates(certRes.data);
-    } catch (err) {
-      console.error('Error fetching data:', err);
-    }
-  };
+    const fetchProfile = async () => {
+      try {
+        const profileData = await fetchUserProfile();
+        setProfile(profileData);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching profile:', err);
+        setLoading(false);
+      }
+    };
 
-  fetchData();
-}, []);
-
-useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get('http://127.0.0.1:8000/api/student/profile', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setProfile(res.data);
-      setLoading(false);
-    } catch (err) {
-      console.error('Error fetching profile:', err);
-      setLoading(false);
-    }
-  };
-
-  fetchProfile();
-}, []);
-
+    fetchProfile();
+  }, []);
 
   const handleProfileUpdate = async (updatedProfile) => {
     try {
-      const res = await updateUserProfile(userID, updatedProfile);
-      setProfile(res.data);
+      const updated = await updateUserProfile(userID, updatedProfile);
+      setProfile(updated);
       setEditModalOpen(false);
       alert('Cập nhật hồ sơ thành công!');
     } catch (err) {

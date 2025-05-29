@@ -122,13 +122,13 @@ export const getMyClasses = () =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
-export const updateUserProfile = (userID, updatedProfile) =>
-  axios.put(`${API_BASE_URL}/student/profile/${userID}`, updatedProfile, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+// export const updateUserProfile = (userID, updatedProfile) =>
+//   axios.put(`${API_BASE_URL}/student/profile/${userID}`, updatedProfile, {
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//       "Content-Type": "application/json",
+//     },
+//   });
 
 export const getUserProfile = () =>
   axios.get(`${API_BASE_URL}/student/profile`, {
@@ -355,5 +355,26 @@ export const deleteEvent = async (id) => {
 
 export const fetchDashboardStats = async () => {
   const res = await axios.get(DASHBOARD_URL);
+  return res.data;
+};
+
+export const fetchCertificates = async () => {
+  const res = await axios.get(`${API_BASE_URL}/student/certificates`, {
+    headers: getAuthHeader(),
+  });
+  return res.data;
+};
+
+export const fetchUserProfile = async () => {
+  const res = await axios.get(`${API_BASE_URL}/student/profile`, {
+    headers: getAuthHeader(),
+  });
+  return res.data;
+};
+
+export const updateUserProfile = async (userId, profileData) => {
+  const res = await axios.put(`${API_BASE_URL}/student/profile/${userId}`, profileData, {
+    headers: getAuthHeader(),
+  });
   return res.data;
 };
