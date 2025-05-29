@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import { FaUserCircle } from "react-icons/fa";
 import axios from "axios";
-
+import {
+   fetchCertificates,
+  fetchUserProfile,
+  updateUserProfile,
+} from "../../service/api";
 Modal.setAppElement("#root");
 
 export default function EditProfileModal({ isOpen, onRequestClose, userID }) {
@@ -32,33 +36,35 @@ export default function EditProfileModal({ isOpen, onRequestClose, userID }) {
   };
 
   useEffect(() => {
-    if (isOpen) {
+    const loadProfile = async () => {
       setLoading(true);
-      axios
-        .get("http://127.0.0.1:8000/api/student/profile") // Gọi GET không truyền userID
-        .then((response) => {
-          const data = response.data;
-          setName(data.name || "");
-          setEmail(data.email || "");
-          setDateOfBirth(data.student?.dateOfBirth || "");
-          setGender(data.student?.gender || "Male");
-          setAddress(data.student?.address || "");
-          setPhoneNumber(data.student?.phoneNumber || "");
-          setAvatarURL(data.student?.avatarURL || "");
-          setEnrollmentDate(data.student?.enrollmentDate || "");
-          setBio(data.student?.bio || "");
-        })
-        .catch((error) => {
-          alert("Lấy dữ liệu thất bại: " + error.message);
-          resetForm();
-        })
-        .finally(() => setLoading(false));
+      try {
+        const data = await fetchUserProfile();
+        setName(data.name || "");
+        setEmail(data.email || "");
+        setDateOfBirth(data.student?.dateOfBirth || "");
+        setGender(data.student?.gender || "Male");
+        setAddress(data.student?.address || "");
+        setPhoneNumber(data.student?.phoneNumber || "");
+        setAvatarURL(data.student?.avatarURL || "");
+        setEnrollmentDate(data.student?.enrollmentDate || "");
+        setBio(data.student?.bio || "");
+      } catch (error) {
+        alert("Lấy dữ liệu thất bại: " + error.message);
+        resetForm();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (isOpen) {
+      loadProfile();
     } else {
       resetForm();
     }
   }, [isOpen]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const updatedProfile = {
@@ -79,18 +85,16 @@ export default function EditProfileModal({ isOpen, onRequestClose, userID }) {
     }
 
     setSaving(true);
-    axios
-      .post(`http://127.0.0.1:8000/api/student/profile/${userID}`, updatedProfile)
-      .then(() => {
-        alert("Cập nhật thành công");
-        onRequestClose();
-      })
-      .catch((error) => {
-        alert("Cập nhật thất bại: " + error.message);
-      })
-      .finally(() => setSaving(false));
+    try {
+      await updateUserProfile(userID, updatedProfile);
+      alert("Cập nhật thành công");
+      onRequestClose();
+    } catch (error) {
+      alert("Cập nhật thất bại: " + (error.message || "Lỗi không xác định"));
+    } finally {
+      setSaving(false);
+    }
   };
-
   return (
     <Modal
       isOpen={isOpen}
