@@ -1,5 +1,6 @@
 import React from "react";
 
+import SupportRequestForm from './pages/Student/StudentSupportRequests';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import AdminUser from './pages/Admin/AdminUser';
 import AdminClass from './pages/Admin/AdminClass';
@@ -29,7 +30,7 @@ const routes = [
         element: <AdminDashboard />,
         name: "Admin Dashboard",
     },
-     {
+    {
         path: "/students/:studentId",
         element: <StudentDetailView />,
         name: "Student deatail",
@@ -109,6 +110,12 @@ const routes = [
         element: <StudentCalendarView />,
         name: "student-timetable",
     },
+    {
+        path: "support-request",
+        element: <SupportRequestForm />,
+        name: "support-request",
+    }
+
 ];
 
 export default routes;
