@@ -26,7 +26,7 @@ export default class AdminDashboard extends Component {
     const { teachers, students, classes } = this.state;
 
     return (
-      <div className="container">
+      <div className="container-fluid">
         <Header />
         <Nav />
         <div className="stats-grid">
