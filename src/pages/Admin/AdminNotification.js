@@ -6,7 +6,7 @@ import Pagination from '../../components/Admin/AdminPagination';
 export default class AdminNotification extends Component {
   render() {
     return (
-      <div className='container'>
+      <div className='container-fluid'>
         <Header />
         <Nav /> 
         <div style={{ marginTop: '20px' }}>
