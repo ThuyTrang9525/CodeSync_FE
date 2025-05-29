@@ -1,0 +1,108 @@
+/* Container có hình + form */
+.support-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* căn giữa theo chiều dọc */
+    padding: 40px 20px;
+    gap: 60px;
+    /* tăng khoảng cách giữa hình và form */
+    flex-wrap: wrap;
+    background-color: #f5f8fb;
+    min-height: 80vh;
+    /* giúp căn giữa tốt hơn */
+}
+
+/* Select có background nhẹ */
+.support-form select {
+    background-color: #f0f8ff;
+}
+
+/* Hình ảnh bên trái */
+.support-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 400px;
+    /* giữ kích thước cố định cho hình */
+}
+
+.support-image img {
+    width: 380px;
+    max-width: 100%;
+    animation: float 3s ease-in-out infinite;
+    border-radius: 19px;
+    margin-left: 50px;
+    margin-bottom: 50px;
+}
+
+/* Form hỗ trợ */
+.support-form {
+    border: 2px solid #00aaff;
+    border-radius: 12px;
+    padding: 32px 40px;
+    max-width: 600px;
+    min-width: 340px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    margin-left: 40px;
+    /* đẩy form qua phải */
+}
+
+.support-form h2 {
+    margin-bottom: 16px;
+    color: #0066cc;
+}
+
+.support-form label {
+    font-weight: bold;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.support-form input,
+.support-form select,
+.support-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+/* Phần hiển thị tên giáo viên (không phải select) */
+.support-form .teacher-name-display {
+    padding: 10px 14px;
+    background-color: #f0f0f0;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    color: #333;
+    border: 1px solid #ccc;
+    user-select: none;
+}
+
+/* Button gửi */
+.support-form button {
+    background-color: #00b894;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.support-form button:hover {
+    background-color: #019875;
+}
+
+/* Thông báo gửi thành công */
+.success-message {
+    color: #009688;
+    font-weight: 600;
+    margin-top: 12px;
+}
