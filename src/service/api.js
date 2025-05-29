@@ -3,7 +3,8 @@ import axios from "axios"
 const API_BASE_URL = "https://codesyncbe-production.up.railway.app/api"
 const SELF_PLAN_URL = `${API_BASE_URL}/student/self-study-plans`
 const STUDY_PLAN_URL = `${API_BASE_URL}/student/study-plans`
-
+const EVENT_URL = `${API_BASE_URL}/events`
+const DASHBOARD_URL = `${API_BASE_URL}/stats`;
 const token = localStorage.getItem("token")
 export const login = (email, password, role) =>
   axios.post(`${API_BASE_URL}/login`, { email, password, role }, {
@@ -302,3 +303,37 @@ export const resolveComment = (commentID, token) =>
   axios.put(`${API_BASE_URL}/comments/${commentID}/resolve`, {}, {
     headers: { Authorization: `Bearer ${token}` },
   });
+const getAuthHeader = () => ({
+  Authorization: `Bearer ${localStorage.getItem('token')}`,
+});
+
+export const fetchEvent = async () => {
+  const res = await axios.get(EVENT_URL, { headers: getAuthHeader() });
+  return res.data;
+};
+
+export const createEvent = async (eventData) => {
+  const res = await axios.post(EVENT_URL, eventData, {
+    headers: getAuthHeader(),
+  });
+  return res.data;
+};
+
+export const updateEvent = async (id, eventData) => {
+  const res = await axios.put(`${EVENT_URL}/${id}`, eventData, {
+    headers: getAuthHeader(),
+  });
+  return res.data;
+};
+
+export const deleteEvent = async (id) => {
+  const res = await axios.delete(`${EVENT_URL}/${id}`, {
+    headers: getAuthHeader(),
+  });
+  return res.data;
+};
+
+export const fetchDashboardStats = async () => {
+  const res = await axios.get(DASHBOARD_URL);
+  return res.data;
+};
