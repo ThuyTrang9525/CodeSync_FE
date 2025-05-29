@@ -136,6 +136,15 @@ export const getUserProfile = () =>
     },
   });
 
+export const getCertificate = (userID) =>
+  axios.get(`${API_BASE_URL}/student/certificates/${userID}`, { 
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  })
+  
+
 export const getUserNotifications = (receiverID) =>
   axios.get(`${API_BASE_URL}/student/notifications/${receiverID}`, {
     headers: {
