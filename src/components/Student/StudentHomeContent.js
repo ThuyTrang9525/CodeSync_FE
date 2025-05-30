@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react"
-import axios from "axios"
-import { LogOut } from "lucide-react"
-import "../../assets/css/StudentHomepage.css"
-import { getMyClasses } from "../../service/api"
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { LogOut } from "lucide-react";
+import "../../assets/css/StudentHomepage.css";
+import { getMyClasses } from "../../service/api";
 export default function StudentHomeContent() {
   const [student, setStudent] = useState("")
   const [classes, setClasses] = useState([])
