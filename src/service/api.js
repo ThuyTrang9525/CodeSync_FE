@@ -378,3 +378,18 @@ export const updateUserProfile = async (userId, profileData) => {
   });
   return res.data;
 };
+export const fetchUnassignedStudents = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/students/unassigned`);
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return Array.isArray(data.unassigned_students) ? data.unassigned_students : [];
+  } catch (error) {
+    console.error("Failed to fetch unassigned students:", error);
+    return [];
+  }
+};
