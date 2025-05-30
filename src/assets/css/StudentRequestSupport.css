@@ -1,21 +1,13 @@
-/* Container có hình + form */
+/* Container chứa hình ảnh và form */
 .support-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* căn giữa theo chiều dọc */
     padding: 40px 20px;
     gap: 60px;
-    /* tăng khoảng cách giữa hình và form */
     flex-wrap: wrap;
     background-color: #f5f8fb;
     min-height: 80vh;
-    /* giúp căn giữa tốt hơn */
-}
-
-/* Select có background nhẹ */
-.support-form select {
-    background-color: #f0f8ff;
 }
 
 /* Hình ảnh bên trái */
@@ -24,7 +16,6 @@
     align-items: center;
     justify-content: center;
     flex: 0 0 400px;
-    /* giữ kích thước cố định cho hình */
 }
 
 .support-image img {
@@ -38,7 +29,7 @@
 
 /* Form hỗ trợ */
 .support-form {
-    border: 2px solid #00aaff;
+    border: 2px solid #00b894;
     border-radius: 12px;
     padding: 32px 40px;
     max-width: 600px;
@@ -47,20 +38,28 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     flex: 1;
     margin-left: 40px;
-    /* đẩy form qua phải */
 }
 
+/* Tiêu đề form */
 .support-form h2 {
-    margin-bottom: 16px;
-    color: #0066cc;
+    margin-bottom: 24px;
+    color: #00796b; /* xanh đậm hiện đại */
+    text-align: center;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
+/* Label */
 .support-form label {
     font-weight: bold;
     margin-bottom: 6px;
     display: block;
 }
 
+/* Input, Select, Textarea */
 .support-form input,
 .support-form select,
 .support-form textarea {
@@ -72,7 +71,12 @@
     font-size: 16px;
 }
 
-/* Phần hiển thị tên giáo viên (không phải select) */
+/* Select có background nhẹ */
+.support-form select {
+    background-color: #f0f8ff;
+}
+
+/* Hiển thị tên giáo viên (không phải select) */
 .support-form .teacher-name-display {
     padding: 10px 14px;
     background-color: #f0f0f0;
@@ -84,20 +88,22 @@
     user-select: none;
 }
 
-/* Button gửi */
+/* Nút gửi */
 .support-form button {
-    background-color: #00b894;
+    background-color: #009688;
     color: white;
-    padding: 12px 20px;
+    padding: 12px 24px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s ease;
+    display: block;
+    margin: 0 auto; /* căn giữa */
 }
 
 .support-form button:hover {
-    background-color: #019875;
+    background-color: #005a47;
 }
 
 /* Thông báo gửi thành công */
@@ -105,4 +111,17 @@
     color: #009688;
     font-weight: 600;
     margin-top: 12px;
+}
+
+/* Hiệu ứng hình ảnh nổi */
+@keyframes float {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(0);
+    }
 }
