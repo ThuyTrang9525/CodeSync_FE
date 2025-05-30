@@ -216,6 +216,18 @@ export const NotificationsByReceiver = async (receiverID) => {
     return [];
   }
 };
+export const getWeekGoalProgress = async (email, week) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/week-goals-progress`, {
+      params: { email, week }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching weekly goal progress:", error);
+    return { progress: 0 }; // fallback nếu lỗi
+  }
+};
 
 export const addUser = (userData) =>
   axios.post(`${API_BASE_URL}/admin/users`, userData, {
@@ -286,16 +298,14 @@ export const fetchAdminGoals = () =>
       "Content-Type": "application/json",
     },
   })
-export const handleSetDeadline = async (goalID, newDeadline, classID = null) => {
+export const handleSetDeadline = async (goalID, newDeadline, classID = null,currentUserId) => {
   try {
     await axios.put(
       `${API_BASE_URL}/teacher/goals/${goalID}/set-deadline`,
-      { deadline: newDeadline, classID }
+      { deadline: newDeadline, classID, senderID: currentUserId }
     );
-    console.success("Deadline updated and student notified!");
   } catch (error) {
     console.error("Failed to update deadline", error);
-    console.error("Failed to update deadline");
   }
 };
   export const fetchComments = (planID, planType, token) =>

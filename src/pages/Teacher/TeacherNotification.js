@@ -100,8 +100,9 @@ export default function NotificationsTable() {
               style={{ width: "120px" }}
             >
               <option value="All">All</option>
-              <option value="PNV26B">PNV26B</option>
-              <option value="PNV25A">PNV25A</option>
+              <option value="TOEIC">TOEIC</option>
+              <option value="SPEAKING">SPEAKING</option>
+              <option value="IT ENGLISH">IT ENGLISH</option>
             </select>
           </div>
         </div>

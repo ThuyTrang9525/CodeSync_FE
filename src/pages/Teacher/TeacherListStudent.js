@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 import NavBar from '../../components/Teacher/TeacherNavBar'
 import Header from "../../components/header"
 import Footer from "../../components/footer"
-import { StudentsByClassId } from "../../service/api"
+import { StudentsByClassId, getWeekGoalProgress } from "../../service/api"
 
 export default function StudentTable() {
   const { classId } = useParams()
@@ -15,18 +15,13 @@ export default function StudentTable() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
-
+  const [weekProgress, setWeekProgress] = useState({}); 
   const [selectedWeek, setSelectedWeek] = useState("Choose Week")
   const [missingOption, setMissingOption] = useState("Missing Status")
   const [showWeekDropdown, setShowWeekDropdown] = useState(false)
-  const [showMissingDropdown, setShowMissingDropdown] = useState(false)
-
   const weekOptions = ["Week 1", "Week 2", "Week 3", "All"]
-  const missingOptions = ["Show All", "Show Missing"]
-
   const formattedClassId = classId ? classId.toUpperCase().replace(/-/g, " ") : "PNV26B"
   const navigate = useNavigate()
-
   const handleViewProfile = (studentId) => {
     navigate(`/students/${studentId}`)
   }
@@ -52,7 +47,30 @@ export default function StudentTable() {
     if (classId) {
       loadStudents();
     }
-  }, [classId]);
+    }, [classId]);
+
+  useEffect(() => {
+    const fetchProgressData = async () => {
+      const progressData = {};
+      const selectedWeekNumber = selectedWeek.includes("Week") ? selectedWeek.split(" ")[1] : null;
+
+      if (!selectedWeekNumber) return;
+
+      await Promise.all(
+        students.map(async (student) => {
+          const result = await getWeekGoalProgress(student.email, selectedWeekNumber);
+          progressData[student.email] = result.progress;
+        })
+      );
+
+      setWeekProgress(progressData);
+    };
+
+    if (selectedWeek !== "Choose Week" && students.length > 0) {
+      fetchProgressData();
+    }
+  }, [students, selectedWeek]);
+
   const filteredStudents = students.filter((student) =>
     student.name?.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -63,12 +81,6 @@ export default function StudentTable() {
       <div className="p-3 container my-3">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
           <div className="d-flex gap-3">
-            {/* <button
-              className="px-3 py-2 fw-medium border-0 border-bottom bg-transparent"
-              style={{ color: "#009688", borderColor: "#009688" }}
-            >
-              {formattedClassId}
-            </button> */}
           </div>
 
           <div className="d-flex align-items-center gap-2">
@@ -85,7 +97,6 @@ export default function StudentTable() {
                 />
             </div>
 
-            {/* Week Dropdown */}
             <div className="dropdown">
               <button
                 className="btn btn-outline-secondary dropdown-toggle"
@@ -111,33 +122,6 @@ export default function StudentTable() {
                 </ul>
               )}
             </div>
-
-            {/* Missing Dropdown */}
-            <div className="dropdown">
-              <button
-                className="btn btn-outline-secondary dropdown-toggle"
-                onClick={() => setShowMissingDropdown(!showMissingDropdown)}
-              >
-                {missingOption}
-              </button>
-              {showMissingDropdown && (
-                <ul className="dropdown-menu show">
-                  {missingOptions.map((option, index) => (
-                    <li key={index}>
-                      <button
-                        className="dropdown-item"
-                        onClick={() => {
-                          setMissingOption(option)
-                          setShowMissingDropdown(false)
-                        }}
-                      >
-                        {option}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
           </div>
         </div>
 
@@ -153,7 +137,9 @@ export default function StudentTable() {
                   <th className="text-center" style={{ width: "60px", color: "#6c757d" }}>STT</th>
                   <th className="text-center" style={{ color: "#6c757d" }}>Name</th>
                   <th className="text-center" style={{ color: "#6c757d" }}>Email</th>
-                  <th className="text-center" style={{ color: "#6c757d" }}>Progress Week 1</th>
+                  <th className="text-center" style={{ color: "#6c757d" }}>
+                    {selectedWeek === "Choose Week" ? "Progress" : `Progress ${selectedWeek}`}
+                  </th>
                   <th className="text-center" style={{ color: "#6c757d" }}></th>
                 </tr>
               </thead>
@@ -164,20 +150,33 @@ export default function StudentTable() {
                       <td className="text-center">{index + 1}</td>
                       <td className="text-center">{student.name || "No name"}</td>
                       <td className="text-center">{student.email || "No email"}</td>
-                      <td>
-                        <div className="d-flex align-items-center gap-2">
-                          <div className="progress flex-grow-1">
+                      <td className="text-center align-middle">
+                        {selectedWeek === "Choose Week" ? (
+                          "-"
+                        ) : weekProgress[student.email] !== undefined ? (
+                          <div className="progress" style={{ height: "20px" }}>
                             <div
                               className="progress-bar"
                               role="progressbar"
-                              style={{ width: `${student.progress || 0}%`, backgroundColor: "#009688" }}
-                              aria-valuenow={student.progress || 0}
+                              style={{
+                                width: `${weekProgress[student.email]}%`,
+                                backgroundColor:
+                                  weekProgress[student.email] >= 80
+                                    ? "#28a745"
+                                    : weekProgress[student.email] >= 50
+                                    ? "#ffc107"
+                                    : "#dc3545",
+                              }}
+                              aria-valuenow={weekProgress[student.email]}
                               aria-valuemin="0"
                               aria-valuemax="100"
-                            ></div>
+                            >
+                              {weekProgress[student.email]}%
+                            </div>
                           </div>
-                          <span className="text-nowrap small">{student.progress || 0}%</span>
-                        </div>
+                        ) : (
+                          <span>Loading...</span>
+                        )}
                       </td>
                       <td>
                         <div className="d-flex justify-content-center gap-2">
