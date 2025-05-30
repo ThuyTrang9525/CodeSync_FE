@@ -226,7 +226,7 @@ export const NotificationsByReceiver = async (receiverID) => {
     const data = res.data;
 
     if (data.status === "success") {
-      return data.data; 
+      return data.data;
     } else {
       console.error("API returned error status:", data);
       return [];
@@ -234,6 +234,18 @@ export const NotificationsByReceiver = async (receiverID) => {
   } catch (err) {
     console.error("Failed to fetch notifications:", err);
     return [];
+  }
+};
+export const getWeekGoalProgress = async (email, week) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/week-goals-progress`, {
+      params: { email, week }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching weekly goal progress:", error);
+    return { progress: 0 }; // fallback nếu lỗi
   }
 };
 
@@ -302,6 +314,16 @@ export const getTimeTable = () =>
       "Content-Type": "application/json",
     },
   })
+export const handleSetDeadline = async (goalID, newDeadline, classID = null,currentUserId) => {
+  try {
+    await axios.put(
+      `${API_BASE_URL}/teacher/goals/${goalID}/set-deadline`,
+      { deadline: newDeadline, classID, senderID: currentUserId }
+    );
+  } catch (error) {
+    console.error("Failed to update deadline", error);
+  }
+};
 
 export const fetchComments = (planID, planType, token) =>
   axios.get(`${API_BASE_URL}/comments`, {
@@ -318,7 +340,6 @@ export const resolveComment = (commentID, token) =>
   axios.put(`${API_BASE_URL}/comments/${commentID}/resolve`, {}, {
     headers: { Authorization: `Bearer ${token}` },
   });
-
 export const getAllSubject = () =>
   axios.get(`${API_BASE_URL}/teacher/subjects`, {}, {
     headers: { Authorization: `Bearer ${token}` },
