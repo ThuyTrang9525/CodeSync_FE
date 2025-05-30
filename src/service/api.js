@@ -280,6 +280,14 @@ export const createClass = (data) =>
     },
   });
 
+
+export const getClassDetails = (classID) =>
+  fetch(`${API_BASE_URL}/admin/classmate/${classID}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
 export const fetchStudents = () =>
   axios.get(`${API_BASE_URL}/admin/reports`);
 
@@ -414,3 +422,33 @@ export const fetchUnassignedStudents = async () => {
     return [];
   }
 };
+
+export const assignStudents = async (classID, studentIDs) => {
+  if (!classID || !studentIDs || studentIDs.length === 0) {
+    throw new Error("Class ID or student IDs missing");
+  }
+
+  const errors = [];
+
+  for (const studentID of studentIDs) {
+    const response = await fetch(`${API_BASE_URL}/admin/classes/${classID}/assign-student`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userID: studentID }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      errors.push({ studentID, message: errorData.message });
+    }
+  }
+
+  if (errors.length > 0) {
+    throw errors;
+  }
+
+  return "Students assigned successfully!";
+};
+

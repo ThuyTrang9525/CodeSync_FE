@@ -6,6 +6,8 @@ import {
   updateClass,
   deleteClass,
   fetchUnassignedStudents,
+  assignStudents, 
+  getClassDetails
 } from "../../service/api";
 
 const ClassTable = () => {
@@ -111,7 +113,7 @@ const getUnassignedStudents = async () => {
   // Fetch detailed info of class including students, also fetch unassigned students
   const fetchClassDetails = async (classID) => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/admin/classmate/${classID}`);
+     const res = await getClassDetails(classID);
       const data = await res.json();
       setSelectedClassDetails(data);
 
@@ -149,32 +151,25 @@ const getUnassignedStudents = async () => {
     return;
   }
 
-  try {
-    for (const studentID of selectedStudentsToAssign) {
-      const response = await fetch(`http://127.0.0.1:8000/api/admin/classes/${selectedClassDetails.class.id}/assign-student`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userID: studentID }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error assigning:", errorData.message);
-        alert(`Failed to assign student ${studentID}: ${errorData.message}`);
-      }
-    }
-
+   try {
+    await assignStudents(selectedClassDetails.class.id, selectedStudentsToAssign);
     alert("Students assigned successfully!");
-    fetchClassDetails(selectedClassDetails.class.classID);
+    const updatedClassDetails = await fetchClassDetails(selectedClassDetails.class.classID);
+    setSelectedClassDetails(updatedClassDetails);
     fetchUnassignedStudents();
     setSelectedStudentsToAssign([]);
   } catch (error) {
-    console.error(error);
-    alert("Error assigning students. Please try again.");
+    // Nếu là mảng lỗi chi tiết
+    if (Array.isArray(error)) {
+      error.forEach(err => {
+        alert(`Failed to assign student ${err.studentID}: ${err.message}`);
+      });
+    } else {
+      alert(error.message || "Error assigning students. Please try again.");
+    }
   }
 };
+
 
 
   return (
