@@ -5,7 +5,7 @@ import Report from '../../components/Admin/AdminTableDataReport';
 export default class AdminReport extends Component {
   render() {
     return (
-      <div className='container'>
+      <div className='container-fluid'>
         <Header />
         <Nav /> 
         <div style={{ marginTop: '20px' }}>

@@ -934,4 +934,55 @@
     max-width: 33.333%;
   }
 
+.delete-button {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
 
+.delete-button:hover {
+  background-color: #ffe5e5; /* đỏ nhạt khi hover */
+}
+
+.trash-icon {
+  color: #e60000; /* màu đỏ */
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.delete-button:hover .trash-icon {
+  color: #cc0000; /* đậm hơn khi hover */
+  transform: scale(1.1);
+}
+
+.icon-green {
+
+  stroke: "green";
+    strokeWidth: 3;
+    fill: "none";         
+    width: "24px";
+    height: "24px";
+    marginRight: "8px";
+}
+
+.comment-button {
+  display: flex;               /* flex */
+  align-items: center;         /* items-center */
+  justify-content: center;     /* justify-center */
+  gap: 4px;                   /* gap-1 (khoảng cách ~4px) */
+  color: #2563eb;              /* text-blue-600 */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;          /* text-xs trong span, nếu span chứa text */
+  padding: 0;                  /* tùy chỉnh nếu muốn */
+  transition: color 0.2s ease;
+}
+
+.comment-button:hover {
+  color: #1e40af;              /* text-blue-800 */
+}

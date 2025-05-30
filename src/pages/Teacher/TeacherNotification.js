@@ -38,22 +38,23 @@ export default function NotificationsTable() {
  const receiverID = localStorage.getItem("userID");
  console.log(receiverID);
 
-   useEffect(() => {
-    setCurrentPage(1);
+  useEffect(() => {
+  if (!receiverID) return;
 
-    const loadNotifications = async () => {
-      try {
-        const data = await NotificationsByReceiver(receiverID);
-        setNotifications(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const loadNotifications = async () => {
+    try {
+      const data = await NotificationsByReceiver(receiverID);
+      setNotifications(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    loadNotifications();
-  }, [selectedClass, date]);
+  loadNotifications();
+}, [selectedClass, date]);
+
 
   const toggleCalendar = () => {
     setOpenCalendar(!openCalendar);
@@ -99,8 +100,9 @@ export default function NotificationsTable() {
               style={{ width: "120px" }}
             >
               <option value="All">All</option>
-              <option value="PNV26B">PNV26B</option>
-              <option value="PNV25A">PNV25A</option>
+              <option value="TOEIC">TOEIC</option>
+              <option value="SPEAKING">SPEAKING</option>
+              <option value="IT ENGLISH">IT ENGLISH</option>
             </select>
           </div>
         </div>

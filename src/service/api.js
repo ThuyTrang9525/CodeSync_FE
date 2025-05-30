@@ -5,6 +5,8 @@ const SELF_PLAN_URL = `${API_BASE_URL}/student/self-study-plans`
 const STUDY_PLAN_URL = `${API_BASE_URL}/student/study-plans`
 
 const token = localStorage.getItem("token");
+const EVENT_URL = `${API_BASE_URL}/events`
+const DASHBOARD_URL = `${API_BASE_URL}/stats`;
 export const login = (email, password, role) =>
   axios.post(`${API_BASE_URL}/login`, { email, password, role }, {
     headers: {
@@ -120,13 +122,13 @@ export const getMyClasses = () =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
-export const updateUserProfile = (userID, updatedProfile) =>
-  axios.put(`${API_BASE_URL}/student/profile/${userID}`, updatedProfile, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-  });
+// export const updateUserProfile = (userID, updatedProfile) =>
+//   axios.put(`${API_BASE_URL}/student/profile/${userID}`, updatedProfile, {
+//     headers: {
+//       Authorization: `Bearer ${token}`,
+//       "Content-Type": "application/json",
+//     },
+//   });
 
 export const getUserProfile = () =>
   axios.get(`${API_BASE_URL}/student/profile`, {
@@ -135,6 +137,15 @@ export const getUserProfile = () =>
       "Content-Type": "application/json",
     },
   });
+
+export const getCertificate = (userID) =>
+  axios.get(`${API_BASE_URL}/student/certificates/${userID}`, { 
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  })
+  
 
 export const getUserNotifications = (receiverID) =>
   axios.get(`${API_BASE_URL}/student/notifications/${receiverID}`, {
@@ -215,7 +226,7 @@ export const NotificationsByReceiver = async (receiverID) => {
     const data = res.data;
 
     if (data.status === "success") {
-      return data.data; // danh sách thông báo
+      return data.data;
     } else {
       console.error("API returned error status:", data);
       return [];
@@ -223,6 +234,18 @@ export const NotificationsByReceiver = async (receiverID) => {
   } catch (err) {
     console.error("Failed to fetch notifications:", err);
     return [];
+  }
+};
+export const getWeekGoalProgress = async (email, week) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/week-goals-progress`, {
+      params: { email, week }
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching weekly goal progress:", error);
+    return { progress: 0 }; // fallback nếu lỗi
   }
 };
 
@@ -234,7 +257,7 @@ export const addUser = (userData) =>
     },
   });
 
-export const getAllNotifications = () =>
+  export const getAllNotifications = () =>
   axios.get(`${API_BASE_URL}/admin/notifications`);
 
 export const markNotificationAsRead = (id) =>
@@ -269,7 +292,6 @@ export const assignTeacherToClass = (data) =>
       Authorization: `Bearer ${token}`,
     },
   });
-
 export const fetchGoalsByStudent = (userID) =>
   axios.get(`${API_BASE_URL}/admin/getGoalsbyStudent/${userID}`);
 
@@ -292,6 +314,16 @@ export const getTimeTable = () =>
       "Content-Type": "application/json",
     },
   })
+export const handleSetDeadline = async (goalID, newDeadline, classID = null,currentUserId) => {
+  try {
+    await axios.put(
+      `${API_BASE_URL}/teacher/goals/${goalID}/set-deadline`,
+      { deadline: newDeadline, classID, senderID: currentUserId }
+    );
+  } catch (error) {
+    console.error("Failed to update deadline", error);
+  }
+};
 
 export const fetchComments = (planID, planType, token) =>
   axios.get(`${API_BASE_URL}/comments`, {
@@ -308,8 +340,77 @@ export const resolveComment = (commentID, token) =>
   axios.put(`${API_BASE_URL}/comments/${commentID}/resolve`, {}, {
     headers: { Authorization: `Bearer ${token}` },
   });
-
 export const getAllSubject = () =>
   axios.get(`${API_BASE_URL}/teacher/subjects`, {}, {
     headers: { Authorization: `Bearer ${token}` },
   });
+const getAuthHeader = () => ({
+  Authorization: `Bearer ${localStorage.getItem('token')}`,
+});
+
+export const fetchEvent = async () => {
+  const res = await axios.get(EVENT_URL, { headers: getAuthHeader() });
+  return res.data;
+};
+
+export const createEvent = async (eventData) => {
+  const res = await axios.post(EVENT_URL, eventData, {
+    headers: getAuthHeader(),
+  });
+  return res.data;
+};
+
+export const updateEvent = async (id, eventData) => {
+  const res = await axios.put(`${EVENT_URL}/${id}`, eventData, {
+    headers: getAuthHeader(),
+  });
+  return res.data;
+};
+
+export const deleteEvent = async (id) => {
+  const res = await axios.delete(`${EVENT_URL}/${id}`, {
+    headers: getAuthHeader(),
+  });
+  return res.data;
+};
+
+export const fetchDashboardStats = async () => {
+  const res = await axios.get(DASHBOARD_URL);
+  return res.data;
+};
+
+export const fetchCertificates = async () => {
+  const res = await axios.get(`${API_BASE_URL}/student/certificates`, {
+    headers: getAuthHeader(),
+  });
+  return res.data;
+};
+
+export const fetchUserProfile = async () => {
+  const res = await axios.get(`${API_BASE_URL}/student/profile`, {
+    headers: getAuthHeader(),
+  });
+  return res.data;
+};
+
+export const updateUserProfile = async (userId, profileData) => {
+  const res = await axios.put(`${API_BASE_URL}/student/profile/${userId}`, profileData, {
+    headers: getAuthHeader(),
+  });
+  return res.data;
+};
+export const fetchUnassignedStudents = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/students/unassigned`);
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return Array.isArray(data.unassigned_students) ? data.unassigned_students : [];
+  } catch (error) {
+    console.error("Failed to fetch unassigned students:", error);
+    return [];
+  }
+};

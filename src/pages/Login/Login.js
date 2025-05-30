@@ -23,11 +23,13 @@ function LoginPage() {
       const user = response.data.user.userID;
       localStorage.setItem('token', token);
       localStorage.setItem("userID", user);
+      localStorage.setItem("email",email);
 
       if (userRole === "TEACHER") {
         navigate(`/teacher-home`);
       } else if (userRole === "STUDENT") {
         navigate(`/student-home`);
+        console.log(token);
       } else if (userRole === "ADMIN") {
         navigate(`/admin-dashboard`);
       }
