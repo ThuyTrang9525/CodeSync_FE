@@ -1,4 +1,4 @@
-/* Container chứa hình ảnh và form */
+/* Container có hình + form */
 .support-container {
     display: flex;
     justify-content: center;
@@ -29,7 +29,7 @@
 
 /* Form hỗ trợ */
 .support-form {
-    border: 2px solid #00b894;
+    border: 2px solid #00796b;
     border-radius: 12px;
     padding: 32px 40px;
     max-width: 600px;
@@ -40,16 +40,11 @@
     margin-left: 40px;
 }
 
-/* Tiêu đề form */
 .support-form h2 {
     margin-bottom: 24px;
-    color: #00796b; /* xanh đậm hiện đại */
+    color: #00796b;
     text-align: center;
-    font-size: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
+    font-size: 26px;
 }
 
 /* Label */
@@ -59,7 +54,7 @@
     display: block;
 }
 
-/* Input, Select, Textarea */
+/* Input, select, textarea có style chung */
 .support-form input,
 .support-form select,
 .support-form textarea {
@@ -67,16 +62,21 @@
     padding: 10px;
     margin-bottom: 16px;
     border-radius: 6px;
-    border: 1px solid #ccc;
+    border: 2px solid #00796b;
     font-size: 16px;
-}
-
-/* Select có background nhẹ */
-.support-form select {
+    outline: none;
     background-color: #f0f8ff;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Hiển thị tên giáo viên (không phải select) */
+.support-form input:focus,
+.support-form select:focus,
+.support-form textarea:focus {
+    border-color: #005a47;
+    box-shadow: 0 0 4px rgba(0, 121, 107, 0.5);
+}
+
+/* Hiển thị tên giáo viên */
 .support-form .teacher-name-display {
     padding: 10px 14px;
     background-color: #f0f0f0;
@@ -88,11 +88,11 @@
     user-select: none;
 }
 
-/* Nút gửi */
+/* Button gửi */
 .support-form button {
-    background-color: #009688;
+    background-color: #00796b;
     color: white;
-    padding: 12px 24px;
+    padding: 12px 20px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -111,17 +111,15 @@
     color: #009688;
     font-weight: 600;
     margin-top: 12px;
+    text-align: center;
 }
 
-/* Hiệu ứng hình ảnh nổi */
+/* Animation cho ảnh */
 @keyframes float {
-    0% {
+    0%, 100% {
         transform: translateY(0);
     }
     50% {
         transform: translateY(-10px);
-    }
-    100% {
-        transform: translateY(0);
     }
 }
