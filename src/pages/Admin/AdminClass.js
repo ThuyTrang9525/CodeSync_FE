@@ -10,7 +10,7 @@ import Pagination from '../../components/Admin/AdminPagination';
 export default class AdminClass extends Component {
   render() {
     return (
-      <div className='container'>
+      <div className='container-fluid'>
         <Header />
         <Nav />
         <SearchForm onSearch={(query) => console.log(`Search query: ${query}`)} />

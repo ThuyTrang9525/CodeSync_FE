@@ -8,7 +8,7 @@ import TableData from '../../components/Admin/AdminTableDataUser';
 export default class AdminUser extends Component {
   render() {
     return (
-        <div className='container'>
+        <div className='container-fluid'>
             <Header />
 
             <Nav />

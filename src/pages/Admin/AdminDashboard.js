@@ -4,7 +4,7 @@ import Nav from '../../components/Admin/AdminNav';
 import TopProgressChart from '../../components/Admin/AdminTopProgressChart';
 import '../../assets/css/Admin.css';
 import axios from 'axios';
-
+import {fetchDashboardStats} from '../../service/api'; // Adjust the import path as necessary
 export default class AdminDashboard extends Component {
   state = {
     teachers: 0,
@@ -13,12 +13,11 @@ export default class AdminDashboard extends Component {
   };
 
   componentDidMount() {
-    axios.get('http://localhost:8000/api/stats')
-      .then(response => {
-        const { teachers, students, classes} = response.data;
-        this.setState({ teachers, students, classes});
+    fetchDashboardStats()
+      .then(({ teachers, students, classes }) => {
+        this.setState({ teachers, students, classes });
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error fetching dashboard data:', error);
       });
   }
@@ -27,7 +26,7 @@ export default class AdminDashboard extends Component {
     const { teachers, students, classes } = this.state;
 
     return (
-      <div className="container">
+      <div className="container-fluid">
         <Header />
         <Nav />
         <div className="stats-grid">

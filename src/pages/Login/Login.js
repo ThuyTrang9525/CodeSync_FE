@@ -29,6 +29,7 @@ function LoginPage() {
         navigate(`/teacher-home`);
       } else if (userRole === "STUDENT") {
         navigate(`/student-home`);
+        console.log(token);
       } else if (userRole === "ADMIN") {
         navigate(`/admin-dashboard`);
       }

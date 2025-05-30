@@ -1,6 +1,7 @@
 import React from "react";
+
 import { Link, useLocation } from "react-router-dom";
-import { Home, Target, Edit, Menu, Settings, HelpCircle } from "lucide-react";
+import { Home, Target, Edit, Menu, HelpCircle } from "lucide-react";
 
 const navs = [
   {
@@ -28,16 +29,10 @@ const navs = [
     isLink: true,
   },
   {
-    label: "Setting",
-    icon: <Settings size={24} />,
-    path: null,
-    isLink: false,
-  },
-  {
     label: "Support",
     icon: <HelpCircle size={24} />,
-    path: null,
-    isLink: false,
+    path: "/support-request",
+    isLink: true,
   },
 ];
 
