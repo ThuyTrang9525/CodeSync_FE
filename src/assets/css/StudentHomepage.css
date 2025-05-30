@@ -3,10 +3,30 @@
   background-color: #009688;
   padding: 5px;
   color: white;
-  justify-content: space-around;
+  justify-content: center; /* căn giữa */
+  gap: 20px; /* khoảng cách nav-item */
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   height: 100px;
+  margin-bottom: 40px; /* thêm khoảng cách dưới navbar */
+}
+
+.section-block {
+  margin: 40px auto;
+  padding: 20px;
+  max-width: 1200px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 50px; /* khoảng cách dưới section-block */
+}
+
+.section-title {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #2d3748;
+  text-align: center;
 }
 
 .nav-item {
@@ -64,6 +84,7 @@
   color: #009688;
   border-bottom: 1px solid #e0e0e0;
   padding-bottom: 15px;
+  margin-bottom: 40px; /* thêm khoảng cách dưới welcome-text */
 }
 
 .course-grid {
@@ -71,6 +92,8 @@
   gap: 20px;
   flex-wrap: wrap;
   margin: 30px;
+  justify-content: center; /* căn giữa các course-card */
+  margin-bottom: 50px; /* thêm khoảng cách dưới course-grid */
 }
 
 .course-card {
