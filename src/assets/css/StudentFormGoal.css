@@ -1,31 +1,179 @@
-.create-goal-card {
-  background-color: #fff; /* nền trắng cho card */
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  border: 1px solid #ddd;
-  max-width: 480px;
-  margin: 20px auto;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+/* Card container */
+.card.create-goal-card {
+  background-color: #f0faf4;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 128, 0, 0.1);
+  max-width: 700px;
+  margin: 2rem auto;
+  font-family: 'Segoe UI', sans-serif;
 }
 
-.create-goal-card .card-header {
-  background-color: #f9f9f9; /* nền nhẹ cho header */
-  border-bottom: 1px solid #ddd;
-  padding: 16px 20px;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+/* Header */
+.card-header h5 {
+  font-size: 2rem;
+  text-align: center;
+  margin: 1.5rem 0;
+  color: #1a3d1a;
 }
 
-.create-goal-card .card-header h5 {
-  color: #000; /* chữ header màu đen */
+
+
+/* Labels */
+.form-label {
   font-weight: 600;
-  margin: 0;
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #1a3d1a;
 }
 
-.create-goal-card .card-body {
-  padding: 24px 20px;
+/* Inputs and selects */
+.form-control,
+.form-select {
+  background-color: #c8e6c9; /* light green */
+  border: none;
+  border-radius: 20px;
+  padding: 0.75rem 1.25rem;
+  width: 100%;
+  margin-bottom: 1.2rem;
+  font-size: 1rem;
+  transition: background-color 0.3s;
 }
 
+.form-control::placeholder,
+.form-select {
+  color: #2e7d32;
+}
+
+.form-control:focus,
+.form-select:focus {
+  outline: 2px solid #2e7d32;
+  background-color: #b2dfdb;
+}
+
+/* Group icons and input alignment */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  color: #2e7d32;
+}
+
+.pl-10 {
+  padding-left: 2.5rem !important;
+}
+
+/* Textarea container */
+.textarea-container .input-icon {
+  top: 16px;
+}
+
+/* Submit button */
+.create-goal-btn {
+  background-color: #2e7d32;
+  border: none;
+  padding: 0.75rem;
+  color: white;
+  font-weight: bold;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s;
+}
+
+.create-goal-btn:hover {
+  background-color: #1b5e20;
+}
+.custom-form {
+  max-width: 600px;
+  background-color: #f4fff4;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin: auto;
+}
+
+/* Tiêu đề */
+.custom-form h1 {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 35px;
+  font-weight: 800;
+  background: linear-gradient(to right, #43a047, #1b5e20);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  letter-spacing: 1px;
+}
+
+/* Nhóm label + input */
+.custom-form .form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.custom-form label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.custom-form input,
+.custom-form select,
+.custom-form textarea {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100%;
+  transition: border 0.3s;
+}
+
+.custom-form input:focus,
+.custom-form select:focus,
+.custom-form textarea:focus {
+  border-color: #2e7d32;
+  outline: none;
+}
+
+/* Flex group (2 input trong 1 hàng nếu dùng) */
+.custom-form .input-row {
+  display: flex;
+  gap: 20px;
+}
+
+.custom-form .input-row .form-group {
+  flex: 1;
+}
+
+/* Button */
+.custom-form button {
+  margin-top: 25px;
+  padding: 12px 20px;
+  background-color: #2e7d32;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-form button:hover {
+  background-color: #1b5e20;
+}
+
+/* Icon trong input */
 .input-with-icon {
   position: relative;
 }
@@ -33,48 +181,11 @@
 .input-icon {
   position: absolute;
   top: 50%;
-  left: 12px;
+  left: 10px;
   transform: translateY(-50%);
-  color: #666;
+  color: #888;
 }
 
-.form-control.pl-10 {
+.pl-10 {
   padding-left: 36px !important;
-}
-
-.form-label {
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #333;
-}
-
-.form-select.pl-10 {
-  padding-left: 36px !important;
-}
-
-.textarea-container textarea {
-  resize: vertical;
-}
-
-.create-goal-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-weight: 600;
-  padding: 10px 0;
-  font-size: 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.create-goal-btn:hover {
-  background-color: #0056b3;
-}
-
-.btn-primary {
-  background-color: #007bff;
-  border-color: #007bff;
-  color: white;
 }

@@ -4,6 +4,8 @@ import React, { useState, useEffect } from "react"
 import { GoalStatus } from "../../types/goal"
 import { updateGoalStatus , deleteGoal, editGoal} from "../../service/api"
 import { Calendar, ChevronDown, ChevronUp } from "lucide-react"
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function GoalItem({ goal: initialGoal }) {
   const [goal, setGoal] = useState(initialGoal)
@@ -17,7 +19,7 @@ export default function GoalItem({ goal: initialGoal }) {
     setEditData(initialGoal)
   }, [initialGoal])
 
-  const handleStatusChange = async () => {
+const handleStatusChange = async () => {
     let newStatus
     switch (goal.status) {
       case GoalStatus.NotStarted:
@@ -35,93 +37,108 @@ export default function GoalItem({ goal: initialGoal }) {
     try {
       const res = await updateGoalStatus(goal.goalID, { ...goal, status: newStatus }, token)
       setGoal(res.data.data)
+      toast.success("Cập nhật trạng thái thành công!")
     } catch (error) {
       console.error("Failed to update goal status:", error)
+      toast.error("Cập nhật trạng thái thất bại!")
     }
   }
 
-  const handleDelete = () => {
-    deleteGoal(goal.goalID)
+  const handleDelete = async () => {
+    try {
+      await deleteGoal(goal.goalID, token)
+      toast.success("Xóa goal thành công!")
+      // Nếu cần, bạn có thể gọi callback để cập nhật lại list ở component cha
+    } catch (error) {
+      console.error("Failed to delete goal:", error)
+      toast.error("Xóa goal thất bại, vui lòng thử lại.")
+    }
   }
 
-  // Xử lý lưu chỉnh sửa
   const handleEditSave = async (e) => {
     e.preventDefault()
     try {
-      await editGoal(editData, token)// editGoal là prop từ cha, cha sẽ gọi API và cập nhật lại state goals
+      await editGoal(editData, token)
+      toast.success("Lưu goal thành công!")
       setShowEdit(false)
+      // Có thể gọi callback để cập nhật lại dữ liệu nếu cần
     } catch (err) {
-      alert("Có lỗi khi lưu goal. Vui lòng thử lại.")
+      toast.error("Có lỗi khi lưu goal. Vui lòng thử lại.")
     }
   }
-
   // Form chỉnh sửa đầy đủ trường
-  const renderEditForm = () => (
-    <form onSubmit={handleEditSave} className="p-3 border rounded bg-light mb-3">
-      <div className="mb-2">
-        <label className="form-label">Title</label>
-        <input
-          className="form-control"
-          value={editData.title}
-          onChange={e => setEditData({ ...editData, title: e.target.value })}
-          required
-        />
-      </div>
-      <div className="mb-2">
-        <label className="form-label">Description</label>
-        <textarea
-          className="form-control"
-          value={editData.description}
-          onChange={e => setEditData({ ...editData, description: e.target.value })}
-          required
-        />
-      </div>
-      <div className="mb-2">
-        <label className="form-label">Semester</label>
-        <input
-          className="form-control"
-          value={editData.semester}
-          onChange={e => setEditData({ ...editData, semester: e.target.value })}
-          required
-        />
-      </div>
-      <div className="mb-2">
-        <label className="form-label">Week</label>
-        <input
-          className="form-control"
-          value={editData.week}
-          onChange={e => setEditData({ ...editData, week: e.target.value })}
-          required
-        />
-      </div>
-      <div className="mb-2">
-        <label className="form-label">Deadline</label>
-        <input
-          type="date"
-          className="form-control"
-          value={editData.deadline}
-          onChange={e => setEditData({ ...editData, deadline: e.target.value })}
-        />
-      </div>
-      <div className="mb-2">
-        <label className="form-label">Priority</label>
-        <select
-          className="form-control"
-          value={editData.priority}
-          onChange={e => setEditData({ ...editData, priority: e.target.value })}
-        >
-          <option value="1">High</option>
-          <option value="2">Medium</option>
-          <option value="3">Low</option>
-        </select>
-      </div>
-      <div className="d-flex gap-2 mt-2">
-        <button type="submit" className="btn btn-primary btn-sm">Save</button>
-        <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowEdit(false)}>Cancel</button>
-      </div>
-    </form>
-  )
-
+ const renderEditForm = () => (
+    <>
+      <ToastContainer position="top-right" autoClose={3000} />
+      <form onSubmit={handleEditSave} className="p-3 border rounded bg-light mb-3">
+        <div className="mb-2">
+          <label className="form-label">Title</label>
+          <input
+            className="form-control"
+            value={editData.title}
+            onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+            required
+          />
+        </div>
+        <div className="mb-2">
+          <label className="form-label">Description</label>
+          <textarea
+            className="form-control"
+            value={editData.description}
+            onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+            required
+          />
+        </div>
+        <div className="mb-2">
+          <label className="form-label">Semester</label>
+          <input
+            className="form-control"
+            value={editData.semester}
+            onChange={(e) => setEditData({ ...editData, semester: e.target.value })}
+            required
+          />
+        </div>
+        <div className="mb-2">
+          <label className="form-label">Week</label>
+          <input
+            className="form-control"
+            value={editData.week}
+            onChange={(e) => setEditData({ ...editData, week: e.target.value })}
+            required
+          />
+        </div>
+        <div className="mb-2">
+          <label className="form-label">Deadline</label>
+          <input
+            type="date"
+            className="form-control"
+            value={editData.deadline}
+            onChange={(e) => setEditData({ ...editData, deadline: e.target.value })}
+          />
+        </div>
+        <div className="mb-2">
+          <label className="form-label">Priority</label>
+          <select
+            className="form-control"
+            value={editData.priority}
+            onChange={(e) => setEditData({ ...editData, priority: e.target.value })}
+          >
+            <option value="1">High</option>
+            <option value="2">Medium</option>
+            <option value="3">Low</option>
+          </select>
+        </div>
+        <div className="d-flex gap-2 mt-2">
+          <button type="submit" className="btn btn-primary btn-sm">
+            Save
+          </button>
+          <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowEdit(false)}>
+            Cancel
+          </button>
+        </div>
+      </form>
+    </>
+  );
   const getStatusBadgeClass = () => {
     switch (goal.status) {
       case GoalStatus.Completed:

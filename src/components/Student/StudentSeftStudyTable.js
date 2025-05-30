@@ -186,7 +186,7 @@ return (
             <th className="p-2 border w-32">Skill/Module</th>
             <th className="p-2 border w-40">My Lesson</th>
             <th className="p-2 border w-28">Time Allocation</th>
-            <th className="p-2 border w-32">Concentration</th>
+            <th className="p-2 border w-32">Concentration (.../10)</th>
             <th className="p-2 border w-32">Resources</th>
             <th className="p-2 border w-32">Activities</th>
             <th className="p-2 border w-28">Evaluation</th>

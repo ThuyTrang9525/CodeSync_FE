@@ -5,6 +5,7 @@ import {
   createClass,
   updateClass,
   deleteClass,
+  fetchUnassignedStudents,
 } from "../../service/api";
 
 const ClassTable = () => {
@@ -50,20 +51,10 @@ const ClassTable = () => {
   };
 
   // Fetch unassigned students
-  const fetchUnassignedStudents = async () => {
-    try {
-      const res = await fetch(
-        "http://127.0.0.1:8000/api/admin/students/unassigned"
-      );
-      const data = await res.json();
-      setUnassignedStudents(
-        Array.isArray(data.unassigned_students) ? data.unassigned_students : []
-      );
-    } catch (error) {
-      console.error("Failed to fetch unassigned students:", error);
-      setUnassignedStudents([]);
-    }
-  };
+const getUnassignedStudents = async () => {
+  const students = await fetchUnassignedStudents();
+  setUnassignedStudents(students);
+};
 
   // Open modal to add new class
   const openAddModal = () => {
