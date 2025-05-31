@@ -3,39 +3,25 @@ import { Check, Plus,Trash2 } from "lucide-react";
 import { fetchGoals, createGoal, updateGoalStatus, deleteGoal ,editGoal} from "../../service/api";
 import "../../assets/css/StudentGoal.css"
 export default function GoalsTable({ token, semester, week }) {
-  const [goals, setGoals] = useState([]);
+  const [goals, setGoals] = useState([])
   const [loading, setLoading] = useState(false);
   const [newGoalDescription, setNewGoalDescription] = useState("");
   const [newGoalSubject, setNewGoalSubject] = useState("");
   const [newGoalDeadline, setNewGoalDeadline] = useState("");
-  const [editingGoalId, setEditingGoalId] = useState(null);
   const [newGoalCompleted, setNewGoalCompleted] = useState(false);
-  const loadGoals = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetchGoals(token, semester, week);
-      setGoals(res.data.data);
-    } catch (error) {
-      console.error("Failed to fetch goals:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+const [editingGoalId, setEditingGoalId] = useState(null);
+const [currentCompleted, setCurrentCompleted] = useState(false); // Trạng thái hoàn thành hiện tại
 const handleAddGoal = async (newGoal) => {
   try {
     const token = localStorage.getItem("token");
 
-    // Bạn cần nhập thêm 'title' và 'deadline' khi tạo mục tiêu
-    // Giả sử tạm thời title giống description, deadline là ngày hiện tại hoặc user nhập
-    const goalData = {
+   const goalData = {
       title: newGoal.description,      // hoặc bạn có thể thêm input riêng để nhập title
       description: newGoal.description,
       semester,
       week,
       deadline: newGoal.deadline || new Date().toISOString().split("T")[0], // ngày hiện tại, định dạng "YYYY-MM-DD"
       subject: newGoal.subject || null,
-       completed: newGoal.completed || false,
     };
 
     const res = await createGoal(goalData, token);
@@ -51,7 +37,7 @@ const handleAddGoal = async (newGoal) => {
   }
 };
   // Các hàm handleAddGoal, toggleCompleted, handleDeleteGoal giữ nguyên hoặc sửa nếu cần
-const toggleCompleted = async (goalId, currentCompleted) => {
+const toggleCompleted = async (goalId) => {
   try {
     const token = localStorage.getItem("token");
     const updatedStatus = !currentCompleted;
@@ -63,6 +49,18 @@ const toggleCompleted = async (goalId, currentCompleted) => {
     console.error("Failed to toggle goal status:", error.response?.data || error.message);
   }
 };
+  const loadGoals = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetchGoals(token, semester, week);
+      setGoals(res.data.data);
+    } catch (error) {
+      console.error("Failed to fetch goals:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 useEffect(() => {
 
   const loadGoals = async () => {
@@ -80,15 +78,23 @@ useEffect(() => {
 
   loadGoals();
 }, [token, semester, week]);
- const handleDeleteGoal = async (goalId) => {
-    try {
-      const token = localStorage.getItem("token");
-      await deleteGoal(goalId, token);
-      loadGoals();
-    } catch (error) {
-      console.error("Failed to delete goal:", error.response?.data || error.message);
+const handleDeleteGoal = async (goalId) => {
+  try {
+    const token = localStorage.getItem("token");
+    await deleteGoal(goalId, token);
+    loadGoals();
+  } catch (error) {
+    if (error.response) {
+      console.error("Failed to delete goal:", {
+        status: error.response.status,
+        data: error.response.data,
+      });
+    } else {
+      console.error("Failed to delete goal:", error.message);
     }
-  };
+  }
+};
+
 
   const startEditing = (goal) => {
     setEditingGoalId(goal.goalID);
@@ -154,7 +160,7 @@ useEffect(() => {
                   )}
                 </td>
                 <td className="p-2 text-center">
-                   <button onClick={() => handleDeleteGoal(goal.id)} className="delete-button" title="Delete goal">
+                   <button onClick={() => handleDeleteGoal(goal.goalID)} className="delete-button" title="Delete goal">
                       <Trash2 className="trash-icon" />
                     </button>
                 </td>

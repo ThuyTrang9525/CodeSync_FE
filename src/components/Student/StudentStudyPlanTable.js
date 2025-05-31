@@ -222,8 +222,12 @@ const StudyPlanTable = ({ semester, week }) => {
                   </button>
               </td>
               <td className="p-2 border text-center">
-                <button
-                  onClick={() => handleDelete(item.planID)}
+               
+                 <button
+                  onClick={() => {
+                    console.log("Deleting plan with ID:", item.planID);
+                    handleDelete(item.planID);
+                  }}
                   className="text-red-500 hover:underline text-xs"
                 >
                   <Trash2 className="trash-icon" />
