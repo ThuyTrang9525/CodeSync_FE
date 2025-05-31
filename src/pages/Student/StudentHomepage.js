@@ -5,7 +5,6 @@ import Navbar from '../../components/Student/StudentNavBar';
 import StudentHomeContent from '../../components/Student/StudentHomeContent';
 import Calendar from '../../components/Student/StudentCalendarView';
 
-
 import SupportRequestFormBody from '../../components/Student/SupportRequestFormBody';
 
 import '../../assets/css/StudentHomepage.css';
