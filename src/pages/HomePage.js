@@ -173,7 +173,7 @@ export default function LandingPage() {
                     <div className="avatar-inner"></div>
                   </div>
                   <div>
-                    <p className="mb-0 fw-bold">Mr. Young</p>
+                    <p className="mb-0 fw-bold">Mr. Vinh</p>
                     <small className="text-muted">Teacher</small>
                   </div>
                 </div>
