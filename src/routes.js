@@ -10,7 +10,7 @@ import StudentGoal from './pages/Student/StudentGoal';
 import StudentManagementStudy from './pages/Student/StudentManagementStudy';
 import ClassesGrid from './pages/Teacher/TeacherHomepage';
 import NotificationsTable from './pages/Teacher/TeacherNotification';
-import StudentCalendarView from './pages/Student/StudentCalendarView';
+
 import StudentTable from './pages/Teacher/TeacherListStudent';
 import Homepage from "./pages/Student/StudentHomepage";
 import Profile from "./pages/Student/StudentProfile";
@@ -19,6 +19,7 @@ import LandingPage from "./pages/HomePage";
 import NotificationsTableStudent from "./pages/Student/StudentNotification"; // Thêm dòng này
 import NotFound from "./pages/404NotFound";
 import StudentDetailView from './pages/Teacher/TeacherTrackStudent';
+import StudentTimeTable from "./pages/Student/StudentTimeTable";
 const routes = [
     {
         path: "/Login",
@@ -107,7 +108,7 @@ const routes = [
     },
     {
         path: "student-timetable",
-        element: <StudentCalendarView />,
+        element: <StudentTimeTable />,
         name: "student-timetable",
     },
     {

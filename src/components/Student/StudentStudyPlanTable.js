@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import { MessageSquare } from "lucide-react"
-
+import { Check, Plus,Trash2 } from "lucide-react";
 import CommentsSection from "./StudentCommentsSection"
 
 import {
@@ -186,7 +186,7 @@ const StudyPlanTable = ({ semester, week }) => {
             <th className="border p-2">Date</th>
             <th className="border p-2">Skill</th>
             <th className="border p-2">Lesson</th>
-            <th className="border p-2">Self-assessment</th>
+            <th className="border p-2">Self-assessment(1-3)</th>
             <th className="border p-2">Difficulties</th>
             <th className="border p-2">Plan</th>
             <th className="border p-2">Solved?</th>
@@ -211,22 +211,26 @@ const StudyPlanTable = ({ semester, week }) => {
                 </td>
               ))}
               <td className="border text-center">
-                <button
-                  ref={(el) => (commentButtonRefs.current[item.planID] = el)}
-                  onClick={() => toggleComments(item.planID)}
-                  className="flex items-center justify-center gap-1 text-blue-600 hover:text-blue-800"
-                  title="Toggle comments"
-                >
-                  <MessageSquare size={18} />
-                  <span className="text-xs"></span>
-                </button>
+                  <button
+                    ref={(el) => (commentButtonRefs.current[item.planID] = el)}
+                    onClick={() => toggleComments(item.planID)}
+                    className="comment-button"
+                    title="Toggle comments"
+                  >
+                    <MessageSquare size={18} />
+                    <span></span>
+                  </button>
               </td>
               <td className="p-2 border text-center">
-                <button
-                  onClick={() => handleDelete(item.planID)}
+               
+                 <button
+                  onClick={() => {
+                    console.log("Deleting plan with ID:", item.planID);
+                    handleDelete(item.planID);
+                  }}
                   className="text-red-500 hover:underline text-xs"
                 >
-                  Delete
+                  <Trash2 className="trash-icon" />
                 </button>
               </td>
             </tr>
@@ -311,7 +315,10 @@ const StudyPlanTable = ({ semester, week }) => {
                 onClick={handleAddEntry}
                 className="text-green-600 hover:underline text-xs"
               >
-                Add
+                     <Plus
+  className="inline-block w-4 h-4 mr-1"
+  style={{ stroke: "green" }}  // hoặc fill: "green"
+ />
               </button>
             </td>
           </tr>

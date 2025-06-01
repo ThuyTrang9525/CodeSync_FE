@@ -1,21 +1,21 @@
 import { useState, useEffect } from "react";
-import { Check, Plus } from "lucide-react";
-import { fetchGoals, createGoal, updateGoalStatus, deleteGoal } from "../../service/api";
-
+import { Check, Plus,Trash2 } from "lucide-react";
+import { fetchGoals, createGoal, updateGoalStatus, deleteGoal ,editGoal} from "../../service/api";
+import "../../assets/css/StudentGoal.css"
 export default function GoalsTable({ token, semester, week }) {
-  const [goals, setGoals] = useState([]);
+  const [goals, setGoals] = useState([])
   const [loading, setLoading] = useState(false);
   const [newGoalDescription, setNewGoalDescription] = useState("");
   const [newGoalSubject, setNewGoalSubject] = useState("");
   const [newGoalDeadline, setNewGoalDeadline] = useState("");
   const [newGoalCompleted, setNewGoalCompleted] = useState(false);
+const [editingGoalId, setEditingGoalId] = useState(null);
+const [currentCompleted, setCurrentCompleted] = useState(false); // Trạng thái hoàn thành hiện tại
 const handleAddGoal = async (newGoal) => {
   try {
     const token = localStorage.getItem("token");
 
-    // Bạn cần nhập thêm 'title' và 'deadline' khi tạo mục tiêu
-    // Giả sử tạm thời title giống description, deadline là ngày hiện tại hoặc user nhập
-    const goalData = {
+   const goalData = {
       title: newGoal.description,      // hoặc bạn có thể thêm input riêng để nhập title
       description: newGoal.description,
       semester,
@@ -37,10 +37,30 @@ const handleAddGoal = async (newGoal) => {
   }
 };
   // Các hàm handleAddGoal, toggleCompleted, handleDeleteGoal giữ nguyên hoặc sửa nếu cần
-const toggleCompleted = (goalId) => {
-  // TODO: Gọi API để cập nhật trạng thái hoàn thành của goal
-  console.log("Toggled goal:", goalId);
+const toggleCompleted = async (goalId) => {
+  try {
+    const token = localStorage.getItem("token");
+    const updatedStatus = !currentCompleted;
+
+    await updateGoalStatus(goalId, updatedStatus, token);
+
+    loadGoals(); // Reload lại sau khi cập nhật thành công
+  } catch (error) {
+    console.error("Failed to toggle goal status:", error.response?.data || error.message);
+  }
 };
+  const loadGoals = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetchGoals(token, semester, week);
+      setGoals(res.data.data);
+    } catch (error) {
+      console.error("Failed to fetch goals:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 useEffect(() => {
 
   const loadGoals = async () => {
@@ -58,11 +78,54 @@ useEffect(() => {
 
   loadGoals();
 }, [token, semester, week]);
-
-const handleDeleteGoal = (goalId) => {
-  // TODO: Gọi API để xóa goal
-  console.log("Deleted goal:", goalId);
+const handleDeleteGoal = async (goalId) => {
+  try {
+    const token = localStorage.getItem("token");
+    await deleteGoal(goalId, token);
+    loadGoals();
+  } catch (error) {
+    if (error.response) {
+      console.error("Failed to delete goal:", {
+        status: error.response.status,
+        data: error.response.data,
+      });
+    } else {
+      console.error("Failed to delete goal:", error.message);
+    }
+  }
 };
+
+
+  const startEditing = (goal) => {
+    setEditingGoalId(goal.goalID);
+    setNewGoalDescription(goal.description);
+    setNewGoalDeadline(goal.deadline);
+    setNewGoalSubject(goal.subject || "");
+  };
+
+  const handleUpdateGoal = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const updatedGoal = {
+        goalID: editingGoalId,
+        title: newGoalDescription,
+        description: newGoalDescription,
+        deadline: newGoalDeadline,
+        subject: newGoalSubject || null,
+      };
+
+      await editGoal(updatedGoal, token);
+      setEditingGoalId(null);
+      setNewGoalDescription("");
+      setNewGoalDeadline("");
+      setNewGoalSubject("");
+      loadGoals();
+    } catch (error) {
+      console.error("Failed to update goal:", error.response?.data || error.message);
+    }
+  };
+
 
 
   return (
@@ -97,12 +160,9 @@ const handleDeleteGoal = (goalId) => {
                   )}
                 </td>
                 <td className="p-2 text-center">
-                  <button
-                    onClick={() => handleDeleteGoal(goal.id)}
-                    className="text-red-600 hover:underline"
-                  >
-                    Delete
-                  </button>
+                   <button onClick={() => handleDeleteGoal(goal.goalID)} className="delete-button" title="Delete goal">
+                      <Trash2 className="trash-icon" />
+                    </button>
                 </td>
               </tr>
             ))}
@@ -150,9 +210,12 @@ const handleDeleteGoal = (goalId) => {
         deadline: newGoalDeadline,
         completed: newGoalCompleted,
       })}
-      className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+      className="bg-green-600 text-white px-3  rounded hover:bg-green-700"
     >
-      <Plus className="inline-block w-4 h-4 mr-1" /> Add
+      <Plus
+  className="inline-block w-4 h-4 mr-1"
+  style={{ stroke: "green" }}  // hoặc fill: "green"
+ />
     </button>
   </td>
 </tr>

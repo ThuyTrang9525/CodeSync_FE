@@ -290,6 +290,14 @@ export const createClass = (data) =>
     },
   });
 
+
+export const getClassDetails = (classID) =>
+  fetch(`${API_BASE_URL}/admin/classmate/${classID}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
 export const fetchStudents = () =>
   axios.get(`${API_BASE_URL}/admin/reports`);
 
@@ -409,3 +417,48 @@ export const updateUserProfile = async (userId, profileData) => {
   });
   return res.data;
 };
+export const fetchUnassignedStudents = async () => {
+  try {
+    const res = await fetch(`${API_BASE_URL}/admin/students/unassigned`);
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const data = await res.json();
+    return Array.isArray(data.unassigned_students) ? data.unassigned_students : [];
+  } catch (error) {
+    console.error("Failed to fetch unassigned students:", error);
+    return [];
+  }
+};
+
+export const assignStudents = async (classID, studentIDs) => {
+  if (!classID || !studentIDs || studentIDs.length === 0) {
+    throw new Error("Class ID or student IDs missing");
+  }
+
+  const errors = [];
+
+  for (const studentID of studentIDs) {
+    const response = await fetch(`${API_BASE_URL}/admin/classes/${classID}/assign-student`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userID: studentID }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      errors.push({ studentID, message: errorData.message });
+    }
+  }
+
+  if (errors.length > 0) {
+    throw errors;
+  }
+
+  return "Students assigned successfully!";
+};
+

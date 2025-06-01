@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import dayjs from 'dayjs';
-import Header from "../../components/header"
-import Footer from "../../components/footer"
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -152,8 +150,6 @@ const handleDelete = async () => {
   };
 
   return (
-    <div className='container-fluid'>
-       <Header />
     <div className="calendar-wrapper container" style={{ position: 'relative', minHeight: '700px', display: 'flex' }}>
       {/* Sidebar mini calendar */}
       <div className="calendar-sidebar" style={{ width: 300, marginRight: 24 }}>
@@ -294,8 +290,6 @@ const handleDelete = async () => {
         </Box>
       </Modal>
     </div>
-     <Footer />
-  </div>
   );
 };
 
