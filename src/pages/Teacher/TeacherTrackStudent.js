@@ -419,7 +419,18 @@ export default function StudentDetailView() {
       )}
     </div>
         ) : (
-          <p>No weekly goals found for selected week.</p>
+            <table className="min-w-full border border-gray-300 text-sm">
+            <thead>
+              <tr className="bg-gray-100 text-xs text-left">
+                <th className="p-2 border">Week</th>
+                <th className="p-2 border">Subject</th>
+                <th className="p-2 border">Title</th>
+                <th className="p-2 border">Description</th>
+                <th className="p-2 border">Deadline</th>
+                <th className="p-2 border">Status</th>
+              </tr>
+            </thead>
+            </table>
         )}
       </div>
     );
@@ -511,7 +522,32 @@ export default function StudentDetailView() {
       )}
     </div>
         ) : (
-          <p>No self-study plans found for selected week.</p>
+           <table className="w-full border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="p-2 border">Date</th>
+              <th className="border border-gray-300 p-2">Skill/ Module</th>
+              <th className="border border-gray-300 p-2">My Lesson</th>
+              <th className="border border-gray-300 p-2">Self - assessment (1-3)</th>
+              <th className="border border-gray-300 p-2">My difficult</th>
+              <th className="border border-gray-300 p-2">My plan</th>
+              <th className="border border-gray-300 p-2">Problem solved</th>
+              <th className="border border-gray-300 p-2">Comment</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr className="hover:bg-gray-50">
+                <td className="p-2 border text-center"></td>
+                <td className="p-2 border text-center"></td>
+                <td className="p-2 border text-center"></td>
+                <td className="p-2 border text-center"></td>
+                <td className="p-2 border text-center"></td>
+                <td className="p-2 border text-center"></td>
+                <td className="p-2 border text-center"></td>
+                <td className="p-2 border text-center"></td>
+              </tr>
+          </tbody>
+        </table>
         )}
       </div>
       );
@@ -603,7 +639,39 @@ export default function StudentDetailView() {
         )}
       </div>
       ) : (
-        <p>No self-study plans found for selected week.</p>
+         <table className="min-w-full border border-gray-300 text-sm">
+              <thead>
+                <tr className="bg-gray-100 text-xs text-left">
+                  <th className="p-2 border">Date</th>
+                  <th className="p-2 border">Skill</th>
+                  <th className="p-2 border">Lesson Summary</th>
+                  <th className="p-2 border">Concentration</th>
+                  <th className="p-2 border">Resources</th>
+                  <th className="p-2 border">Activities</th>
+                  <th className="p-2 border">Evaluation</th>
+                  <th className="p-2 border">Notes</th>
+                  <th className="p-2 border">Time Allocation</th>
+                  <th className="p-2 border">Comment</th>
+                </tr>
+              </thead>
+              <tbody>
+                {InClass.map((plan, idx) => (
+                  <tr key={idx} className="border-t hover:bg-gray-50">
+                    <td className="p-2 border"></td>
+                    <td className="p-2 border"></td>
+                    <td className="p-2 border"></td>
+                    <td className="p-2 border"></td>
+                    <td className="p-2 border"></td>
+                    <td className="p-2 border"></td>
+                    <td className="p-2 border"></td>
+                    <td className="p-2 border"></td>
+                    <td className="p-2 border"></td>
+                    <td className="p-2 border text-center">
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
       )}
     </div>
     );
