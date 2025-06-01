@@ -1,68 +1,69 @@
 import Logo from "../assets/image/Logo.jpg";
-import '../assets/css/Global.css';
+import "../assets/css/Global.css";
 
 export default function Footer() {
   return (
-    <footer className="bg-light text-dark pt-5 pb-4 border-top shadow-sm">
-      <div className="container">
-        <div className="row gy-4 align-items-start">
-
-          {/* Logo và mô tả */}
-          <div className="col-md-4 text-center text-md-start">
-            <img
-              src={Logo}
-              alt="TrackSmart Logo"
-              className="mb-3"
-              style={{ width: "120px", borderRadius: "10px" }}
-            />
-            <p className="text-muted small">
-              Simplify your academic journey with <strong>TrackSmart</strong>. Stay organized, meet deadlines, and achieve your goals effortlessly.
-            </p>
+    <footer className="footer">
+      <div className="footer-top">
+        {/* Logo + Social */}
+        <div className="footer-brand">
+          <img src={Logo} alt="Logo" className="footer-logo" />
+          <p className="footer-slogan">Worth doing, worth TrackSmart.</p>
+          <div className="footer-socials">
+            <a href="#"><i className="bi bi-facebook"></i></a>
+            <a href="#"><i className="bi bi-instagram"></i></a>
+            <a href="#"><i className="bi bi-pinterest"></i></a>
+            <a href="#"><i className="bi bi-youtube"></i></a>
           </div>
+        </div>
 
-          {/* Liên kết nhanh */}
-          <div className="col-md-4 text-center text-md-start">
-            <h6 className="mb-3 fw-semibold">Quick Links</h6>
-            <ul className="list-unstyled">
-              <li className="mb-2">
-                <a href="#" className="text-decoration-none text-muted small hover-text-dark">About Us</a>
-              </li>
-              <li className="mb-2">
-                <a href="#" className="text-decoration-none text-muted small hover-text-dark">Features</a>
-              </li>
-              <li className="mb-2">
-                <a href="#" className="text-decoration-none text-muted small hover-text-dark">Pricing</a>
-              </li>
-              <li>
-                <a href="#" className="text-decoration-none text-muted small hover-text-dark">Contact</a>
-              </li>
+        {/* Navigation columns */}
+        <div className="footer-links">
+          <div>
+            <h6>Home</h6>
+            <ul>
+              <li><a href="#">Colour</a></li>
+              <li><a href="#">Products</a></li>
+              <li><a href="#">Inspiration</a></li>
+              <li><a href="#">Support</a></li>
+              <li><a href="#">Professional</a></li>
             </ul>
           </div>
-
-          {/* Mạng xã hội */}
-          <div className="col-md-4 text-center text-md-end">
-            <h6 className="mb-3 fw-semibold">Follow Us</h6>
-            <div className="d-flex justify-content-center justify-content-md-end gap-3">
-              {["facebook", "twitter", "instagram", "linkedin"].map((platform) => (
-                <a
-                  key={platform}
-                  href="#"
-                  className="d-inline-flex align-items-center justify-content-center rounded-circle bg-white shadow-sm"
-                  style={{ width: "36px", height: "36px" }}
-                >
-                  <i className={`bi bi-${platform} text-dark`}></i>
-                </a>
-              ))}
-            </div>
+          <div>
+            <h6>Services</h6>
+            <ul>
+              <li><a href="#">Find a Painter</a></li>
+              <li><a href="#">Find a Store</a></li>
+              <li><a href="#">TrackSmart Designers</a></li>
+              <li><a href="#">Help & Advice</a></li>
+            </ul>
+          </div>
+          <div>
+            <h6>About TrackSmart</h6>
+            <ul>
+              <li><a href="#">Contact Us</a></li>
+              <li><a href="#">Manage My Account</a></li>
+              <li><a href="#">News & Media</a></li>
+              <li><a href="#">Careers</a></li>
+              <li><a href="#">Accuracy</a></li>
+            </ul>
           </div>
         </div>
+      </div>
 
-        <hr className="my-4" />
+      <hr className="footer-divider" />
 
-        {/* Bản quyền */}
-        <div className="text-center small text-muted">
-          © {new Date().getFullYear()} <strong>TrackSmart</strong>. All rights reserved.
+      <div className="footer-bottom">
+        <div className="footer-bottom-links">
+          <a href="#">Shipping & Returns</a>
+          <a href="#">Careers</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Corporate Info</a>
+          <a href="#">Recommended Sites</a>
+          <a href="#">News & Media</a>
+          <a href="#">Site Terms</a>
         </div>
+        <p className="footer-copy">© {new Date().getFullYear()} TrackSmart</p>
       </div>
     </footer>
   );
