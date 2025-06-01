@@ -1,7 +1,6 @@
 import axios from "axios";
 
 const API_BASE_URL = "https://codesyncbe-production.up.railway.app/api"
-// const API_BASE_URL = "http://localhost:8000/api"
 const SELF_PLAN_URL = `${API_BASE_URL}/student/self-study-plans`
 const STUDY_PLAN_URL = `${API_BASE_URL}/student/study-plans`
 
