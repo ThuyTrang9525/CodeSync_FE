@@ -26,7 +26,7 @@
   font-size: 24px;
   font-weight: bold;
   color: #2d3748;
-  text-align: center;
+  /* text-align: center; */
 }
 
 .nav-item {
@@ -36,7 +36,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
+  /* text-align: center; */
   width: 200px;
   height: 90px;
   border-radius: 8px;
@@ -139,4 +139,266 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+/* Toàn trang */
+.student-homepage {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to bottom, #ffffff, #dbeafe); /* gradient nhẹ */
+  color: #1e3a8a; /* màu chữ chủ đạo xanh */
+}
+
+/* Các section chung */
+.section,
+section {
+  margin-bottom: 3rem;
+}
+
+/* Tiêu đề section */
+h2 {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* Animation đơn giản */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.6s ease forwards;
+}
+
+/* Slide in animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.7s ease forwards;
+}
+
+/* Gallery grid: ảnh nằm ngang, responsive */
+#gallery .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Mỗi block ảnh */
+#gallery .grid > div {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 10px 15px -3px rgb(59 130 246 / 0.3),
+    0 4px 6px -4px rgb(59 130 246 / 0.2);
+  transition: transform 0.3s ease;
+}
+
+#gallery .grid > div:hover {
+  transform: scale(1.05);
+}
+
+/* Ảnh trong gallery */
+#gallery img {
+  width: 100%;
+  height: 15rem;
+  object-fit: cover;
+  display: block;
+  border-radius: 1rem;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-in-out forwards;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.8s ease-in-out forwards;
+}
+
+/* Section About Us & Contact */
+#about p,
+#contact p {
+  margin: 0 auto;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: #374151;
+}
+
+/* Nút Contact Us */
+#contact button {
+  background-color: #7c3aed;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 2rem;
+  border-radius: 9999px; /* full rounded */
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 15px rgba(124, 58, 237, 0.3);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  font-size: 1.125rem;
+  user-select: none;
+}
+
+#contact button:hover {
+  background-color: #6b21a8;
+  box-shadow: 0 12px 20px rgba(107, 33, 168, 0.5);
+}
+
+/* Responsive text size */
+@media (max-width: 768px) {
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  #about p,
+  #contact p {
+    font-size: 1rem;
+  }
+}
+
+/* About Section */
+#about {
+  background-color: #f8fafc;
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+}
+
+
+#about h2 {
+  font-size: 2rem;
+  color: #1d4ed8;
+  margin-bottom: 1rem;
+}
+
+#about p {
+  color: #334155;
+  line-height: 1.6;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+#about strong {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* Contact box */
+#about .contact-box {
+  background-color: #f0f9ff;
+  padding: 1.75rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03);
+}
+#about .contact-box p {
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  color: #374151;
+  line-height: 1.75;
+}
+
+#about .contact-box h3 {
+  color: #075985;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+#about .contact-box a {
+  color: #2563eb;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+#about .contact-box a:hover {
+  color: #1e40af;
+}
+
+#about ul {
+  margin-top: 0.5rem;
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
+
+@media (max-width: 768px) {
+  #about {
+    padding: 1rem;
+  }
+  #about h2 {
+    font-size: 1.5rem;
+  }
+}
+/* Description box in About */
+#about .about-description {
+  background: linear-gradient(to bottom right, #f1f5f9, #ffffff);
+  padding: 1.75rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03);
+}
+
+
+#about .about-description:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+}
+
+#about .about-description p {
+  font-size: 1.1rem;
+  color: #374151;
+  line-height: 1.75;
+  margin-bottom: 0.85rem;
+}
+
+#about .about-description strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+@media (max-width: 768px) {
+  #about {
+    padding: 1.25rem;
+  }
+  #about h2 {
+    font-size: 1.5rem;
+    /* text-align: center; */
+  }
+  #about .about-description,
+  #about .contact-box {
+    padding: 1.25rem;
+  }
 }
