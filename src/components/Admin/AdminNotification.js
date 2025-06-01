@@ -38,7 +38,8 @@ const styles = {
   },
   read: {
     textDecoration: 'line-through',
-    color: 'white'
+    color: 'white',
+    // display:'none',
   },
   teacher: {
     backgroundColor: '#009688',
