@@ -296,27 +296,51 @@ export default function StudentDetailView() {
       </div>
     );
   };
-  const renderGoals = () => (
-    <div className="card">
-      <div className="card-header">
-        <h5 className="mb-0">Semester Goals</h5>
-      </div>
+  const renderGoals = () => {
+    const goals = getFilteredGoals();
 
-      <div className="card-body p-0">
-        <div className="p-4">
-          {getFilteredGoals().length > 0 ? (
-            getFilteredGoals().map((goal) => <GoalItem key={goal.goalID} goal={goal} />)
-          ) : (
-            <div className="text-center py-4 text-muted">
-              <p>No goals found in this category.</p>
-            </div>
-          )}
+    return (
+      <div className="card shadow border-0 rounded-3">
+        <div className="card-header text-white d-flex justify-content-between align-items-center">
+          <div className="d-flex align-items-center">
+            <i className="bi bi-flag-fill me-2"></i>
+            <h5 className="mb-0 text-secondary ">Semester Goals</h5>
+          </div>
+          <h4 className="badge bg-light text-secondary">
+            {goals.length} {goals.length === 1 ? "goal" : "goals"}
+          </h4>
+        </div>
+
+        <div className="card-body p-0" >
+          <div className="p-3">
+            {goals.length > 0 ? (
+              <div className="row g-3">
+                {goals.map((goal) => (
+                  <div key={goal.goalID} className="col-md-6">
+                    <div className="border rounded p-3 d-flex align-items-start h-100">
+                      <i className="bi bi-bullseye me-3 text-primary fs-4"></i>
+                      <div className="flex-grow-1">
+                        <GoalItem goal={goal} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-4 text-muted fst-italic">
+                <p>No goals found in this category.</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="card-footer bg-light">
+          <ChatWidget />
         </div>
       </div>
-      <ChatWidget />
-    </div>
-    
-  )
+    );
+  };
+
   const renderWeekGoals = () => {
     const weeklyGoals = getWeeklyGoals();
     const handleSetDeadline = async (goalID, deadline, classID, userID) => {
@@ -616,23 +640,34 @@ export default function StudentDetailView() {
     }
   }
 
-  return (
-    <div className="card mt-3 d-flex justify-content-center">
-      <div className="">
-        <ul className="nav nav-tabs card-header">
-          {["← Back","profile", "goals", "learning_journal"].map((tab) => (
-            <li className="nav-item" key={tab}>
-              <button className={`nav-link ${activeTab === tab ? "active" : ""}`} onClick={() => setActiveTab(tab)}>
-                {tab
-                  .split("_")
-                  .map((w) => w[0].toUpperCase() + w.slice(1))
-                  .join(" ")}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="card-body">{renderContent()}</div>
+ return (
+  <div className="card mt-4 shadow border-0 rounded-3">
+    {/* Tabs Header */}
+    <div className="card-header bg-light border-bottom-0 p-0">
+      <ul className="nav nav-tabs nav-fill">
+        {["← Back", "profile", "goals", "learning_journal"].map((tab) => (
+          <li className="nav-item" key={tab}>
+            <button
+              className={`nav-link text-capitalize ${
+                activeTab === tab ? "active fw-bold" : ""
+              }`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab === "← Back"
+                ? tab
+                : tab
+                    .split("_")
+                    .map((w) => w[0].toUpperCase() + w.slice(1))
+                    .join(" ")}
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
-  )
+
+    {/* Tab Content */}
+    <div className="card-body">{renderContent()}</div>
+  </div>
+);
+
 }

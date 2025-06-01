@@ -109,7 +109,7 @@ export default function StudentTable() {
           <div className="d-flex gap-2">
             <div className="dropdown">
               <button
-                className="btn btn-outline-secondary dropdown-toggle shadow-sm"
+                className="btn btn-outline-primary dropdown-toggle shadow-sm"
                 onClick={() => setShowWeekDropdown(!showWeekDropdown)}
               >
                 {selectedWeek}
