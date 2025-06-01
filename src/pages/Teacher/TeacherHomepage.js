@@ -10,12 +10,13 @@ import { TeacherClasses } from "../../service/api"
 function ClassesGrid() {
   const navigate = useNavigate()
   const [classes, setClasses] = useState([])
-
+  const [totalStudents, setTotalStudents] = useState(0);
  
   useEffect(() => {
     const loadClasses = async () => {
       const result = await TeacherClasses();
-      setClasses(result);
+      setClasses(result.classes);
+      setTotalStudents(result.totalStudents);
     };
 
     loadClasses();
@@ -34,68 +35,102 @@ function ClassesGrid() {
     }
   }, [])
 
-  return (
-    <div className="d-flex flex-column min-vh-100 bg-white">
+ return (
+  <div className="d-flex min-vh-100 bg-body-tertiary">
+    {/* Main Content */}
+    <main className="flex-grow-1 p-4">
       <Header />
       <NavBar />
-      <div className="p-3 container my-3">
-        <div className="w-100">
-          {/* Banner */}
-          <div className="text-white p-4 rounded mb-4" style={{ backgroundColor: "#009688" }}>
-            <h2 className="fs-3 fw-bold mb-2">Keep Students at the Heart of Teaching</h2>
-            <p className="mb-4">
-              See progress unfold in real time, get tailored assignment suggestions, and unlock powerful insights—all in one place.
-            </p>
-            <div className="d-flex justify-content-end">
-              <button className="btn btn-light text-teal">Create a class</button>
-            </div>
-          </div>
 
-          <div className="row g-3">
-            {classes.length === 0 ? (
-              <div className="text-center w-100">
-                <p>No classes found or loading...</p>
-              </div>
-            ) : (
-              classes.map((cls) => (
-                <div className="col-6" key={cls.classID}>
-                  <div
-                    className="text-white p-3 rounded h-100"
-                    style={{
-                      backgroundColor: cls.color || "#009688",
-                      minHeight: "130px",
-                      cursor: "pointer"
-                    }}
-                    onClick={() => handleClassClick(cls.classID)}
-                  >
-                    <div className="d-flex justify-content-between align-items-start">
-                      <div>
-                        <h3 className="fs-6 fw-bold mb-1">{cls.className || cls.classID}</h3>
-                        <p className="mb-0">{cls.teacherName || "Teacher"}</p>
-                      </div>
-                      <div className="d-flex gap-2">
-                        <button className="btn btn-sm btn-outline-light border-0">
-                          <i className="bi bi-people-fill"></i>
-                        </button>
-                        <button className="btn btn-sm btn-outline-light border-0">
-                          <i className="bi bi-bar-chart-fill"></i>
-                        </button>
-                        <button className="btn btn-sm btn-outline-light border-0">
-                          <i className="bi bi-bookmark-fill"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
+      {/* Welcome Banner */}
+      <section className="p-4 mb-4 rounded shadow-sm" style={{  color: "black" }}>
+        <h2 className="fw-bold mb-1">Welcome back, Teacher!</h2>
+        <p className="mb-0">Here's an overview of your teaching activities.</p>
+      </section>
+
+      {/* Overview Cards */}
+      <div className="row g-3 mb-4">
+        <div className="col-md-4">
+          <div className="p-3 rounded shadow-sm d-flex justify-content-between align-items-center" style={{ backgroundColor: "#f0f9ff" }}>
+            <div>
+              <h6 className="text-muted mb-1">Classes</h6>
+              <h4 className="fw-bold mb-0">{classes.length}</h4>
+            </div>
+            <i className="bi bi-easel2-fill fs-2 text-primary"></i>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="p-3 rounded shadow-sm d-flex justify-content-between align-items-center" style={{ backgroundColor: "#f0fff4" }}>
+            <div>
+              <h6 className="text-muted mb-1">Students</h6>
+              <h4 className="fw-bold mb-0">{totalStudents}</h4>
+            </div>
+            <i className="bi bi-people-fill fs-2" style={{ color: "#009688" }}></i>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="p-3 rounded shadow-sm d-flex justify-content-between align-items-center" style={{ backgroundColor: "#fff5f0" }}>
+            <div>
+              <h6 className="text-muted mb-1">New Messages</h6>
+              <h4 className="fw-bold mb-0">5</h4>
+            </div>
+            <i className="bi bi-chat-dots-fill fs-2 text-danger"></i>
           </div>
         </div>
       </div>
 
-      <Footer />
-    </div>
-  )
+      {/* Class List Section */}
+      <section>
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h5 className="fw-bold">Your Classes</h5>
+          <button className="btn btn-success" style={{ backgroundColor: "#009688" }}><i className="bi bi-plus-lg me-1"></i>Add Class</button>
+        </div>
+
+        <div className="row g-3">
+          {classes.length === 0 ? (
+            <div className="text-center text-muted w-100">No classes found.</div>
+          ) : (
+            classes.map((cls) => (
+              <div className="col-md-6" key={cls.classID}>
+                <div
+                  className="p-3 rounded shadow-sm h-100 border"
+                  style={{
+                    backgroundColor: "#d9f0ff", // dùng màu bạn yêu cầu
+                    cursor: "pointer",
+                    transition: "box-shadow 0.2s"
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "0 0 12px rgba(0,0,0,0.1)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
+                  onClick={() => handleClassClick(cls.classID)}
+                >
+                  <div className="d-flex justify-content-between align-items-start">
+                    <div>
+                      <h6 className="fw-bold">{cls.className}</h6>
+                      <p className="text-muted mb-0">{cls.teacherName || "Teacher"}</p>
+                    </div>
+                    <div className="d-flex gap-2">
+                      <button className="btn btn-sm btn-outline-secondary">
+                        <i className="bi bi-people"></i>
+                      </button>
+                      <button className="btn btn-sm btn-outline-secondary">
+                        <i className="bi bi-graph-up-arrow"></i>
+                      </button>
+                      <button className="btn btn-sm btn-outline-secondary">
+                        <i className="bi bi-bookmark"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+    </section>
+  </main>
+  </div>
+  );
+
 }
 
 export default ClassesGrid

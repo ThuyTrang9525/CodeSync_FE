@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = "https://codesyncbe-production.up.railway.app/api"
+// const API_BASE_URL = "https://codesyncbe-production.up.railway.app/api"
+const API_BASE_URL = "http://localhost:8000/api"
 const SELF_PLAN_URL = `${API_BASE_URL}/student/self-study-plans`
 const STUDY_PLAN_URL = `${API_BASE_URL}/student/study-plans`
 
@@ -167,15 +168,24 @@ export const TeacherClasses = async () => {
 
     const data = res.data;
 
-    if (data.classes) {
-      return data.classes;
+    if (data.classes && typeof data.totalStudents === 'number') {
+      return {
+        classes: data.classes,
+        totalStudents: data.totalStudents
+      };
     } else {
-      console.error("No classes field in response", data);
-      return [];
+      console.error("Unexpected response format:", data);
+      return {
+        classes: [],
+        totalStudents: 0
+      };
     }
   } catch (err) {
     console.error("Failed to fetch classes:", err);
-    return [];
+    return {
+      classes: [],
+      totalStudents: 0
+    };
   }
 };
 
@@ -236,10 +246,10 @@ export const NotificationsByReceiver = async (receiverID) => {
     return [];
   }
 };
-export const getWeekGoalProgress = async (email, week) => {
+export const getWeekGoalProgress = async (email, week, semester) => {
   try {
     const response = await axios.get(`${API_BASE_URL}/week-goals-progress`, {
-      params: { email, week }
+      params: { email, week, semester }
     });
 
     return response.data;
