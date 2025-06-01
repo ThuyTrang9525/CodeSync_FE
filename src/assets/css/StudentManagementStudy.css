@@ -146,11 +146,7 @@ tr:hover {
   margin-right: 4px;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
+
 
 @layer base {
   :root {
