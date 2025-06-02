@@ -30,9 +30,7 @@ function LoginPage() {
       } else if (userRole === "STUDENT") {
         navigate(`/student-home`);
         console.log(token);
-      } else if (userRole === "ADMIN") {
-        navigate(`/admin-dashboard`);
-      }
+      } 
     } catch (err) {
       if (err.response) {
         setError(err.response.data.message || "Login failed. Please try again.");
@@ -100,7 +98,6 @@ function LoginPage() {
                 >
                   <option value="STUDENT">Student</option>
                   <option value="TEACHER">Teacher</option>
-                  <option value="ADMIN">Admin</option>
 
                 </select>
               </div>
